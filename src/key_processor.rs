@@ -1,5 +1,6 @@
+use argon2::{Argon2, Algorithm, Version, Params};
 use shielded::Shielded;
-use argon2::Argon2;
+use std::thread::available_parallelism;
 
 
 static SALT: &[u8; 14] = b"cru5tw0rd5a1ty";
@@ -14,8 +15,19 @@ pub fn process_input_key(password: String) -> SecureStorage {
 fn derive_key(password: String) -> Vec<u8> {
     let mut key = [0u8; 64];
 
-    Argon2::default().hash_password_into(
-        password.as_ref(),
+    let config = Argon2::new(
+        Algorithm::Argon2id,
+        Version::default(),
+        Params::new(
+            Params::DEFAULT_M_COST,
+            4,
+            available_parallelism().unwrap().get() as u32 / 2,
+            Some(Params::DEFAULT_OUTPUT_LEN)
+        ).unwrap()
+    );
+
+    config.hash_password_into(
+        password.as_bytes(),
         SALT,
         &mut key,
     ).unwrap();
