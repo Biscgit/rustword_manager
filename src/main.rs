@@ -1,6 +1,7 @@
-mod password_clipboard;
 mod key_processor;
-mod sqlite;
+
+// mod sqlite;
+// mod password_clipboard;
 
 fn main() {
     // ToDo!
