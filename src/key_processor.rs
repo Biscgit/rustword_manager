@@ -15,6 +15,7 @@ pub fn process_input_key(password: String) -> SecureStorage {
 fn derive_key(password: String) -> Vec<u8> {
     let mut key = [0u8; 64];
 
+    // uses half of the available logical cpu cores
     let config = Argon2::new(
         Algorithm::Argon2id,
         Version::default(),
@@ -22,8 +23,8 @@ fn derive_key(password: String) -> Vec<u8> {
             Params::DEFAULT_M_COST,
             4,
             available_parallelism().unwrap().get() as u32 / 2,
-            Some(Params::DEFAULT_OUTPUT_LEN)
-        ).unwrap()
+            Some(Params::DEFAULT_OUTPUT_LEN),
+        ).unwrap(),
     );
 
     config.hash_password_into(
