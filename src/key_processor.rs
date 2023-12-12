@@ -36,7 +36,7 @@ fn derive_key(password: String) -> Vec<u8> {
     key.to_vec()
 }
 
-struct SecureStorage {
+pub struct SecureStorage {
     memory: Shielded,
 }
 
@@ -49,7 +49,7 @@ impl SecureStorage {
     }
 
     // Shielded re-encrypts key after being unshielded
-    fn get_key(&mut self) -> Vec<u8> {
+    pub fn get_key(&mut self) -> Vec<u8> {
         let unshielded = self.memory.unshield();
         unshielded.as_ref().to_vec()
     }
