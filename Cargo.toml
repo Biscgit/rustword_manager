@@ -6,4 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+argon2 = { version = "0.5.2", features = ["alloc"] }
+cli-clipboard = "0.4.0"
+lazy_static = "1.4.0"
+rusqlite = "0.30.0"
 shielded = "0.1.2"
