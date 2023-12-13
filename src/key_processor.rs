@@ -17,7 +17,7 @@ fn derive_key(password: String) -> Vec<u8> {
 
     // uses half of the available logical cpu cores
     let config = Argon2::new(
-        Algorithm::Argon2id,
+        Algorithm::Argon2d,
         Version::default(),
         Params::new(
             Params::DEFAULT_M_COST,
