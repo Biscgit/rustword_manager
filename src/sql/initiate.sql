@@ -20,7 +20,7 @@ VALUES ('simple', CAST('{
 }' AS BLOB));
 
 -- ssh key pair
-CREATE TABLE IF NOT EXISTS tp_ssh_pair
+CREATE TABLE IF NOT EXISTS tp_ssh_keypair
 (
     description TEXT,
     clear_1     TEXT,
