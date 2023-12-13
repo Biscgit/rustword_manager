@@ -23,7 +23,7 @@ fn derive_key(password: String) -> Vec<u8> {
             Params::DEFAULT_M_COST,
             4,
             available_parallelism().unwrap().get() as u32 / 2,
-            Some(Params::DEFAULT_OUTPUT_LEN),
+            Some(key.len()),
         ).unwrap(),
     );
 
