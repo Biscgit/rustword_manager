@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS tp_simple
     hidden_1    Text
 );
 INSERT INTO templates (name, structure)
-VALUES ('simple', CAST('{
+VALUES ('Simple', CAST('{
   "clear_1": "username",
   "hidden_1": "password"
 }' AS BLOB));
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS tp_ssh_keypair
     hidden_1    Text
 );
 INSERT INTO templates (name, structure)
-VALUES ('simple', CAST('{
+VALUES ('SSH-Keypair', CAST('{
   "clear_1": "name",
   "clear_2": "public_key",
   "hidden_1": "private_key"
