@@ -1,3 +1,4 @@
+use std::num::NonZeroUsize;
 use argon2::{Argon2, Algorithm, Version, Params};
 use shielded::Shielded;
 use std::thread::available_parallelism;
