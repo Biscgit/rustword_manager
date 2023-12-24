@@ -17,12 +17,13 @@ fn derive_key(password: String) -> Vec<u8> {
     let mut key = [0u8; 64];
 
     // uses half of the available logical cpu cores
+    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
     let config = Argon2::new(
         Algorithm::Argon2d,
         Version::default(),
         Params::new(
-            Params::DEFAULT_M_COST,
-            4,
+            1024 * 256,
+            10,
             available_parallelism()
                 .unwrap_or(NonZeroUsize::new(1).unwrap())
                 .get()
