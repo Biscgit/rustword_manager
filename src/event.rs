@@ -3,7 +3,7 @@ use std::{
     ops::ControlFlow,
     sync::mpsc,
     thread,
-    time::{Duration, Instant},
+    time::{Duration},
 };
 use crossterm::event::{self, Event, KeyCode, KeyEvent, MouseEvent};
 

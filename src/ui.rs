@@ -153,7 +153,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_stateful_widget(items, lists_layout[0], &mut app.template_names.state);
 
     // Template display
-    if let Some(index) = app.current_template {
+    if let Some(_index) = app.current_template {
         display_template(frame, app, lists_layout[1]);
     } else {
         frame.render_widget(
@@ -168,7 +168,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     }
 }
 
-fn page_template_creator(frame: &mut Frame, app: &mut App, area: Rect) {
+fn page_template_creator(frame: &mut Frame, _app: &mut App, area: Rect) {
     frame.render_widget(
         Paragraph::new("In progress..."),
         area,

@@ -12,7 +12,7 @@ impl<T> StatefulList<T> {
             items,
         };
         list.state.select(Some(0));
-        return list;
+        list
     }
 
     pub fn next(&mut self) {
