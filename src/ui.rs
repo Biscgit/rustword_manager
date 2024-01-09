@@ -1,8 +1,11 @@
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::prelude::{Color, Modifier, Style};
-use ratatui::style::Stylize;
-use ratatui::widgets::{Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs};
+use std::str::FromStr;
+use ratatui::{
+    Frame,
+    layout::{Constraint, Direction, Layout, Rect},
+    prelude::{Color, Modifier, Style},
+    style::Stylize,
+    widgets::{Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
+};
 use crate::app::App;
 
 
@@ -124,7 +127,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
 
     // entry view
     let items: Vec<ListItem> = app
-        .template_list
+        .template_names
         .items
         .iter()
         .map(|i| {
@@ -148,14 +151,21 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         )
         .highlight_symbol(" ❱ ");
 
-    frame.render_stateful_widget(items, lists_layout[0], &mut app.template_list.state);
+    frame.render_stateful_widget(items, lists_layout[0], &mut app.template_names.state);
 
-    // new entry view
+    // Template display
+    let mut displayed_text = String::from_str("Select a template to display").unwrap();
+    if let Some(index) = app.current_template {
+        displayed_text = index.to_string();
+    }
+
     frame.render_widget(
-        Block::new()
-            .borders(Borders::ALL)
-            .border_type(BorderType::Rounded)
-            .title("New Entry"),
+        Paragraph::new(displayed_text).block(
+            Block::new()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+                .title("New Entry")
+        ),
         lists_layout[1],
     );
 }
@@ -163,6 +173,6 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
 fn page_templates(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_widget(
         Paragraph::new("In progress..."),
-        area
+        area,
     );
 }

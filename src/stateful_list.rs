@@ -12,7 +12,7 @@ impl<T> StatefulList<T> {
             items,
         };
         list.state.select(Some(0));
-        return list
+        return list;
     }
 
     pub fn next(&mut self) {
@@ -41,5 +41,9 @@ impl<T> StatefulList<T> {
             None => 0,
         };
         self.state.select(Some(i));
+    }
+
+    pub fn current(&self) -> Option<usize> {
+        self.state.selected()
     }
 }

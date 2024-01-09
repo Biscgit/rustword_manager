@@ -1,12 +1,22 @@
-use crate::event::handle_events;
-use crate::stateful_list::StatefulList;
-use crate::ui::draw_ui;
-use crate::types::Terminal;
+use serde::{Deserialize, Serialize};
+
+
+use crate::{
+    event::handle_events,
+    stateful_list::StatefulList,
+    ui::draw_ui,
+    types::Terminal,
+};
 
 
 pub struct App<'a> {
     pub entries_list: StatefulList<(&'a str, usize)>,
-    pub template_list: StatefulList<(&'a str, usize)>,
+    // pub selected_entry: json
+
+    pub template_names: StatefulList<(&'a str, usize)>,
+    pub templates: Vec<Template>,
+    pub current_template: Option<usize>,
+
     pub page_index: PageManager,
 }
 
@@ -26,11 +36,41 @@ impl<'a> App<'a> {
                 ("Item8", 1),
                 ("Item9", 2),
             ]),
-            template_list: StatefulList::with_items(vec![
-                ("Template1", 1),
-                ("Template2", 1),
-                ("Template3", 1),
+            template_names: StatefulList::with_items(vec![
+                ("Simple Credential", 0),
+                ("SSH-Keypair", 1),
+                ("Note", 2),
             ]),
+            templates: vec![
+                serde_json::from_str(
+                    r#"{
+                        "deletable": false,
+                        "elements": [
+                          {"name":  "Username", "private":  false},
+                          {"name":  "Password", "private":  true}
+                        ]
+                    }"#
+                ).unwrap(),
+                serde_json::from_str(
+                    r#"{
+                        "deletable": false,
+                        "elements": [
+                          {"name":  "Website", "private":  false},
+                          {"name":  "SSH-Public", "private":  false},
+                          {"name":  "SSH-Private", "private":  true}
+                        ]
+                    }"#
+                ).unwrap(),
+                serde_json::from_str(
+                    r#"{
+                        "deletable": false,
+                        "elements": [
+                          {"name":  "Note", "private":  false}
+                        ]
+                    }"#
+                ).unwrap(),
+            ],
+            current_template: None,
             page_index: PageManager::new(),
         }
     }
@@ -42,6 +82,10 @@ impl<'a> App<'a> {
                 return Ok(());
             }
         }
+    }
+
+    pub fn select_template(&mut self) {
+        self.current_template = self.template_names.current();
     }
 }
 
@@ -64,4 +108,16 @@ impl PageManager {
         // fix for possible negative value
         self.index = (self.index as isize - 1).rem_euclid(3) as usize;
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Template {
+    deletable: bool,
+    elements: Vec<TemplateElement>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TemplateElement {
+    name: String,
+    private: bool,
 }

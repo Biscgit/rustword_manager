@@ -56,8 +56,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     match key.code {
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
-                        KeyCode::Up => app.template_list.previous(),
-                        KeyCode::Down => app.template_list.next(),
+                        KeyCode::Up => app.template_names.previous(),
+                        KeyCode::Down => app.template_names.next(),
+                        KeyCode::Enter => app.select_template(),
                         KeyCode::Char('q') => { return Ok(ControlFlow::Break(())); }
                         _ => {}
                     }
