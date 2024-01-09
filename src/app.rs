@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 use crate::{
     event::handle_events,
     stateful_list::StatefulList,
@@ -112,12 +111,12 @@ impl PageManager {
 
 #[derive(Serialize, Deserialize)]
 pub struct Template {
-    deletable: bool,
-    elements: Vec<TemplateElement>,
+    pub deletable: bool,
+    pub elements: Vec<TemplateElement>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct TemplateElement {
-    name: String,
-    private: bool,
+    pub name: String,
+    pub private: bool,
 }

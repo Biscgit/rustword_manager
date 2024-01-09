@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -40,7 +39,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     match app.page_index.index {
         0 => page_credentials(frame, app, main_layout[1]),
         1 => page_new_entry(frame, app, main_layout[1]),
-        2 => page_templates(frame, app, main_layout[1]),
+        2 => page_template_creator(frame, app, main_layout[1]),
         _ => {}
     }
 }
@@ -154,25 +153,62 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_stateful_widget(items, lists_layout[0], &mut app.template_names.state);
 
     // Template display
-    let mut displayed_text = String::from_str("Select a template to display").unwrap();
     if let Some(index) = app.current_template {
-        displayed_text = index.to_string();
+        display_template(frame, app, lists_layout[1]);
+    } else {
+        frame.render_widget(
+            Paragraph::new("Select a template to display")
+                .block(
+                    Block::default()
+                        .borders(Borders::NONE)
+                        .padding(Padding::uniform(1))
+                ),
+            lists_layout[1],
+        );
     }
-
-    frame.render_widget(
-        Paragraph::new(displayed_text).block(
-            Block::new()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .title("New Entry")
-        ),
-        lists_layout[1],
-    );
 }
 
-fn page_templates(frame: &mut Frame, app: &mut App, area: Rect) {
+fn page_template_creator(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_widget(
         Paragraph::new("In progress..."),
         area,
     );
+}
+
+fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
+    // display fields for a new entry if any exist else display nothing
+    if let Some(template) = app.templates.get(app.current_template.unwrap_or(0)) {
+        let mut fields = vec![Constraint::Length(3); template.elements.len()];
+        fields.push(Constraint::Min(0));
+        fields.push(Constraint::Length(3));
+
+        let input_layout = Layout::new(
+            Direction::Vertical,
+            fields,
+        ).split(area);
+
+        for (i, template) in template.elements.iter().enumerate() {
+            frame.render_widget(
+                Paragraph::new("Input")
+                    .block(
+                        Block::new()
+                            .borders(Borders::ALL)
+                            .border_type(BorderType::Rounded)
+                            .title(template.name.clone())
+                    ),
+                input_layout[i],
+            )
+        }
+
+        // render insert button
+        frame.render_widget(
+            Paragraph::new("Insert")
+                .block(
+                    Block::new()
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                ),
+            *input_layout.last().unwrap(),
+        )
+    }
 }

@@ -10,7 +10,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEvent, MouseEvent};
 use crate::app::App;
 
 
-/// Terminal events.
+// Terminal events.
 #[derive(Clone, Copy, Debug)]
 pub enum _Event {
     /// Terminal tick.
@@ -24,7 +24,7 @@ pub enum _Event {
 }
 
 
-/// Terminal event handler.
+// Terminal event handler.
 #[derive(Debug)]
 pub struct EventHandler {
     /// Event sender channel.
