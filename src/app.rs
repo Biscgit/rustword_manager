@@ -16,7 +16,8 @@ pub struct App<'a> {
     pub templates: Vec<Template>,
     pub current_template: Option<usize>,
 
-    pub page_index: PageManager,
+    pub page_index: IndexManager,
+    pub page_side: IndexManager
 }
 
 
@@ -70,7 +71,8 @@ impl<'a> App<'a> {
                 ).unwrap(),
             ],
             current_template: None,
-            page_index: PageManager::new(),
+            page_index: IndexManager::new(3),
+            page_side: IndexManager::new(2)
         }
     }
 
@@ -88,24 +90,26 @@ impl<'a> App<'a> {
     }
 }
 
-pub struct PageManager {
+pub struct IndexManager {
     pub index: usize,
+    pub size: usize
 }
 
-impl PageManager {
-    pub fn new() -> PageManager {
-        PageManager {
-            index: 0
+impl IndexManager {
+    pub fn new(size: usize) -> IndexManager {
+        IndexManager {
+            index: 0,
+            size
         }
     }
 
     pub fn page_up(&mut self) {
-        self.index = (self.index + 1).rem_euclid(3);
+        self.index = (self.index + 1).rem_euclid(self.size);
     }
 
     pub fn page_down(&mut self) {
         // fix for possible negative value
-        self.index = (self.index as isize - 1).rem_euclid(3) as usize;
+        self.index = (self.index as isize - 1).rem_euclid(self.size as isize) as usize;
     }
 }
 

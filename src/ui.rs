@@ -40,7 +40,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         0 => page_credentials(frame, app, main_layout[1]),
         1 => page_new_entry(frame, app, main_layout[1]),
         2 => page_template_creator(frame, app, main_layout[1]),
-        _ => {}
+        _ => unreachable!()
     }
 }
 
@@ -187,6 +187,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             fields,
         ).split(area);
 
+        // create input fields dynamically
         for (i, template) in template.elements.iter().enumerate() {
             frame.render_widget(
                 Paragraph::new("Input")
