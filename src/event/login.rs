@@ -8,6 +8,7 @@ use crate::{
     app_states::LoginState,
     ui::login::password_field,
 };
+use crate::password::validate_password_strength;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
@@ -29,11 +30,15 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             // creating new vault and first password input
             LoginState::NewVault => match key.code {
                 KeyCode::Enter => {
-                    app.vault_state.set_password(
-                        &app.text_fields.password_input.lines()[0]
-                    );
-                    app.vault_state.state = LoginState::NewVaultConfirmNoMatch;
-                    app.text_fields.password_input = password_field();
+                    let mut pw_field = &mut app.text_fields.password_input;
+
+                    if validate_password_strength(&mut pw_field).is_none() {
+                        app.vault_state.set_password(
+                            &app.text_fields.password_input.lines()[0]
+                        );
+                        app.vault_state.state = LoginState::NewVaultConfirmNoMatch;
+                        app.text_fields.password_input = password_field();
+                    }
                 }
                 _ => {
                     app.text_fields.password_input.input(key);

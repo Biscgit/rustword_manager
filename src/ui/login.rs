@@ -48,7 +48,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         LoginState::IncorrectLogin => login_with_password(frame, app, center_layout[1]),
         LoginState::NewVault |
         LoginState::NewVaultConfirmMatch |
-        LoginState::NewVaultConfirmNoMatch => new_password(frame, app, center_layout[1]),
+        LoginState::NewVaultConfirmNoMatch => register_password(frame, app, center_layout[1]),
         _ => unreachable!()
     }
 }
@@ -82,12 +82,28 @@ fn login_with_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     frame.render_widget(password_field.widget(), area);
 }
 
-fn new_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
-    let mut password_field = &mut app.text_fields.password_input;
+fn register_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+    match app.vault_state.state {
+        // new vault password create
+        LoginState::NewVault => {
+            first_password(frame, app, area)
+        }
+        LoginState::NewVaultConfirmMatch | LoginState::NewVaultConfirmNoMatch => {
+            confirm_password(frame, app, area)
+        }
+        _ => unreachable!()
+    }
+}
+
+fn first_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+    let mut pw_field = &mut app.text_fields.password_input;
+    pw_field.set_placeholder_text("Please enter your password");
+
+
     // set design depending on validation of password strength
-    if let Some(error) = validate_password_strength(&mut password_field) {
-        password_field.set_style(Style::default().fg(Color::LightRed));
-        password_field.set_block(
+    if let Some(error) = validate_password_strength(&mut pw_field) {
+        pw_field.set_style(Style::default().fg(Color::LightRed));
+        pw_field.set_block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Thick)
@@ -96,8 +112,8 @@ fn new_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
                 .title(error)
         );
     } else {
-        password_field.set_style(Style::default().fg(Color::LightGreen));
-        password_field.set_block(
+        pw_field.set_style(Style::default().fg(Color::LightGreen));
+        pw_field.set_block(
             Block::default()
                 .borders(Borders::ALL)
                 .fg(Color::LightGreen)
@@ -106,5 +122,36 @@ fn new_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
         );
     }
 
-    frame.render_widget(password_field.widget(), area);
+    frame.render_widget(pw_field.widget(), area);
+}
+
+fn confirm_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+    let mut pw_field = &mut app.text_fields.password_input;
+    pw_field.set_placeholder_text("Please confirm your password");
+
+    match app.vault_state.state {
+        LoginState::NewVaultConfirmMatch => {
+            pw_field.set_style(Style::default().fg(Color::LightGreen));
+            pw_field.set_block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .fg(Color::LightGreen)
+                    .padding(Padding::horizontal(1))
+                    .title("Press Enter to confirm")
+            );
+        }
+        LoginState::NewVaultConfirmNoMatch => {
+            pw_field.set_style(Style::default().fg(Color::LightRed));
+            pw_field.set_block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .fg(Color::LightRed)
+                    .padding(Padding::horizontal(1))
+                    .title("Password do not match!")
+            )
+        }
+        _ => unreachable!()
+    }
+
+    frame.render_widget(pw_field.widget(), area);
 }
