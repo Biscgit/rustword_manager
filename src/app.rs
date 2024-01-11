@@ -29,7 +29,7 @@ impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         App {
             vault_unlocked: false,
-            vault_setup: false,
+            vault_setup: true,
             text_fields: EditableTextFields::new(),
             entries_list: StatefulList::with_items(vec![
                 ("Item0", 1),
@@ -78,7 +78,7 @@ impl<'a> App<'a> {
                 ).unwrap(),
             ],
             current_template: None,
-            page_index: IndexManager::new(4),
+            page_index: IndexManager::new(3),
             page_side: IndexManager::new(2),
         }
     }
@@ -97,7 +97,9 @@ impl<'a> App<'a> {
     }
 
     pub fn unlock_vault(&mut self) {
-        self.vault_unlocked = true;
+        if self.text_fields.password_input.lines()[0] == "Password123#" {
+            self.vault_unlocked = true;
+        }
     }
 }
 
