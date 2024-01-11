@@ -102,7 +102,7 @@ impl<'a> App<'a> {
 
         let template: &Template = &self.templates.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
-            vec![input_field(); template.elements.len()])
+            vec![input_field(); template.elements.len() + 1])
         );
 
         for (field, temp) in self.text_fields.edit_fields
@@ -145,6 +145,10 @@ impl<'a> App<'a> {
 
     pub fn setup_vault(&mut self) {
         self.vault_state.state = LoginState::Unlocked
+    }
+
+    pub fn save_entry(&mut self) {
+        // ToDo: check for fields and clear and insert into db
     }
 }
 

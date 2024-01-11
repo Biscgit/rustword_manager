@@ -215,14 +215,24 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             );
         }
 
-        // render insert button
+        // render insert button (for simplicity the last field is also a text field)
+        let last_index = items.len() - 1;
+        let confirm_button = items.last_mut().unwrap();
+        confirm_button.set_block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+        );
+        confirm_button.set_placeholder_text("Test");
+
+        if highlight_index == last_index {
+            field_active(confirm_button)
+        } else {
+            field_inactive(confirm_button)
+        }
+
         frame.render_widget(
-            Paragraph::new("Insert")
-                .block(
-                    Block::new()
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Rounded)
-                ),
+            confirm_button.widget(),
             *input_layout.last().unwrap(),
         )
     }

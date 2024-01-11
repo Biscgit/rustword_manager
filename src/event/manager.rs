@@ -43,13 +43,27 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 _ => {}
                             }
                             true => match key.code {
-                                KeyCode::Esc => { app.unselect_template()}
+                                KeyCode::Esc => { app.unselect_template() }
 
                                 KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
-                                KeyCode::Down | KeyCode::Enter => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
+                                KeyCode::Down => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
+                                KeyCode::Enter => {
+                                    let fields = app.text_fields.edit_fields.as_ref().unwrap();
+                                    if let Some(index) = fields.current() {
+                                        if index == fields.items.len() - 1 {
+                                            app.save_entry();
+                                        } else {
+                                            app.text_fields.edit_fields.as_mut().unwrap().next();
+                                        }
+                                    }
+                                }
                                 _ => {
-                                    let index = app.text_fields.edit_fields.as_ref().unwrap().current().clone().unwrap();
-                                    app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);
+                                    let fields = app.text_fields.edit_fields.as_mut().unwrap();
+                                    if let Some(index) = fields.current() {
+                                        if index != fields.items.len() - 1 {
+                                            app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);
+                                        }
+                                    }
                                 }
                             }
                         }
