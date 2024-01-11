@@ -26,7 +26,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             KeyCode::Up => app.entries_list.previous(),
                             KeyCode::Down => app.entries_list.next(),
 
-                            _ => {}
+                            _ => { app.text_fields.search_bar.input(key); }
                         }
                     }
                     1 => {
@@ -43,7 +43,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 _ => {}
                             }
                             true => match key.code {
-                                KeyCode::Esc => { app.unselect_template() }
+                                KeyCode::Esc => { app.unselect_template(); }
 
                                 KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
                                 KeyCode::Down => { app.text_fields.edit_fields.as_mut().unwrap().next(); }

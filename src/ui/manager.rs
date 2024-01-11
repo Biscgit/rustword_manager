@@ -94,23 +94,38 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_stateful_widget(items, password_list[0], &mut app.entries_list.state);
 
     // search field
+    let search_bar = &mut app.text_fields.search_bar;
+    search_bar.set_placeholder_text("Type to search");
+    search_bar.set_block(
+        Block::new()
+            .borders(Borders::ALL)
+            .border_type(BorderType::Rounded)
+            .padding(Padding::horizontal(1))
+            .title("Search")
+    );
+
+    // set bar color
+    let mut color = Color::LightBlue;
+    if search_bar.is_empty() {
+        color = Color::White;
+    }
+
+    let block = set_border_color(search_bar, color);
+    search_bar.set_block(block);
+
     frame.render_widget(
-        Paragraph::new("Type to search").block(
-            Block::new()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .padding(Padding::horizontal(1))
-                .title("Search")
-        ),
+        search_bar.widget(),
         password_list[1],
     );
 
     // password content view
     frame.render_widget(
-        Block::new()
-            .borders(Borders::ALL)
-            .border_type(BorderType::Rounded)
-            .title("Credentials"),
+        Paragraph::new("Select an entry to display")
+            .block(
+                Block::default()
+                    .borders(Borders::NONE)
+                    .padding(Padding::uniform(1))
+            ),
         lists_layout[1],
     );
 }

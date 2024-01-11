@@ -1,4 +1,3 @@
-use std::fmt::format;
 use ratatui::layout::Alignment;
 use ratatui::prelude::Style;
 use ratatui::widgets::{Block, Borders, BorderType};
@@ -129,7 +128,7 @@ impl<'a> App<'a> {
         // (for simplicity the last field is also a text field disguised as a button)
         let confirm_button = self.text_fields.edit_fields.as_mut().unwrap().items.last_mut().unwrap();
 
-        confirm_button.insert_str("Insert!");
+        confirm_button.insert_str("Insert");
         confirm_button.set_alignment(Alignment::Center);
         confirm_button.set_cursor_style(Style::default());
         confirm_button.set_block(
@@ -167,6 +166,8 @@ impl<'a> App<'a> {
 
     pub fn save_entry(&mut self) {
         if self.all_fields_filled() {
+            // ToDo: send input to database
+
             self.reset_input_fields();
         }
     }
@@ -219,6 +220,7 @@ pub struct TemplateElement {
 
 pub struct EditableTextFields<'a> {
     pub password_input: TextArea<'a>,
+    pub search_bar: TextArea<'a>,
     pub edit_fields: Option<StatefulList<TextArea<'a>>>,
 }
 
@@ -226,6 +228,7 @@ impl<'a> EditableTextFields<'a> {
     pub fn new() -> EditableTextFields<'a> {
         EditableTextFields {
             password_input: password_field(),
+            search_bar: input_field(),
             edit_fields: None,
         }
     }
