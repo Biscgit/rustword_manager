@@ -15,7 +15,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
     if let Event::Key(key) = event::read()? {
         // check for special overall functions
         match key.code {
+            // quit application
             KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+            // toggle character visibility
             KeyCode::Tab => {
                 let mut field = &mut app.text_fields.password_input;
                 if field.mask_char().is_none() {
