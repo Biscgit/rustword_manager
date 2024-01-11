@@ -193,6 +193,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         ).split(area);
 
         // create input fields dynamically
+        let all_filled = app.all_fields_filled();
         let fields = app.text_fields.edit_fields.as_mut().unwrap();
 
         let highlight_index = fields.current().clone().unwrap();
@@ -219,13 +220,20 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         let last_index = items.len() - 1;
         let confirm_button = items.last_mut().unwrap();
 
+        let mut color = Color::DarkGray;
         if highlight_index == last_index {
-            let block = set_border_color(confirm_button, Color::White);
-            confirm_button.set_block(block);
-        } else {
-            let block = set_border_color(confirm_button, Color::DarkGray);
-            confirm_button.set_block(block);
+
+            // set button color depending if entry can be inserted
+            if all_filled {
+                color = Color::LightGreen;
+            } else {
+                color = Color::LightYellow;
+            }
         }
+
+        let block = set_border_color(confirm_button, color);
+        confirm_button.set_block(block);
+
 
         frame.render_widget(
             confirm_button.widget(),
@@ -243,10 +251,15 @@ fn set_border_color<'a>(text_field: &TextArea<'a>, color: Color) -> Block<'a> {
 
 fn field_active(text_field: &mut TextArea<'_>) {
     // sets theme to active
-    text_field.set_cursor_line_style(Style::default().add_modifier(Modifier::UNDERLINED));
     text_field.set_cursor_style(Style::default().add_modifier(Modifier::REVERSED));
 
-    let block = set_border_color(text_field, Color::White);
+    // set color to red if empty
+    let mut color = Color::White;
+    if text_field.is_empty() {
+        color = Color::LightRed;
+    }
+
+    let block = set_border_color(text_field, color);
     text_field.set_block(block);
 }
 

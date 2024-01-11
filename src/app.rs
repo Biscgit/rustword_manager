@@ -166,6 +166,15 @@ impl<'a> App<'a> {
     pub fn save_entry(&mut self) {
         // ToDo: check for fields and clear and insert into db
     }
+
+    pub fn all_fields_filled(&self) -> bool {
+        for field in self.text_fields.edit_fields.as_ref().unwrap().items.iter() {
+            if field.is_empty() {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 pub struct IndexManager {
