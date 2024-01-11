@@ -54,7 +54,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 }
 
 fn login_with_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
-    let mut password_field = &mut app.text_fields.password_input;
+    let password_field = &mut app.text_fields.password_input;
     password_field.set_placeholder_text("Please enter your password");
 
     if app.vault_state.state == LoginState::Login {
@@ -126,7 +126,7 @@ fn first_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
 }
 
 fn confirm_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
-    let mut pw_field = &mut app.text_fields.password_input;
+    let pw_field = &mut app.text_fields.password_input;
     pw_field.set_placeholder_text("Please confirm your password");
 
     match app.vault_state.state {
