@@ -215,20 +215,16 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             );
         }
 
-        // render insert button (for simplicity the last field is also a text field)
+        // render insert button
         let last_index = items.len() - 1;
         let confirm_button = items.last_mut().unwrap();
-        confirm_button.set_block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-        );
-        confirm_button.set_placeholder_text("Test");
 
         if highlight_index == last_index {
-            field_active(confirm_button)
+            let block = set_border_color(confirm_button, Color::White);
+            confirm_button.set_block(block);
         } else {
-            field_inactive(confirm_button)
+            let block = set_border_color(confirm_button, Color::DarkGray);
+            confirm_button.set_block(block);
         }
 
         frame.render_widget(

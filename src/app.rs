@@ -1,3 +1,5 @@
+use ratatui::layout::Alignment;
+use ratatui::prelude::Style;
 use ratatui::widgets::{Block, Borders, BorderType};
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
@@ -121,6 +123,20 @@ impl<'a> App<'a> {
             )
         }
 
+        // setup confirm button
+        // (for simplicity the last field is also a text field disguised as a button)
+        let confirm_button = self.text_fields.edit_fields.as_mut().unwrap().items.last_mut().unwrap();
+
+        confirm_button.insert_str("Insert!");
+        confirm_button.set_alignment(Alignment::Center);
+        confirm_button.set_cursor_style(Style::default());
+        confirm_button.set_block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+        );
+
+        // move focus to right side
         self.select_right();
     }
 
