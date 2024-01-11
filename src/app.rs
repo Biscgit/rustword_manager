@@ -1,3 +1,4 @@
+use std::fmt::format;
 use ratatui::layout::Alignment;
 use ratatui::prelude::Style;
 use ratatui::widgets::{Block, Borders, BorderType};
@@ -99,7 +100,8 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn select_template(&mut self) {
+    pub fn reset_input_fields(&mut self) {
+        // create inputs from template
         self.current_template = self.template_names.current();
 
         let template: &Template = &self.templates.get(self.current_template.unwrap()).unwrap();
@@ -164,7 +166,9 @@ impl<'a> App<'a> {
     }
 
     pub fn save_entry(&mut self) {
-        // ToDo: check for fields and clear and insert into db
+        if self.all_fields_filled() {
+            self.reset_input_fields();
+        }
     }
 
     pub fn all_fields_filled(&self) -> bool {

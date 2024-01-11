@@ -38,7 +38,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 KeyCode::Down => app.template_names.next(),
 
                                 KeyCode::Right => app.select_right(),
-                                KeyCode::Enter => app.select_template(),
+                                KeyCode::Enter => app.reset_input_fields(),
 
                                 _ => {}
                             }
