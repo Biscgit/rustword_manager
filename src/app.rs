@@ -4,13 +4,14 @@ use tui_textarea::TextArea;
 use crate::{
     event::handle_events,
     stateful_list::StatefulList,
-    ui::{draw_ui, manager::password_field},
+    ui::{draw_ui, login::password_field},
     types::Terminal,
 };
 
 
 pub struct App<'a> {
     pub vault_unlocked: bool,
+    pub vault_setup: bool,
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<(&'a str, usize)>,
@@ -24,11 +25,11 @@ pub struct App<'a> {
     pub page_side: IndexManager,
 }
 
-
 impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         App {
-            vault_unlocked: true,
+            vault_unlocked: false,
+            vault_setup: false,
             text_fields: EditableTextFields::new(),
             entries_list: StatefulList::with_items(vec![
                 ("Item0", 1),
@@ -93,6 +94,10 @@ impl<'a> App<'a> {
 
     pub fn select_template(&mut self) {
         self.current_template = self.template_names.current();
+    }
+
+    pub fn unlock_vault(&mut self) {
+        self.vault_unlocked = true;
     }
 }
 
