@@ -126,6 +126,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     ).split(area);
 
     // entry view
+    let color = if app.page_selected { Color::DarkGray } else { Color::Yellow };
     let items: Vec<ListItem> = app
         .template_names
         .items
@@ -133,16 +134,20 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         .map(|i| {
             ListItem::new(i.0)
                 .style(Style::default()
-                    .fg(Color::Yellow)
+                    .fg(color)
                 )
         })
         .collect();
 
     // Create a List from all list items and highlight the currently selected one
+    let color_border = if app.page_selected { Color::DarkGray } else { Color::White };
     let items = List::new(items)
-        .block(Block::new()
-            .borders(Borders::ALL)
-            .title("Templates"))
+        .block(
+            Block::new()
+                .borders(Borders::ALL)
+                .fg(color_border)
+                .title("Templates")
+        )
         .highlight_style(
             Style::default()
                 .fg(Color::LightYellow)
@@ -178,7 +183,7 @@ fn page_template_creator(frame: &mut Frame, _app: &mut App, area: Rect) {
 fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
     // display fields for a new entry if any exist else display nothing
     if let Some(template) = app.templates.get(app.current_template.unwrap_or(0)) {
-        let mut fields = vec![Constraint::Length(3); template.elements.len()];
+        let mut fields = vec![Constraint::Length(4); template.elements.len()];
         fields.push(Constraint::Min(0));
         fields.push(Constraint::Length(3));
 
@@ -197,7 +202,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             let current = &mut items[i];
 
             // apply theme
-            if i == highlight_index {
+            if i == highlight_index && app.page_selected {
                 field_active(current);
             } else {
                 field_inactive(current);

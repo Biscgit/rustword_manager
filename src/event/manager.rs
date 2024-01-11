@@ -16,13 +16,13 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             KeyCode::Tab => app.page_index.page_up(),
             KeyCode::BackTab => app.page_index.page_down(),
 
-            KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
-
             _ => {
                 // page specific events
                 match app.page_index.index {
                     0 => {
                         match key.code {
+                            KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+
                             KeyCode::Up => app.entries_list.previous(),
                             KeyCode::Down => app.entries_list.next(),
 
@@ -32,16 +32,21 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     1 => {
                         match app.page_selected {
                             false => match key.code {
+                                KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+
                                 KeyCode::Up => app.template_names.previous(),
                                 KeyCode::Down => app.template_names.next(),
 
+                                KeyCode::Right => app.select_right(),
                                 KeyCode::Enter => app.select_template(),
 
                                 _ => {}
                             }
                             true => match key.code {
-                                KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); },
-                                KeyCode::Down | KeyCode::Enter => { app.text_fields.edit_fields.as_mut().unwrap().next(); },
+                                KeyCode::Esc => { app.unselect_template()}
+
+                                KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
+                                KeyCode::Down | KeyCode::Enter => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
                                 _ => {
                                     let index = app.text_fields.edit_fields.as_ref().unwrap().current().clone().unwrap();
                                     app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);

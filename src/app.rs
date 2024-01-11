@@ -6,7 +6,7 @@ use crate::{
     app_states::{LoginState, LoginStates},
     event::handle_events,
     stateful_list::StatefulList,
-    ui::{draw_ui, login::password_field},
+    ui::{draw_ui, login::{input_field, password_field}},
     types::Terminal,
 };
 
@@ -102,7 +102,7 @@ impl<'a> App<'a> {
 
         let template: &Template = &self.templates.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
-            vec![password_field(); template.elements.len()])
+            vec![input_field(); template.elements.len()])
         );
 
         for (field, temp) in self.text_fields.edit_fields
@@ -113,7 +113,6 @@ impl<'a> App<'a> {
             .zip(&template.elements)
         {
             field.set_placeholder_text("Enter credential");
-            field.clear_mask_char();
             field.set_block(
                 Block::default()
                     .borders(Borders::ALL)
@@ -122,8 +121,16 @@ impl<'a> App<'a> {
             )
         }
 
+        self.select_right();
+    }
+
+    pub fn select_right(&mut self) {
         // set selected to true for ui
         self.page_selected = true;
+    }
+
+    pub fn unselect_template(&mut self) {
+        self.page_selected = false;
     }
 
     pub fn unlock_vault(&mut self) {
