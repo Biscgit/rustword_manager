@@ -126,7 +126,9 @@ impl<'a> App<'a> {
 
     pub fn select_right(&mut self) {
         // set selected to true for ui
-        self.page_selected = true;
+        if self.current_template.is_some() {
+            self.page_selected = true;
+        }
     }
 
     pub fn unselect_template(&mut self) {
