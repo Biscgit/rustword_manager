@@ -11,12 +11,18 @@ impl<T> StatefulList<T> {
             state: ListState::default(),
             items,
         };
-        list.reset_selected();
+        list.default_selected();
         list
     }
 
+    pub fn default_selected(&mut self) {
+        if !self.items.is_empty() {
+            self.state.select(Some(0));
+        }
+    }
+
     pub fn reset_selected(&mut self) {
-        self.state.select(Some(0));
+        self.state.select(None);
     }
 
     pub fn next(&mut self) {

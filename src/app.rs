@@ -1,14 +1,18 @@
 use serde::{Deserialize, Serialize};
+use tui_textarea::TextArea;
 
 use crate::{
     event::handle_events,
     stateful_list::StatefulList,
-    ui::draw_ui,
+    ui::{draw_ui, manager::password_field},
     types::Terminal,
 };
 
 
 pub struct App<'a> {
+    pub vault_unlocked: bool,
+    pub text_fields: EditableTextFields<'a>,
+
     pub entries_list: StatefulList<(&'a str, usize)>,
     // pub selected_entry: json
 
@@ -17,13 +21,15 @@ pub struct App<'a> {
     pub current_template: Option<usize>,
 
     pub page_index: IndexManager,
-    pub page_side: IndexManager
+    pub page_side: IndexManager,
 }
 
 
 impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         App {
+            vault_unlocked: true,
+            text_fields: EditableTextFields::new(),
             entries_list: StatefulList::with_items(vec![
                 ("Item0", 1),
                 ("Item1", 2),
@@ -71,8 +77,8 @@ impl<'a> App<'a> {
                 ).unwrap(),
             ],
             current_template: None,
-            page_index: IndexManager::new(3),
-            page_side: IndexManager::new(2)
+            page_index: IndexManager::new(4),
+            page_side: IndexManager::new(2),
         }
     }
 
@@ -92,14 +98,14 @@ impl<'a> App<'a> {
 
 pub struct IndexManager {
     pub index: usize,
-    pub size: usize
+    pub size: usize,
 }
 
 impl IndexManager {
     pub fn new(size: usize) -> IndexManager {
         IndexManager {
             index: 0,
-            size
+            size,
         }
     }
 
@@ -123,4 +129,16 @@ pub struct Template {
 pub struct TemplateElement {
     pub name: String,
     pub private: bool,
+}
+
+pub struct EditableTextFields<'a> {
+    pub password_input: TextArea<'a>,
+}
+
+impl<'a> EditableTextFields<'a> {
+    pub fn new() -> EditableTextFields<'a> {
+        EditableTextFields {
+            password_input: password_field()
+        }
+    }
 }

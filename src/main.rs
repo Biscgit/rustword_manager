@@ -4,6 +4,7 @@ mod stateful_list;
 mod event;
 mod types;
 mod terminal;
+mod password;
 
 
 use std::error::Error;
@@ -28,6 +29,3 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
-
-
-
