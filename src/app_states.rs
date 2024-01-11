@@ -8,7 +8,7 @@ impl LoginStates {
     pub fn new() -> LoginStates {
         LoginStates {
             state: LoginState::Register,
-            last_password: None
+            last_password: None,
         }
     }
 
@@ -26,10 +26,12 @@ impl LoginStates {
 
 #[derive(PartialEq, Clone)]
 pub enum LoginState {
+    Login,
+    IncorrectLogin,
+
     Register,
     NewVaultConfirmMatch,
     NewVaultConfirmNoMatch,
-    Login,
-    IncorrectLogin,
-    Unlocked
+
+    Unlocked,
 }
