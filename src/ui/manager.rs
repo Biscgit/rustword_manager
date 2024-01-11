@@ -227,7 +227,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             if all_filled {
                 color = Color::LightGreen;
             } else {
-                color = Color::LightYellow;
+                color = Color::LightRed;
             }
         }
 
