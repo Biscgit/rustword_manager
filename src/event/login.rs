@@ -4,7 +4,8 @@ use std::{
 };
 use crossterm::event::{self, Event, KeyCode};
 use crate::{
-    app::{App, LoginState},
+    app::App,
+    app_states::LoginState,
     ui::login::password_field,
 };
 
