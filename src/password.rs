@@ -6,9 +6,7 @@ pub fn validate_password_strength(textarea: &mut TextArea) -> Option<String> {
 }
 
 fn password_strength(password: String) -> Option<String> {
-    if password.len() < 10 {
-        Some(String::from("Password too short"))
-    } else if process_letters(&password, is_numeric) {
+     if process_letters(&password, is_numeric) {
         Some(String::from("Password needs one numerical character"))
     } else if process_letters(&password, is_lower) {
         Some(String::from("Password needs one lowercase character"))
@@ -16,6 +14,8 @@ fn password_strength(password: String) -> Option<String> {
         Some(String::from("Password needs one uppercase character"))
     } else if process_letters(&password, is_special) {
         Some(String::from("Password needs one special character"))
+    } else if password.len() < 10 {
+        Some(String::from("Password too short"))
     } else {
         None
     }

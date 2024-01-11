@@ -8,10 +8,46 @@ use crate::{
     types::Terminal,
 };
 
+#[derive(Clone)]
+pub struct LoginStates {
+    pub state: LoginState,
+    last_password: Option<String>,
+}
+
+impl LoginStates {
+    pub fn new() -> LoginStates {
+        LoginStates {
+            state: LoginState::NewVault,
+            last_password: None
+        }
+    }
+
+    pub fn check_pw(self, password: &String) -> bool {
+        if let Some(last_password) = self.last_password {
+            return last_password == *password;
+        }
+        false
+    }
+
+    pub fn set_password(&mut self, password: &String) {
+        self.last_password = Some(password.clone());
+    }
+}
+
+#[derive(PartialEq, Clone)]
+pub enum LoginState {
+    NewVault,
+    NewVaultConfirmMatch,
+    NewVaultConfirmNoMatch,
+    Login,
+    IncorrectLogin,
+    Unlocked
+}
+
 
 pub struct App<'a> {
-    pub vault_unlocked: bool,
-    pub vault_setup: bool,
+    pub vault_state: LoginStates,
+
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<(&'a str, usize)>,
@@ -28,8 +64,8 @@ pub struct App<'a> {
 impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         App {
-            vault_unlocked: false,
-            vault_setup: true,
+            vault_state: LoginStates::new(),
+
             text_fields: EditableTextFields::new(),
             entries_list: StatefulList::with_items(vec![
                 ("Item0", 1),
@@ -98,8 +134,14 @@ impl<'a> App<'a> {
 
     pub fn unlock_vault(&mut self) {
         if self.text_fields.password_input.lines()[0] == "Password123#" {
-            self.vault_unlocked = true;
+            self.vault_state.state = LoginState::Unlocked;
+        } else {
+            self.vault_state.state = LoginState::IncorrectLogin;
         }
+    }
+
+    pub fn setup_vault(&mut self) {
+        self.vault_state.state = LoginState::Unlocked
     }
 }
 
