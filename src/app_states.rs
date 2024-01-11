@@ -7,7 +7,7 @@ pub struct LoginStates {
 impl LoginStates {
     pub fn new() -> LoginStates {
         LoginStates {
-            state: LoginState::NewVault,
+            state: LoginState::Register,
             last_password: None
         }
     }
@@ -26,7 +26,7 @@ impl LoginStates {
 
 #[derive(PartialEq, Clone)]
 pub enum LoginState {
-    NewVault,
+    Register,
     NewVaultConfirmMatch,
     NewVaultConfirmNoMatch,
     Login,

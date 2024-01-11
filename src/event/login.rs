@@ -28,7 +28,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                 }
             }
             // creating new vault and first password input
-            LoginState::NewVault => match key.code {
+            LoginState::Register => match key.code {
                 KeyCode::Enter => {
                     let mut pw_field = &mut app.text_fields.password_input;
 

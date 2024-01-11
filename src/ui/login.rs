@@ -46,7 +46,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     match app.vault_state.state {
         LoginState::Login |
         LoginState::IncorrectLogin => login_with_password(frame, app, center_layout[1]),
-        LoginState::NewVault |
+        LoginState::Register |
         LoginState::NewVaultConfirmMatch |
         LoginState::NewVaultConfirmNoMatch => register_password(frame, app, center_layout[1]),
         _ => unreachable!()
@@ -85,7 +85,7 @@ fn login_with_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
 fn register_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     match app.vault_state.state {
         // new vault password create
-        LoginState::NewVault => {
+        LoginState::Register => {
             first_password(frame, app, area)
         }
         LoginState::NewVaultConfirmMatch | LoginState::NewVaultConfirmNoMatch => {
@@ -97,7 +97,7 @@ fn register_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
 
 fn first_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     let mut pw_field = &mut app.text_fields.password_input;
-    pw_field.set_placeholder_text("Please enter your password");
+    pw_field.set_placeholder_text("Please enter a strong password");
 
 
     // set design depending on validation of password strength
