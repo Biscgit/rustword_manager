@@ -1,3 +1,4 @@
+use ratatui::widgets::{Block, Borders, BorderType};
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
@@ -23,7 +24,7 @@ pub struct App<'a> {
     pub current_template: Option<usize>,
 
     pub page_index: IndexManager,
-    pub page_side: IndexManager,
+    pub page_selected: bool,
 }
 
 impl<'a> App<'a> {
@@ -53,6 +54,7 @@ impl<'a> App<'a> {
                 serde_json::from_str(
                     r#"{
                         "deletable": false,
+                        "name": "Web Credential",
                         "elements": [
                           {"name":  "Username", "private":  false},
                           {"name":  "Password", "private":  true}
@@ -62,6 +64,7 @@ impl<'a> App<'a> {
                 serde_json::from_str(
                     r#"{
                         "deletable": false,
+                        "name": "SSH-Keypair",
                         "elements": [
                           {"name":  "Website", "private":  false},
                           {"name":  "SSH-Public", "private":  false},
@@ -72,6 +75,7 @@ impl<'a> App<'a> {
                 serde_json::from_str(
                     r#"{
                         "deletable": false,
+                        "name": "Note",
                         "elements": [
                           {"name":  "Note", "private":  false}
                         ]
@@ -80,7 +84,7 @@ impl<'a> App<'a> {
             ],
             current_template: None,
             page_index: IndexManager::new(3),
-            page_side: IndexManager::new(2),
+            page_selected: false,
         }
     }
 
@@ -95,10 +99,35 @@ impl<'a> App<'a> {
 
     pub fn select_template(&mut self) {
         self.current_template = self.template_names.current();
+
+        let template: &Template = &self.templates.get(self.current_template.unwrap()).unwrap();
+        self.text_fields.edit_fields = Some(StatefulList::with_items(
+            vec![password_field(); template.elements.len()])
+        );
+
+        for (field, temp) in self.text_fields.edit_fields
+            .as_mut()
+            .unwrap()
+            .items
+            .iter_mut()
+            .zip(&template.elements)
+        {
+            field.set_placeholder_text("Enter credential");
+            field.clear_mask_char();
+            field.set_block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .title(temp.name.clone())
+            )
+        }
+
+        // set selected to true for ui
+        self.page_selected = true;
     }
 
     pub fn unlock_vault(&mut self) {
-        if self.text_fields.password_input.lines()[0] == "Password123#" {
+        if self.text_fields.password_input.lines()[0] == "pass" {
             self.vault_state.state = LoginState::Unlocked;
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
@@ -133,13 +162,14 @@ impl IndexManager {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Template {
     pub deletable: bool,
+    pub name: String,
     pub elements: Vec<TemplateElement>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TemplateElement {
     pub name: String,
     pub private: bool,
@@ -147,12 +177,14 @@ pub struct TemplateElement {
 
 pub struct EditableTextFields<'a> {
     pub password_input: TextArea<'a>,
+    pub edit_fields: Option<StatefulList<TextArea<'a>>>,
 }
 
 impl<'a> EditableTextFields<'a> {
     pub fn new() -> EditableTextFields<'a> {
         EditableTextFields {
-            password_input: password_field()
+            password_input: password_field(),
+            edit_fields: None,
         }
     }
 }

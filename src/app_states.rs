@@ -7,7 +7,7 @@ pub struct LoginStates {
 impl LoginStates {
     pub fn new() -> LoginStates {
         LoginStates {
-            state: LoginState::Register,
+            state: LoginState::Login,
             last_password: None,
         }
     }

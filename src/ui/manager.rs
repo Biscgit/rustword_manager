@@ -5,9 +5,8 @@ use ratatui::{
     style::Stylize,
     widgets::{Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
 };
+use tui_textarea::TextArea;
 use crate::app::App;
-
-
 
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
@@ -189,17 +188,26 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         ).split(area);
 
         // create input fields dynamically
-        for (i, template) in template.elements.iter().enumerate() {
+        let fields = app.text_fields.edit_fields.as_mut().unwrap();
+
+        let highlight_index = fields.current().clone().unwrap();
+        let items = &mut fields.items;
+
+        for i in 0..template.elements.len() {
+            let current = &mut items[i];
+
+            // apply theme
+            if i == highlight_index {
+                field_active(current);
+            } else {
+                field_inactive(current);
+            }
+
+            // render widget in spot
             frame.render_widget(
-                Paragraph::new("Input")
-                    .block(
-                        Block::new()
-                            .borders(Borders::ALL)
-                            .border_type(BorderType::Rounded)
-                            .title(template.name.clone())
-                    ),
+                current.widget(),
                 input_layout[i],
-            )
+            );
         }
 
         // render insert button
@@ -213,4 +221,29 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             *input_layout.last().unwrap(),
         )
     }
+}
+
+fn set_border_color<'a>(text_field: &TextArea<'a>, color: Color) -> Block<'a> {
+    text_field.block()
+        .unwrap()
+        .clone()
+        .style(Style::default().fg(color))
+}
+
+fn field_active(text_field: &mut TextArea<'_>) {
+    // sets theme to active
+    text_field.set_cursor_line_style(Style::default().add_modifier(Modifier::UNDERLINED));
+    text_field.set_cursor_style(Style::default().add_modifier(Modifier::REVERSED));
+
+    let block = set_border_color(text_field, Color::White);
+    text_field.set_block(block);
+}
+
+fn field_inactive(text_field: &mut TextArea<'_>) {
+    // modifies block to look inactive
+    text_field.set_cursor_line_style(Style::default());
+    text_field.set_cursor_style(Style::default());
+
+    let block = set_border_color(text_field, Color::DarkGray);
+    text_field.set_block(block);
 }

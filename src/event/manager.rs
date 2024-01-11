@@ -1,7 +1,8 @@
 use std::{
     error::Error,
-    ops::ControlFlow
+    ops::ControlFlow,
 };
+use std::hint::unreachable_unchecked;
 use crossterm::event::{self, Event, KeyCode};
 use crate::app::App;
 
@@ -25,23 +26,27 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             KeyCode::Up => app.entries_list.previous(),
                             KeyCode::Down => app.entries_list.next(),
 
-                            KeyCode::Right => app.page_side.page_up(),
-                            KeyCode::Left => app.page_side.page_down(),
-
                             _ => {}
                         }
                     }
                     1 => {
-                        match key.code {
-                            KeyCode::Up => app.template_names.previous(),
-                            KeyCode::Down => app.template_names.next(),
+                        match app.page_selected {
+                            false => match key.code {
+                                KeyCode::Up => app.template_names.previous(),
+                                KeyCode::Down => app.template_names.next(),
 
-                            KeyCode::Right => app.page_side.page_up(),
-                            KeyCode::Left => app.page_side.page_down(),
+                                KeyCode::Enter => app.select_template(),
 
-                            KeyCode::Enter => app.select_template(),
-
-                            _ => {}
+                                _ => {}
+                            }
+                            true => match key.code {
+                                KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); },
+                                KeyCode::Down | KeyCode::Enter => { app.text_fields.edit_fields.as_mut().unwrap().next(); },
+                                _ => {
+                                    let index = app.text_fields.edit_fields.as_ref().unwrap().current().clone().unwrap();
+                                    app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);
+                                }
+                            }
                         }
                     }
                     2 => {}

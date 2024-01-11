@@ -1,11 +1,12 @@
 use ratatui::{
     Frame,
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     prelude::{Color, Style},
     style::Stylize,
-    widgets::{Block, Borders, BorderType, Padding},
+    widgets::{Block, Borders, BorderType, Padding, Paragraph},
 };
 use tui_textarea::TextArea;
+
 use crate::{
     app::App,
     app_states::LoginState,
@@ -27,6 +28,15 @@ pub fn password_field<'a>() -> TextArea<'a> {
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     // center layout
     let area = frame.size();
+    let main_layout = Layout::new(
+        Direction::Vertical,
+        [
+            Constraint::Length(3),
+            Constraint::Length(area.height / 2 - 3),
+            Constraint::Length(3),
+            Constraint::Length(area.height / 2 - 3)
+        ],
+    ).split(area);
     let center_layout = Layout::new(
         Direction::Horizontal,
         [
@@ -34,14 +44,18 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
             Constraint::Percentage(80),
             Constraint::Percentage(10)
         ],
-    ).split(Layout::new(
-        Direction::Vertical,
-        [
-            Constraint::Length(area.height / 2 - 2),
-            Constraint::Length(3),
-            Constraint::Length(area.height / 2 - 1)
-        ],
-    ).split(area)[1]);
+    ).split(main_layout[2]);
+
+    // draw title
+    frame.render_widget(
+        Paragraph::new("Welcome to the RustwordManager!")
+            .alignment(Alignment::Center)
+            .block(Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+            ),
+        main_layout[0],
+    );
 
     match app.vault_state.state {
         LoginState::Login |
