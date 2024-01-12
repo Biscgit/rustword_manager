@@ -20,12 +20,14 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     ).split(frame.size());
 
     // tabs
+    let color = if app.page_selected { Color::DarkGray } else { Color::White };
     let tab_titles = vec!["Credentials", "New Entry", "Templates"];
     let tabs = Tabs::new(tab_titles)
         .block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded)
+                .fg(color)
                 .title("Pages")
         )
         .select(app.page_index.index)
@@ -148,9 +150,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         .iter()
         .map(|i| {
             ListItem::new(i.0)
-                .style(Style::default()
-                    .fg(color)
-                )
+                .style(Style::default().fg(color))
         })
         .collect();
 
