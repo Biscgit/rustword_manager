@@ -3,7 +3,7 @@ use tui_textarea::TextArea;
 
 use crate::{
     stateful_list::StatefulList,
-    ui::{login::password_field, manager::input_field}
+    ui::fields::{password_field, input_field}
 };
 
 

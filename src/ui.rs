@@ -3,6 +3,7 @@ use crate::{app::{App, states::LoginState}};
 
 pub(crate) mod manager;
 pub(crate) mod login;
+pub(crate) mod fields;
 
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {

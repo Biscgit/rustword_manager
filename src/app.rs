@@ -11,7 +11,7 @@ use crate::{
     event::handle_events,
     password::generate_strong_password,
     stateful_list::StatefulList,
-    ui::{draw_ui, login::password_field, manager::input_field},
+    ui::{draw_ui, fields::{password_field, input_field}},
     types::Terminal,
 };
 

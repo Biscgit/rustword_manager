@@ -9,13 +9,6 @@ use tui_textarea::TextArea;
 use crate::app::App;
 
 
-pub fn input_field<'a>() -> TextArea<'a> {
-    let mut text_input = TextArea::default();
-    text_input.set_cursor_line_style(Style::default());
-
-    text_input
-}
-
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     // main view
     let main_layout = Layout::new(

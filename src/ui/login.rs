@@ -13,16 +13,6 @@ use crate::{
 };
 
 
-pub fn password_field<'a>() -> TextArea<'a> {
-    // needs to be accessible from the events -> storing in app state
-    let mut password_input = TextArea::default();
-
-    password_input.set_cursor_line_style(Style::default());
-    password_input.set_mask_char('\u{2022}'); //U+2022 BULLET (•)
-
-    password_input
-}
-
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     // center layout
     let area = frame.size();
