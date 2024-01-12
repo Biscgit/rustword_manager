@@ -7,6 +7,29 @@ use crate::{
 };
 
 
+pub struct IndexManager {
+    pub index: usize,
+    pub size: usize,
+}
+
+impl IndexManager {
+    pub fn new(size: usize) -> IndexManager {
+        IndexManager {
+            index: 0,
+            size,
+        }
+    }
+
+    pub fn page_up(&mut self) {
+        self.index = (self.index + 1).rem_euclid(self.size);
+    }
+
+    pub fn page_down(&mut self) {
+        // fix for possible negative value
+        self.index = (self.index as isize - 1).rem_euclid(self.size as isize) as usize;
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Template {
     pub deletable: bool,
