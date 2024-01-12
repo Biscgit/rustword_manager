@@ -9,7 +9,7 @@ impl LoginStates {
     pub fn new() -> LoginStates {
         // create a default state
         LoginStates {
-            state: LoginState::Login,
+            state: LoginState::Register,
             last_password: None,
         }
     }

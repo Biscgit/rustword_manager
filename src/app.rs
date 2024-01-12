@@ -248,4 +248,8 @@ impl<'a> App<'a> {
         // ToDo: thread to reset clipboard after time
         self.clipboard.set_text(text).unwrap();
     }
+
+    pub fn update_shown_entries(&mut self, _filter: String) {
+        // updates entries in list in relation to search filter
+    }
 }
