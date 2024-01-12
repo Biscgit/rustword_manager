@@ -13,7 +13,7 @@ use crate::{
 
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
-    // center layout
+    // layout to center field dynamically
     let area = frame.size();
     let main_layout = Layout::new(
         Direction::Vertical,
@@ -44,6 +44,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         main_layout[0],
     );
 
+    // render page and functionality depending on registering or logging in
     match app.vault_state.state {
         LoginState::Login |
         LoginState::IncorrectLogin => login_with_password(frame, app, center_layout[1]),
@@ -55,9 +56,11 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 }
 
 fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
+    // page for logging in
     let password_field = &mut app.text_fields.password_input;
     password_field.set_placeholder_text("Please enter your password");
 
+    // style color according to last sent input
     if app.vault_state.state == LoginState::Login {
         password_field.set_style(Style::default().fg(Color::LightYellow));
         password_field.set_block(
@@ -84,11 +87,11 @@ fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn register_password(frame: &mut Frame, app: &mut App, area: Rect) {
+    // page for registering
     match app.vault_state.state {
         // new vault password create
-        LoginState::Register => {
-            first_password(frame, app, area)
-        }
+        LoginState::Register => { first_password(frame, app, area) }
+        // confirm password on register
         LoginState::NewVaultConfirmMatch | LoginState::NewVaultConfirmNoMatch => {
             confirm_password(frame, app, area)
         }
@@ -97,9 +100,9 @@ fn register_password(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
+    // handle first registration password and check needed criteria
     let pw_field = &mut app.text_fields.password_input;
     pw_field.set_placeholder_text("Please enter a strong password");
-
 
     // set design depending on validation of password strength
     let result = validate_password_strength(pw_field);
@@ -128,9 +131,11 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn confirm_password(frame: &mut Frame, app: &mut App, area: Rect) {
+    // check for matching second password
     let pw_field = &mut app.text_fields.password_input;
     pw_field.set_placeholder_text("Please confirm your password");
 
+    // render ui depending if entries match or not
     match app.vault_state.state {
         LoginState::NewVaultConfirmMatch => {
             pw_field.set_style(Style::default().fg(Color::LightGreen));

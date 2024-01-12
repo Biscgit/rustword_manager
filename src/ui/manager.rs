@@ -19,7 +19,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         ],
     ).split(frame.size());
 
-    // tabs
+    // create and name tabs
     let color = if app.page_selected { Color::DarkGray } else { Color::White };
     let tab_titles = vec!["Credentials", "New Entry", "Templates"];
     let tabs = Tabs::new(tab_titles)
@@ -49,7 +49,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 }
 
 fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
-    // application pages
+    // split view of credentials
     let lists_layout = Layout::new(
         Direction::Horizontal,
         [
@@ -58,7 +58,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         ],
     ).split(area);
 
-    // password list
+    // left side
     let password_list = Layout::new(
         Direction::Vertical,
         [
@@ -67,7 +67,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         ],
     ).split(lists_layout[0]);
 
-    // entry view
+    // create items to be displayed
     let entry_color = if app.page_selected { Color::DarkGray } else { Color::Yellow };
     let items: Vec<ListItem> = app
         .entries_list
@@ -79,8 +79,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         })
         .collect();
 
-
-    // Create a List from all list items and highlight the currently selected one
+    // create a list from all list items and highlight the currently selected one
     let border_color = if app.page_selected { Color::DarkGray } else { Color::White };
     let items = List::new(items)
         .block(Block::default()
@@ -119,7 +118,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         password_list[1],
     );
 
-    // password content view
+    // right side: show contents if something selected
     if app.current_entry.is_some() {
         render_credentials(frame, app, lists_layout[1]);
     } else {
@@ -136,7 +135,9 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
+    // function for rendering selected credentials
     if let Some(entries) = &app.current_entry {
+        // create all fields in a layout
         let mut fields = vec![Constraint::Length(4); entries.items.len()];
         fields.push(Constraint::Min(0));
 
@@ -145,6 +146,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
             fields,
         ).split(area);
 
+        // fill fields with content and highlight
         for (entry, (index, field)) in entries.items.iter().zip(credentials_layout.iter().enumerate()) {
             let color = if index == entries.current_index().unwrap() && app.page_selected
             { Color::White } else { Color::DarkGray };
@@ -164,7 +166,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 }
 
 fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
-    // application pages
+    // split view of templates
     let lists_layout = Layout::new(
         Direction::Horizontal,
         [
@@ -173,7 +175,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         ],
     ).split(area);
 
-    // entry view
+    // create items to be displayed
     let color = if app.page_selected { Color::DarkGray } else { Color::Yellow };
     let items: Vec<ListItem> = app
         .templates
@@ -185,7 +187,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         })
         .collect();
 
-    // Create a List from all list items and highlight the currently selected one
+    // create a list from all list items and highlight the currently selected one
     let color_border = if app.page_selected { Color::DarkGray } else { Color::White };
     let items = List::new(items)
         .block(
@@ -203,7 +205,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
 
     frame.render_stateful_widget(items, lists_layout[0], &mut app.templates.state);
 
-    // Template display
+    // right side: show template fields if something selected
     if let Some(_index) = app.current_template {
         display_template(frame, app, lists_layout[1]);
     } else {
@@ -219,15 +221,9 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     }
 }
 
-fn page_template_creator(frame: &mut Frame, _app: &mut App, area: Rect) {
-    frame.render_widget(
-        Paragraph::new("In progress..."),
-        area,
-    );
-}
 
 fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
-    // display fields for a new entry if any exist else display nothing
+    // function for rendering input fields of selected template
     if let Some(template) = app.templates.items.get(app.current_template.unwrap_or(0)) {
         let mut fields = vec![Constraint::Length(4); template.elements.len()];
         fields.push(Constraint::Min(0));
@@ -242,9 +238,11 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         let all_filled = app.all_fields_filled();
         let fields = app.text_fields.edit_fields.as_mut().unwrap();
 
+        // set highlight here because of (i)mutable re-use
         let highlight_index = fields.current_index().unwrap();
         let items = &mut fields.items;
 
+        // create all inputs according to provided template
         for i in 0..template.elements.len() {
             let current = &mut items[i];
 
@@ -277,9 +275,9 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             }
         }
 
+        // apply button style
         let block = set_border_color(confirm_button, color);
         confirm_button.set_block(block);
-
 
         frame.render_widget(
             confirm_button.widget(),
@@ -288,7 +286,16 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
     }
 }
 
+fn page_template_creator(frame: &mut Frame, _app: &mut App, area: Rect) {
+    // placeholder for last page
+    frame.render_widget(
+        Paragraph::new("In progress..."),
+        area,
+    );
+}
+
 fn set_border_color<'a>(text_field: &TextArea<'a>, color: Color) -> Block<'a> {
+    // changes border color from a TextArea and returns new border
     text_field.block()
         .unwrap()
         .clone()
