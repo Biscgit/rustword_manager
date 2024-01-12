@@ -132,7 +132,7 @@ impl<'a> App<'a> {
             .iter_mut()
             .zip(&template.elements)
         {
-            field.set_placeholder_text("Fill with credential\nPress Enter to generate secure password");
+            field.set_placeholder_text("Enter or paste credential\nPress Enter to generate secure password");
             field.set_block(
                 Block::default()
                     .borders(Borders::ALL)
