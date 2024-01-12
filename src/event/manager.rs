@@ -5,7 +5,6 @@ use std::{
 
 use crossterm::event::{self, Event, KeyCode};
 use crate::app::App;
-use crate::app::states::LoginState;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {

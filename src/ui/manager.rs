@@ -1,4 +1,3 @@
-use std::any::Any;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
