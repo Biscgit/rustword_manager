@@ -1,12 +1,3 @@
-mod ui;
-mod app;
-mod stateful_list;
-mod event;
-mod types;
-mod terminal;
-mod password;
-
-
 use std::error::Error;
 
 use crate::{
@@ -14,6 +5,14 @@ use crate::{
     terminal::*,
     types::*,
 };
+
+mod ui;
+mod app;
+mod stateful_list;
+mod event;
+mod types;
+mod terminal;
+mod password;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
