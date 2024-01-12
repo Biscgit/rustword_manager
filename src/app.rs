@@ -39,6 +39,7 @@ pub struct App<'a> {
     pub page_selected: bool,
 
     pub clipboard: Clipboard,
+    pub copied: Option<usize>,
 }
 
 impl<'a> App<'a> {
@@ -102,6 +103,7 @@ impl<'a> App<'a> {
             page_selected: false,
 
             clipboard: Clipboard::new().unwrap(),
+            copied: None,
         }
     }
 
@@ -122,7 +124,9 @@ impl<'a> App<'a> {
                 ("Title1", "Content1"),
                 ("Title2", "Content2"),
                 ("Title3", "Content3"),
-            ]))
+            ]));
+
+            self.copied = None;
         }
     }
 
@@ -246,6 +250,8 @@ impl<'a> App<'a> {
     pub fn copy_to_clipboard(&mut self, text: &str) {
         // copies a string to clipboard
         // ToDo: thread to reset clipboard after time
+
+        self.copied = Some(self.current_entry.as_ref().unwrap().current_index().unwrap());
         self.clipboard.set_text(text).unwrap();
     }
 

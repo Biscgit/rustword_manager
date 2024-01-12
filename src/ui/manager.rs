@@ -1,9 +1,9 @@
 use ratatui::{
     Frame,
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     prelude::{Color, Modifier, Style},
     style::Stylize,
-    widgets::{Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
+    widgets::{block::{Position, Title}, Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
 };
 use tui_textarea::TextArea;
 use crate::app::App;
@@ -148,17 +148,39 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
         // fill fields with content and highlight
         for (entry, (index, field)) in entries.items.iter().zip(credentials_layout.iter().enumerate()) {
-            let color = if index == entries.current_index().unwrap() && app.page_selected
-            { Color::White } else { Color::DarkGray };
+            // set color and style with responsive copy
+            let mut color = Color::DarkGray;
+
+            if app.page_selected {
+                if index == entries.current_index().unwrap() {
+                    color = Color::White;
+
+                    if let Some(copied) = app.copied {
+                        if copied == index {
+                            color = Color::LightBlue;
+                        }
+                    }
+                }
+            }
+
+            let mut p_block = Block::new()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded)
+                .fg(color)
+                .title(entry.0);
+
+            if let Some(copied) = app.copied {
+                if copied == index {
+                    p_block = p_block.title(
+                        Title::from("Copied!")
+                            .position(Position::Top)
+                            .alignment(Alignment::Center));
+                }
+            }
 
             frame.render_widget(
                 Paragraph::new(entry.1)
-                    .block(Block::new()
-                        .borders(Borders::ALL)
-                        .border_type(BorderType::Rounded)
-                        .fg(color)
-                        .title(entry.0)
-                    ),
+                    .block(p_block),
                 *field,
             )
         }
@@ -220,7 +242,6 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         );
     }
 }
-
 
 fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
     // function for rendering input fields of selected template
