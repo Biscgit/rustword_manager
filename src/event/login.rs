@@ -43,7 +43,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Enter => {
                             let pw_field = &mut app.text_fields.password_input;
 
-                            if validate_password_strength(pw_field).is_none() {
+                            if validate_password_strength(pw_field).0.is_none() {
                                 app.vault_state.set_password(
                                     app.text_fields.password_input.lines()[0].clone()
                                 );

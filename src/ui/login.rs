@@ -121,7 +121,8 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
 
 
     // set design depending on validation of password strength
-    if let Some(error) = validate_password_strength(pw_field) {
+    let result = validate_password_strength(pw_field);
+    if let Some(error) = result.0 {
         pw_field.set_style(Style::default().fg(Color::LightRed));
         pw_field.set_block(
             Block::default()
@@ -138,7 +139,7 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .borders(Borders::ALL)
                 .fg(Color::LightGreen)
                 .padding(Padding::horizontal(1))
-                .title("Valid Password")
+                .title(format!("Strong Password ({}%)", result.1))
         );
     }
 

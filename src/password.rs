@@ -1,12 +1,21 @@
 use tui_textarea::TextArea;
+use passwords::{analyzer, scorer};
+
+// pub fn generate_strong_password(length: usize) -> String {}
 
 
-pub fn validate_password_strength(textarea: &mut TextArea) -> Option<String> {
-    password_strength(textarea.lines()[0].clone())
+pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u32) {
+    let input = textarea.lines()[0].clone();
+    let score = scorer::score(&analyzer::analyze(&input)).floor() as u32;
+
+    if let Some(strength) = password_strength(&input) {
+        return (Some(strength), score);
+    }
+    (None, score)
 }
 
-fn password_strength(password: String) -> Option<String> {
-     if process_letters(&password, is_numeric) {
+fn password_strength(password: &String) -> Option<String> {
+    if process_letters(&password, is_numeric) {
         Some(String::from("Password needs one numerical character"))
     } else if process_letters(&password, is_lower) {
         Some(String::from("Password needs one lowercase character"))
