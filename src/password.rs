@@ -23,7 +23,7 @@ pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u
     let score = scorer::score(&analyzer::analyze(&input)).floor() as u32;
 
     if let Some(mut strength) = password_strength(&input) {
-        strength.push_str(&*format!(" ({}%)", score));
+        strength.push_str(&format!(" ({}%)", score));
         return (Some(strength), score);
     }
     (None, score)
@@ -31,13 +31,13 @@ pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u
 
 fn password_strength(password: &String) -> Option<String> {
     // checks password if requirements are fulfilled
-    if process_letters(&password, is_numeric) {
+    if process_letters(password, is_numeric) {
         Some(String::from("Password needs one numerical character"))
-    } else if process_letters(&password, is_lower) {
+    } else if process_letters(password, is_lower) {
         Some(String::from("Password needs one lowercase character"))
-    } else if process_letters(&password, is_upper) {
+    } else if process_letters(password, is_upper) {
         Some(String::from("Password needs one uppercase character"))
-    } else if process_letters(&password, is_special) {
+    } else if process_letters(password, is_special) {
         Some(String::from("Password needs one special character"))
     } else if password.len() < 10 {
         Some(String::from("Password needs 10 or more characters"))
@@ -46,7 +46,7 @@ fn password_strength(password: &String) -> Option<String> {
     }
 }
 
-fn process_letters<F>(input: &String, check: F) -> bool where F: Fn(&char) -> bool {
+fn process_letters<F>(input: &str, check: F) -> bool where F: Fn(&char) -> bool {
     // processes a strings characters with a provided function
     for char in input.chars() {
         if check(&char) {
