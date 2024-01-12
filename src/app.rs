@@ -4,13 +4,16 @@ use ratatui::widgets::{Block, Borders, BorderType};
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
+use self::states::{LoginState, LoginStates};
 use crate::{
-    app_states::{LoginState, LoginStates},
     event::handle_events,
     stateful_list::StatefulList,
     ui::{draw_ui, login::{input_field, password_field}},
     types::Terminal,
 };
+
+pub(crate) mod states;
+mod extras;
 
 
 pub struct App<'a> {

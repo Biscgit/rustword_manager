@@ -8,8 +8,7 @@ use ratatui::{
 use tui_textarea::TextArea;
 
 use crate::{
-    app::App,
-    app_states::LoginState,
+    app::{App, states::LoginState},
     password::validate_password_strength,
 };
 

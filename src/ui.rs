@@ -1,8 +1,5 @@
 use ratatui::Frame;
-use crate::{
-    app::App,
-    app_states::LoginState,
-};
+use crate::{app::{App, states::LoginState}};
 
 mod manager;
 pub(crate) mod login;

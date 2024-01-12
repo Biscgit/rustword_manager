@@ -4,8 +4,7 @@ use std::{
 };
 use crossterm::event::{self, Event, KeyCode};
 use crate::{
-    app::App,
-    app_states::LoginState,
+    app::{App, states::LoginState},
     ui::login::password_field,
 };
 use crate::password::validate_password_strength;

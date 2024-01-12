@@ -1,6 +1,5 @@
 mod ui;
 mod app;
-mod app_states;
 mod stateful_list;
 mod event;
 mod types;

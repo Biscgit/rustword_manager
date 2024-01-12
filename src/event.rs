@@ -4,10 +4,7 @@ use std::{
     time::Duration,
 };
 use crossterm::event;
-use crate::{
-    app::App,
-    app_states::LoginState
-};
+use crate::{app::{App, states::LoginState}};
 
  mod manager;
  mod login;
