@@ -15,7 +15,7 @@ impl LoginStates {
     }
 
     pub fn check_pw(self, password: &String) -> bool {
-        // checks password
+        // checks confirmation password on vault creation
         if let Some(last_password) = self.last_password {
             return last_password == *password;
         }
@@ -23,12 +23,20 @@ impl LoginStates {
     }
 
     pub fn set_password(&mut self, password: String) {
+        // sets first entered password
         self.last_password = Some(password);
+    }
+
+    pub fn clear_password(&mut self) {
+        // clears first entered password
+        self.last_password = None;
     }
 }
 
 #[derive(PartialEq, Clone)]
 pub enum LoginState {
+    // enum holding all possible application states
+    // rendering and input handling depend on these
     Login,
     IncorrectLogin,
 
