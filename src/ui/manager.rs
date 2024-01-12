@@ -1,3 +1,4 @@
+use std::any::Any;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -104,17 +105,15 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded)
             .padding(Padding::horizontal(1))
+            .fg(border_color)
             .title("Search")
     );
 
-    // set bar color
-    let mut color = Color::LightBlue;
-    if search_bar.is_empty() {
-        color = Color::White;
+    // set bar color to blue if search active
+    if !search_bar.is_empty() {
+        let block = set_border_color(search_bar, Color::LightBlue);
+        search_bar.set_block(block);
     }
-
-    let block = set_border_color(search_bar, color);
-    search_bar.set_block(block);
 
     frame.render_widget(
         search_bar.widget(),
@@ -122,15 +121,47 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     );
 
     // password content view
-    frame.render_widget(
-        Paragraph::new("Select an entry to display")
-            .block(
-                Block::default()
-                    .borders(Borders::NONE)
-                    .padding(Padding::uniform(1))
-            ),
-        lists_layout[1],
-    );
+    if app.current_entry.is_some() {
+        render_credentials(frame, app, lists_layout[1]);
+    } else {
+        frame.render_widget(
+            Paragraph::new("Select an entry to display")
+                .block(
+                    Block::default()
+                        .borders(Borders::NONE)
+                        .padding(Padding::uniform(1))
+                ),
+            lists_layout[1],
+        );
+    }
+}
+
+fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
+    if let Some(entries) = &app.current_entry {
+        let mut fields = vec![Constraint::Length(4); entries.items.len()];
+        fields.push(Constraint::Min(0));
+
+        let credentials_layout = Layout::new(
+            Direction::Vertical,
+            fields,
+        ).split(area);
+
+        for (entry, (index, field)) in entries.items.iter().zip(credentials_layout.iter().enumerate()) {
+            let color = if index == entries.current_index().unwrap() && app.page_selected
+            { Color::White } else { Color::DarkGray };
+
+            frame.render_widget(
+                Paragraph::new(entry.1)
+                    .block(Block::new()
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded)
+                        .fg(color)
+                        .title(entry.0)
+                    ),
+                *field,
+            )
+        }
+    }
 }
 
 fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {

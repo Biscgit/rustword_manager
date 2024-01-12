@@ -18,7 +18,7 @@ pub struct App<'a> {
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<(&'a str, usize)>,
-    pub current_entry: Option<usize>,
+    pub current_entry: Option<StatefulList<(&'a str, &'a str)>>,
     // pub selected_entry: json
 
     pub templates: StatefulList<Template>,
@@ -35,18 +35,18 @@ impl<'a> App<'a> {
             text_fields: EditableTextFields::new(),
 
             entries_list: StatefulList::with_items(vec![
-                ("Item0", 1),
-                ("Item1", 2),
-                ("Item2", 1),
+                ("Item0", 0),
+                ("Item1", 1),
+                ("Item2", 2),
                 ("Item3", 3),
-                ("Item4", 1),
-                ("Item5", 4),
-                ("Item6", 1),
-                ("Item7", 3),
-                ("Item8", 1),
-                ("Item9", 2),
+                ("Item4", 4),
+                ("Item5", 5),
+                ("Item6", 6),
+                ("Item7", 7),
+                ("Item8", 8),
+                ("Item9", 9),
             ]),
-            current_entry: Some(1),
+            current_entry: None,
 
             templates: StatefulList::with_items(vec![
                 serde_json::from_str(
@@ -96,8 +96,12 @@ impl<'a> App<'a> {
     }
 
     pub fn display_entry(&mut self) {
-        // switch to entry
-        self.select_entry();
+        // ToDo: set entry from DB
+        self.current_entry = Some(StatefulList::with_items(vec![
+            ("Title1", "Content1"),
+            ("Title2", "Content2"),
+            ("Title3", "Content3"),
+        ]))
     }
 
     pub fn select_entry(&mut self) {
