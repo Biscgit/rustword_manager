@@ -5,6 +5,7 @@ use std::{
 
 use crossterm::event::{self, Event, KeyCode};
 use crate::app::App;
+use crate::app::states::LoginState;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
@@ -16,7 +17,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             0 => {
                 match app.page_selected {
                     false => match key.code {
-                        KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+                        KeyCode::Esc => { app.lock_vault(); }
 
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
@@ -45,7 +46,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             1 => {
                 match app.page_selected {
                     false => match key.code {
-                        KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+                        KeyCode::Esc => { app.lock_vault(); }
 
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
@@ -87,7 +88,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             }
             2 => {
                 match key.code {
-                    KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+                    KeyCode::Esc => { app.lock_vault(); }
 
                     KeyCode::Tab => app.page_index.page_up(),
                     KeyCode::BackTab => app.page_index.page_down(),

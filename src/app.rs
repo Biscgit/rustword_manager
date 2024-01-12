@@ -168,9 +168,16 @@ impl<'a> App<'a> {
         self.page_selected = false;
     }
 
+    pub fn lock_vault(&mut self) {
+         self.vault_state.state = LoginState::Login;
+    }
+
     pub fn unlock_vault(&mut self) {
         if self.text_fields.password_input.lines()[0] == "pass" {
+            // unlock vault and clear password
             self.vault_state.state = LoginState::Unlocked;
+            self.text_fields.password_input = password_field();
+
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
         }
