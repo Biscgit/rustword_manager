@@ -11,7 +11,6 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
     // handle key presses and other events
     if let Event::Key(key) = event::read()? {
         // match inputs depending on currently displayed page
-        // default events
         // page specific events
         match app.page_index.index {
             0 => {

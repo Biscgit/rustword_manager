@@ -15,10 +15,10 @@ use crate::{
 
 pub struct App<'a> {
     pub vault_state: LoginStates,
-
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<(&'a str, usize)>,
+    pub current_entry: Option<usize>,
     // pub selected_entry: json
 
     pub template_names: StatefulList<(&'a str, usize)>,
@@ -33,8 +33,8 @@ impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         App {
             vault_state: LoginStates::new(),
-
             text_fields: EditableTextFields::new(),
+
             entries_list: StatefulList::with_items(vec![
                 ("Item0", 1),
                 ("Item1", 2),
@@ -47,6 +47,8 @@ impl<'a> App<'a> {
                 ("Item8", 1),
                 ("Item9", 2),
             ]),
+            current_entry: Some(1),
+
             template_names: StatefulList::with_items(vec![
                 ("Simple Credential", 0),
                 ("SSH-Keypair", 1),
@@ -96,6 +98,17 @@ impl<'a> App<'a> {
             if handle_events(&mut self)?.is_break() {
                 return Ok(());
             }
+        }
+    }
+
+    pub fn display_entry(&mut self) {
+        // switch to entry
+        self.select_entry();
+    }
+
+    pub fn select_entry(&mut self) {
+        if self.current_entry.is_some() {
+            self.page_selected = true;
         }
     }
 
