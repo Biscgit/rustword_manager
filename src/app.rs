@@ -97,11 +97,13 @@ impl<'a> App<'a> {
 
     pub fn display_entry(&mut self) {
         // ToDo: set entry from DB
-        self.current_entry = Some(StatefulList::with_items(vec![
-            ("Title1", "Content1"),
-            ("Title2", "Content2"),
-            ("Title3", "Content3"),
-        ]))
+        if self.entries_list.current_index().is_some() {
+            self.current_entry = Some(StatefulList::with_items(vec![
+                ("Title1", "Content1"),
+                ("Title2", "Content2"),
+                ("Title3", "Content3"),
+            ]))
+        }
     }
 
     pub fn select_entry(&mut self) {

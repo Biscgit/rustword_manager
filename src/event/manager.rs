@@ -27,7 +27,10 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Enter => app.display_entry(),
                         KeyCode::Right | KeyCode::Left => app.select_entry(),
 
-                        _ => { app.text_fields.search_bar.input(key); }
+                        _ => {
+                            app.text_fields.search_bar.input(key);
+                            app.entries_list.default_selected();
+                        }
                     }
                     true => match key.code {
                         KeyCode::Esc | KeyCode::Right | KeyCode::Left => { app.unselect_right(); }
