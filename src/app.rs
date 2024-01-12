@@ -1,3 +1,4 @@
+use arboard::Clipboard;
 use ratatui::{
     layout::Alignment,
     prelude::Style,
@@ -18,7 +19,7 @@ use crate::{
 
 pub(crate) mod states;
 mod extras;
-
+mod clipboard;
 
 pub struct App<'a> {
     // App handling all states and storage of the application
@@ -35,6 +36,8 @@ pub struct App<'a> {
 
     pub page_index: IndexManager,
     pub page_selected: bool,
+
+    pub clipboard: Clipboard,
 }
 
 impl<'a> App<'a> {
@@ -64,6 +67,7 @@ impl<'a> App<'a> {
                         "deletable": false,
                         "name": "Web Credential",
                         "elements": [
+                          {"name":  "Name", "private":  false},
                           {"name":  "Username", "private":  false},
                           {"name":  "Password", "private":  true}
                         ]
@@ -74,6 +78,7 @@ impl<'a> App<'a> {
                         "deletable": false,
                         "name": "SSH-Keypair",
                         "elements": [
+                          {"name":  "Name", "private":  false},
                           {"name":  "Website", "private":  false},
                           {"name":  "SSH-Public", "private":  false},
                           {"name":  "SSH-Private", "private":  true}
@@ -85,6 +90,7 @@ impl<'a> App<'a> {
                         "deletable": false,
                         "name": "Note",
                         "elements": [
+                          {"name":  "Name", "private":  false},
                           {"name":  "Note", "private":  false}
                         ]
                     }"#
@@ -93,6 +99,8 @@ impl<'a> App<'a> {
             current_template: None,
             page_index: IndexManager::new(3),
             page_selected: false,
+
+            clipboard: Clipboard::new().unwrap(),
         }
     }
 
@@ -232,5 +240,11 @@ impl<'a> App<'a> {
             }
         }
         true
+    }
+
+    pub fn copy_to_clipboard(&mut self, text: &str) {
+        // copies a string to clipboard
+        // ToDo: thread to reset clipboard after time
+        self.clipboard.set_text(text).unwrap();
     }
 }
