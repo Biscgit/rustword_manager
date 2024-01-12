@@ -17,6 +17,7 @@ use crate::{
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
+    // main function to setup app and run
     let mut terminal = setup_terminal()?;
     let app = App::new();
 

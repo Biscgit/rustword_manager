@@ -18,6 +18,8 @@ mod extras;
 
 
 pub struct App<'a> {
+    // App handling all states and storage of the application
+
     pub vault_state: LoginStates,
     pub text_fields: EditableTextFields<'a>,
 
@@ -34,6 +36,7 @@ pub struct App<'a> {
 
 impl<'a> App<'a> {
     pub fn new() -> App<'a> {
+        // creates a new with testing values
         App {
             vault_state: LoginStates::new(),
             text_fields: EditableTextFields::new(),
@@ -91,6 +94,7 @@ impl<'a> App<'a> {
     }
 
     pub fn run(mut self, terminal: &mut Terminal) -> crate::Result<()> {
+        // runs application forever until exited. Draws to the screen and handles events
         loop {
             terminal.draw(|f| draw_ui(f, &mut self))?;
             if handle_events(&mut self)?.is_break() {
@@ -111,6 +115,7 @@ impl<'a> App<'a> {
     }
 
     pub fn select_entry(&mut self) {
+        // push right side of entries page to focus
         if self.current_entry.is_some() {
             self.page_selected = true;
         }
@@ -120,11 +125,13 @@ impl<'a> App<'a> {
         // create inputs from template
         self.current_template = self.templates.current_index();
 
+        // get current template
         let template: &Template = self.templates.items.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
             vec![input_field(); template.elements.len() + 1])
         );
 
+        // fill fields with new formatted inputs from the template
         for (field, temp) in self.text_fields.edit_fields
             .as_mut()
             .unwrap()
@@ -145,6 +152,7 @@ impl<'a> App<'a> {
         // (for simplicity the last field is also a text field disguised as a button)
         let confirm_button = self.text_fields.edit_fields.as_mut().unwrap().items.last_mut().unwrap();
 
+        // style confirm button
         confirm_button.insert_str("Insert");
         confirm_button.set_alignment(Alignment::Center);
         confirm_button.set_cursor_style(Style::default());
@@ -159,7 +167,7 @@ impl<'a> App<'a> {
     }
 
     pub fn select_template(&mut self) {
-        // set selected to true for ui
+        // push right side of templates page to focus
         if self.current_template.is_some() {
             self.page_selected = true;
         }
@@ -172,14 +180,20 @@ impl<'a> App<'a> {
     }
 
     pub fn unselect_right(&mut self) {
+        // push left side and tabs to focus
         self.page_selected = false;
     }
 
     pub fn lock_vault(&mut self) {
+        // disconnects from database and locks vault
+        // ToDo: remove connection from DB etc.
         self.vault_state.state = LoginState::Login;
     }
 
     pub fn unlock_vault(&mut self) {
+        // unlocks existing vault
+        // sets app state according to if password is correct
+        // ToDo: check password
         if self.text_fields.password_input.lines()[0] == "pass" {
             // unlock vault and clear password
             self.vault_state.state = LoginState::Unlocked;
@@ -190,10 +204,15 @@ impl<'a> App<'a> {
     }
 
     pub fn setup_vault(&mut self) {
-        self.vault_state.state = LoginState::Unlocked
+        // creates a new vault with entered credential
+
+        // unlock vault and clear password
+        self.vault_state.state = LoginState::Unlocked;
+        self.text_fields.password_input = password_field();
     }
 
     pub fn save_entry(&mut self) {
+        // tries to save a new entry to database
         if self.all_fields_filled() {
             // ToDo: send input to database
 
@@ -202,6 +221,7 @@ impl<'a> App<'a> {
     }
 
     pub fn all_fields_filled(&self) -> bool {
+        // checks if all template fields are filled
         for field in self.text_fields.edit_fields.as_ref().unwrap().items.iter() {
             if field.is_empty() {
                 return false;
