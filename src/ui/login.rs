@@ -74,7 +74,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     }
 }
 
-fn login_with_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
     let password_field = &mut app.text_fields.password_input;
     password_field.set_placeholder_text("Please enter your password");
 
@@ -103,7 +103,7 @@ fn login_with_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     frame.render_widget(password_field.widget(), area);
 }
 
-fn register_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+fn register_password(frame: &mut Frame, app: &mut App, area: Rect) {
     match app.vault_state.state {
         // new vault password create
         LoginState::Register => {
@@ -116,13 +116,13 @@ fn register_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     }
 }
 
-fn first_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
-    let mut pw_field = &mut app.text_fields.password_input;
+fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
+    let pw_field = &mut app.text_fields.password_input;
     pw_field.set_placeholder_text("Please enter a strong password");
 
 
     // set design depending on validation of password strength
-    if let Some(error) = validate_password_strength(&mut pw_field) {
+    if let Some(error) = validate_password_strength(pw_field) {
         pw_field.set_style(Style::default().fg(Color::LightRed));
         pw_field.set_block(
             Block::default()
@@ -146,7 +146,7 @@ fn first_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
     frame.render_widget(pw_field.widget(), area);
 }
 
-fn confirm_password<'a>(frame: &mut Frame, app: &'a mut App, area: Rect) {
+fn confirm_password(frame: &mut Frame, app: &mut App, area: Rect) {
     let pw_field = &mut app.text_fields.password_input;
     pw_field.set_placeholder_text("Please confirm your password");
 

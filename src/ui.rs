@@ -4,7 +4,7 @@ use crate::{
     app_states::LoginState,
 };
 
-pub(self) mod manager;
+mod manager;
 pub(crate) mod login;
 
 

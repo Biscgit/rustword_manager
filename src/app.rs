@@ -103,7 +103,7 @@ impl<'a> App<'a> {
         // create inputs from template
         self.current_template = self.template_names.current();
 
-        let template: &Template = &self.templates.get(self.current_template.unwrap()).unwrap();
+        let template: &Template = self.templates.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
             vec![input_field(); template.elements.len() + 1])
         );

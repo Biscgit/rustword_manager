@@ -2,7 +2,7 @@ use std::{
     error::Error,
     ops::ControlFlow,
 };
-use std::hint::unreachable_unchecked;
+
 use crossterm::event::{self, Event, KeyCode};
 use crate::app::App;
 

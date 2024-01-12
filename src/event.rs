@@ -9,8 +9,8 @@ use crate::{
     app_states::LoginState
 };
 
-pub(self) mod manager;
-pub(self) mod login;
+ mod manager;
+ mod login;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {

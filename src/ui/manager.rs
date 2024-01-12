@@ -211,7 +211,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         let all_filled = app.all_fields_filled();
         let fields = app.text_fields.edit_fields.as_mut().unwrap();
 
-        let highlight_index = fields.current().clone().unwrap();
+        let highlight_index = fields.current().unwrap();
         let items = &mut fields.items;
 
         for i in 0..template.elements.len() {

@@ -19,7 +19,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
             // toggle character visibility
             KeyCode::Tab => {
-                let mut field = &mut app.text_fields.password_input;
+                let field = &mut app.text_fields.password_input;
                 if field.mask_char().is_none() {
                     field.set_mask_char('\u{2022}');
                 } else {
@@ -42,11 +42,11 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     // creating new vault and first password input
                     LoginState::Register => match key.code {
                         KeyCode::Enter => {
-                            let mut pw_field = &mut app.text_fields.password_input;
+                            let pw_field = &mut app.text_fields.password_input;
 
-                            if validate_password_strength(&mut pw_field).is_none() {
+                            if validate_password_strength(pw_field).is_none() {
                                 app.vault_state.set_password(
-                                    &app.text_fields.password_input.lines()[0]
+                                    app.text_fields.password_input.lines()[0].clone()
                                 );
                                 app.vault_state.state = LoginState::NewVaultConfirmNoMatch;
                                 app.text_fields.password_input = password_field();

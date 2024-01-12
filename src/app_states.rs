@@ -19,8 +19,8 @@ impl LoginStates {
         false
     }
 
-    pub fn set_password(&mut self, password: &String) {
-        self.last_password = Some(password.clone());
+    pub fn set_password(&mut self, password: String) {
+        self.last_password = Some(password);
     }
 }
 
