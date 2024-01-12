@@ -43,8 +43,8 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
 
-                        KeyCode::Up => app.template_names.previous(),
-                        KeyCode::Down => app.template_names.next(),
+                        KeyCode::Up => app.templates.previous(),
+                        KeyCode::Down => app.templates.next(),
 
                         KeyCode::Right => app.select_template(),
                         KeyCode::Enter => app.reset_input_fields(),

@@ -21,8 +21,7 @@ pub struct App<'a> {
     pub current_entry: Option<usize>,
     // pub selected_entry: json
 
-    pub template_names: StatefulList<(&'a str, usize)>,
-    pub templates: Vec<Template>,
+    pub templates: StatefulList<Template>,
     pub current_template: Option<usize>,
 
     pub page_index: IndexManager,
@@ -49,12 +48,7 @@ impl<'a> App<'a> {
             ]),
             current_entry: Some(1),
 
-            template_names: StatefulList::with_items(vec![
-                ("Simple Credential", 0),
-                ("SSH-Keypair", 1),
-                ("Note", 2),
-            ]),
-            templates: vec![
+            templates: StatefulList::with_items(vec![
                 serde_json::from_str(
                     r#"{
                         "deletable": false,
@@ -85,7 +79,7 @@ impl<'a> App<'a> {
                         ]
                     }"#
                 ).unwrap(),
-            ],
+            ]),
             current_template: None,
             page_index: IndexManager::new(3),
             page_selected: false,
@@ -114,9 +108,9 @@ impl<'a> App<'a> {
 
     pub fn reset_input_fields(&mut self) {
         // create inputs from template
-        self.current_template = self.template_names.current();
+        self.current_template = self.templates.current();
 
-        let template: &Template = self.templates.get(self.current_template.unwrap()).unwrap();
+        let template: &Template = self.templates.items.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
             vec![input_field(); template.elements.len() + 1])
         );

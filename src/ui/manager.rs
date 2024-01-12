@@ -146,11 +146,11 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     // entry view
     let color = if app.page_selected { Color::DarkGray } else { Color::Yellow };
     let items: Vec<ListItem> = app
-        .template_names
+        .templates
         .items
         .iter()
-        .map(|i| {
-            ListItem::new(i.0)
+        .map(|t| {
+            ListItem::new(t.name.clone())
                 .style(Style::default().fg(color))
         })
         .collect();
@@ -171,7 +171,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         )
         .highlight_symbol(" ❱ ");
 
-    frame.render_stateful_widget(items, lists_layout[0], &mut app.template_names.state);
+    frame.render_stateful_widget(items, lists_layout[0], &mut app.templates.state);
 
     // Template display
     if let Some(_index) = app.current_template {
@@ -198,7 +198,7 @@ fn page_template_creator(frame: &mut Frame, _app: &mut App, area: Rect) {
 
 fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
     // display fields for a new entry if any exist else display nothing
-    if let Some(template) = app.templates.get(app.current_template.unwrap_or(0)) {
+    if let Some(template) = app.templates.items.get(app.current_template.unwrap_or(0)) {
         let mut fields = vec![Constraint::Length(4); template.elements.len()];
         fields.push(Constraint::Min(0));
         fields.push(Constraint::Length(3));
