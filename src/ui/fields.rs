@@ -3,6 +3,7 @@ use tui_textarea::TextArea;
 
 
 pub fn input_field<'a>() -> TextArea<'a> {
+    // creates a new input field
     let mut text_input = TextArea::default();
     text_input.set_cursor_line_style(Style::default());
 
@@ -10,7 +11,7 @@ pub fn input_field<'a>() -> TextArea<'a> {
 }
 
 pub fn password_field<'a>() -> TextArea<'a> {
-    // needs to be accessible from the events -> storing in app state
+    // creates a new password input field
     let mut password_input = TextArea::default();
 
     password_input.set_cursor_line_style(Style::default());
