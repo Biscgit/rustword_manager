@@ -8,7 +8,6 @@ use crate::{
 
 mod ui;
 mod app;
-mod stateful_list;
 mod event;
 mod types;
 mod terminal;

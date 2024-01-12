@@ -4,6 +4,7 @@ use ratatui::{
     prelude::Style,
     widgets::{Block, Borders, BorderType}
 };
+use stateful_list::StatefulList;
 
 use self::{
     extras::*,
@@ -12,14 +13,14 @@ use self::{
 use crate::{
     event::handle_events,
     password::generate_strong_password,
-    stateful_list::StatefulList,
-    ui::{draw_ui, fields::{password_field, input_field}},
     types::Terminal,
+    ui::{draw_ui, fields::{input_field, password_field}},
 };
 
 pub(crate) mod states;
 mod extras;
 mod clipboard;
+mod stateful_list;
 
 pub struct App<'a> {
     // App handling all states and storage of the application

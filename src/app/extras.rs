@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
-use crate::{
-    stateful_list::StatefulList,
-    ui::fields::{password_field, input_field},
-};
+use crate::ui::fields::{input_field, password_field};
+use crate::app::stateful_list::StatefulList;
 
 
 pub struct IndexManager {
