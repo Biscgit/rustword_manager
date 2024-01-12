@@ -11,6 +11,7 @@ use crate::password::validate_password_strength;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
+    // handels events when logging in or registering
     if let Event::Key(key) = event::read()? {
         // check for special overall functions
         match key.code {
