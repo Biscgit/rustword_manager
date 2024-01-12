@@ -35,7 +35,7 @@ fn password_strength(password: &String) -> Option<String> {
     } else if process_letters(&password, is_special) {
         Some(String::from("Password needs one special character"))
     } else if password.len() < 10 {
-        Some(String::from("Password too short"))
+        Some(String::from("Password needs 10 or more characters"))
     } else {
         None
     }
