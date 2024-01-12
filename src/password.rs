@@ -1,7 +1,18 @@
 use tui_textarea::TextArea;
-use passwords::{analyzer, scorer};
+use passwords::{analyzer, PasswordGenerator, scorer};
 
-// pub fn generate_strong_password(length: usize) -> String {}
+pub fn generate_strong_password(length: usize) -> String {
+    // uses thread_rng which is marked as cryptographically secure
+    let generator = PasswordGenerator::new()
+        .length(length)
+        .numbers(true)
+        .lowercase_letters(true)
+        .uppercase_letters(true)
+        .symbols(true)
+        .strict(true);
+
+    generator.generate_one().expect("Failed to generate Password")
+}
 
 
 pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u32) {
