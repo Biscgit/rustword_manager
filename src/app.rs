@@ -210,6 +210,7 @@ impl<'a> App<'a> {
         // creates a new vault with entered credential
 
         // unlock vault and clear password
+        self.vault_state.clear_password();
         self.vault_state.state = LoginState::Unlocked;
         self.text_fields.password_input = password_field();
     }
