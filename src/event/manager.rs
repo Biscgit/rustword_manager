@@ -42,7 +42,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Down | KeyCode::Tab => { app.current_entry.as_mut().unwrap().next(); }
 
                         KeyCode::Char('c') => {
-                            let text = app.current_entry.as_ref().unwrap().current_item().unwrap().1.clone();
+                            let text = app.current_entry.as_ref().unwrap().current_item().unwrap().1;
                             app.copy_to_clipboard(text);
                         }
                         _ => {}
