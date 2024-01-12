@@ -1,16 +1,5 @@
-use ratatui::{
-    Frame,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    prelude::{Color, Style},
-    style::Stylize,
-    widgets::{Block, Borders, BorderType, Padding, Paragraph},
-};
+use ratatui::prelude::Style;
 use tui_textarea::TextArea;
-
-use crate::{
-    app::{App, states::LoginState},
-    password::validate_password_strength,
-};
 
 
 pub fn input_field<'a>() -> TextArea<'a> {

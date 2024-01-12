@@ -1,7 +1,6 @@
 use ratatui::layout::Alignment;
 use ratatui::prelude::Style;
 use ratatui::widgets::{Block, Borders, BorderType};
-use serde::{Deserialize, Serialize};
 
 use self::{
     extras::*,

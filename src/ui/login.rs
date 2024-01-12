@@ -5,7 +5,6 @@ use ratatui::{
     style::Stylize,
     widgets::{Block, Borders, BorderType, Padding, Paragraph},
 };
-use tui_textarea::TextArea;
 
 use crate::{
     app::{App, states::LoginState},
