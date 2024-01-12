@@ -121,7 +121,7 @@ impl<'a> App<'a> {
         // ToDo: set entry from DB
         if self.entries_list.current_index().is_some() {
             self.current_entry = Some(StatefulList::with_items(vec![
-                ("Title1", "Content1"),
+                ("Title1", "Content1 and this is a very long content or password or idk"),
                 ("Title2", "Content2"),
                 ("Title3", "Content3"),
             ]));

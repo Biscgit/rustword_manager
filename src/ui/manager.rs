@@ -5,6 +5,7 @@ use ratatui::{
     style::Stylize,
     widgets::{block::{Position, Title}, Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
 };
+use ratatui::widgets::Wrap;
 use tui_textarea::TextArea;
 use crate::app::App;
 
@@ -169,10 +170,11 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 .fg(color)
                 .title(entry.0);
 
+            // apply theme if copied field
             if let Some(copied) = app.copied {
                 if copied == index {
                     p_block = p_block.title(
-                        Title::from("Copied!")
+                        Title::from("Copied to clipboard!")
                             .position(Position::Top)
                             .alignment(Alignment::Center));
                 }
@@ -180,7 +182,8 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
             frame.render_widget(
                 Paragraph::new(entry.1)
-                    .block(p_block),
+                    .block(p_block)
+                    .wrap(Wrap {trim: false}),
                 *field,
             )
         }
