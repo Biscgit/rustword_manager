@@ -138,17 +138,17 @@ impl<'a> App<'a> {
         );
 
         // move focus to right side
-        self.select_right();
+        self.select_template();
     }
 
-    pub fn select_right(&mut self) {
+    pub fn select_template(&mut self) {
         // set selected to true for ui
         if self.current_template.is_some() {
             self.page_selected = true;
         }
     }
 
-    pub fn unselect_template(&mut self) {
+    pub fn unselect_right(&mut self) {
         self.page_selected = false;
     }
 

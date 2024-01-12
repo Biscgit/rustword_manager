@@ -37,13 +37,13 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 KeyCode::Up => app.template_names.previous(),
                                 KeyCode::Down => app.template_names.next(),
 
-                                KeyCode::Right => app.select_right(),
+                                KeyCode::Right => app.select_template(),
                                 KeyCode::Enter => app.reset_input_fields(),
 
                                 _ => {}
                             }
                             true => match key.code {
-                                KeyCode::Esc => { app.unselect_template(); }
+                                KeyCode::Esc => { app.unselect_right(); }
 
                                 KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
                                 KeyCode::Down => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
