@@ -14,16 +14,25 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
         // page specific events
         match app.page_index.index {
             0 => {
-                match key.code {
-                    KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
+                match app.page_selected {
+                    false => match key.code {
+                        KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
 
-                    KeyCode::Tab => app.page_index.page_up(),
-                    KeyCode::BackTab => app.page_index.page_down(),
+                        KeyCode::Tab => app.page_index.page_up(),
+                        KeyCode::BackTab => app.page_index.page_down(),
 
-                    KeyCode::Up => app.entries_list.previous(),
-                    KeyCode::Down => app.entries_list.next(),
+                        KeyCode::Up => app.entries_list.previous(),
+                        KeyCode::Down => app.entries_list.next(),
 
-                    _ => { app.text_fields.search_bar.input(key); }
+                        KeyCode::Enter => app.display_entry(),
+
+                        _ => { app.text_fields.search_bar.input(key); }
+                    }
+                    true => match key.code {
+                        KeyCode::Esc => { app.unselect_right(); }
+
+                        _ => {}
+                    }
                 }
             }
             1 => {

@@ -68,23 +68,24 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     ).split(lists_layout[0]);
 
     // entry view
+    let entry_color = if app.page_selected { Color::DarkGray } else { Color::Yellow };
     let items: Vec<ListItem> = app
         .entries_list
         .items
         .iter()
         .map(|i| {
             ListItem::new(i.0)
-                .style(Style::default()
-                    .fg(Color::Yellow)
-                )
+                .style(Style::default().fg(entry_color))
         })
         .collect();
 
 
     // Create a List from all list items and highlight the currently selected one
+    let border_color = if app.page_selected { Color::DarkGray } else { Color::White };
     let items = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
+            .fg(border_color)
             .title("List"))
         .highlight_style(
             Style::default()
