@@ -53,7 +53,11 @@ impl<T> StatefulList<T> {
         self.state.select(Some(i));
     }
 
-    pub fn current(&self) -> Option<usize> {
+    pub fn current_index(&self) -> Option<usize> {
         self.state.selected()
+    }
+
+    pub fn current_item(&self) -> Option<&T> {
+        self.items.get(self.current_index().unwrap_or(self.items.len() + 1))
     }
 }

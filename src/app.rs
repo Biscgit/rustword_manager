@@ -108,7 +108,7 @@ impl<'a> App<'a> {
 
     pub fn reset_input_fields(&mut self) {
         // create inputs from template
-        self.current_template = self.templates.current();
+        self.current_template = self.templates.current_index();
 
         let template: &Template = self.templates.items.get(self.current_template.unwrap()).unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(

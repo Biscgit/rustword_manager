@@ -59,7 +59,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         KeyCode::Enter => {
                             let fields = app.text_fields.edit_fields.as_ref().unwrap();
-                            if let Some(index) = fields.current() {
+                            if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
                                 } else {
@@ -69,7 +69,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         }
                         _ => {
                             let fields = app.text_fields.edit_fields.as_mut().unwrap();
-                            if let Some(index) = fields.current() {
+                            if let Some(index) = fields.current_index() {
                                 if index != fields.items.len() - 1 {
                                     app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);
                                 }
