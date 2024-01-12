@@ -7,6 +7,7 @@ use tui_textarea::TextArea;
 use self::states::{LoginState, LoginStates};
 use crate::{
     event::handle_events,
+    password::generate_strong_password,
     stateful_list::StatefulList,
     ui::{draw_ui, login::{input_field, password_field}},
     types::Terminal,
@@ -131,7 +132,7 @@ impl<'a> App<'a> {
             .iter_mut()
             .zip(&template.elements)
         {
-            field.set_placeholder_text("Enter credential");
+            field.set_placeholder_text("Fill with credential\nPress Enter to generate secure password");
             field.set_block(
                 Block::default()
                     .borders(Borders::ALL)
@@ -164,12 +165,18 @@ impl<'a> App<'a> {
         }
     }
 
+    pub fn fill_random_password(&mut self, i: usize) {
+        // fills selected field with a random password
+        let field = &mut self.text_fields.edit_fields.as_mut().unwrap().items[i];
+        field.insert_str(generate_strong_password(16));
+    }
+
     pub fn unselect_right(&mut self) {
         self.page_selected = false;
     }
 
     pub fn lock_vault(&mut self) {
-         self.vault_state.state = LoginState::Login;
+        self.vault_state.state = LoginState::Login;
     }
 
     pub fn unlock_vault(&mut self) {
@@ -177,7 +184,6 @@ impl<'a> App<'a> {
             // unlock vault and clear password
             self.vault_state.state = LoginState::Unlocked;
             self.text_fields.password_input = password_field();
-
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
         }

@@ -70,6 +70,10 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
                                 } else {
+                                    if fields.current_item().unwrap().is_empty() {
+                                        app.fill_random_password(index);
+                                    }
+
                                     app.text_fields.edit_fields.as_mut().unwrap().next();
                                 }
                             }
