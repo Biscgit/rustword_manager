@@ -201,7 +201,7 @@ impl<'a> App<'a> {
     pub fn fill_random_password(&mut self, i: usize) {
         // fills selected field with a random password
         let field = &mut self.text_fields.edit_fields.as_mut().unwrap().items[i];
-        field.insert_str(generate_strong_password(20));
+        field.insert_str(generate_strong_password(24));
     }
 
     pub fn unselect_right(&mut self) {
