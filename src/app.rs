@@ -126,6 +126,7 @@ impl<'a> App<'a> {
                 ("Title1", "Content1 and this is a very long content or password or idk", false),
                 ("Title2", "Content2 is hidden", true),
                 ("Title3", "Content3", false),
+                ("Title3", "", true),
                 ("", "", false),
             ]));
 
