@@ -213,10 +213,11 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 color = Color::Red;
             }
         }
-        let text = if app.delete_confirm { "Confirm Delete" } else { "Delete Entry" };
+        let text = if app.delete_confirm { "Confirm Delete".bold() } else { "Delete Entry".not_bold() };
 
         frame.render_widget(
             Paragraph::new(text)
+                .alignment(Alignment::Center)
                 .block(Block::new()
                     .borders(Borders::ALL)
                     .border_type(border_type)
