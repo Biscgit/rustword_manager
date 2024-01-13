@@ -65,7 +65,7 @@ impl<T> StatefulList<T> {
         }
     }
 
-    pub fn get(&self, index: usize) -> Option<&T> {
+    pub fn _get(&self, index: usize) -> Option<&T> {
         // get an item from index
         self.items.get(index)
     }

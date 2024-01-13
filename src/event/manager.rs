@@ -25,7 +25,12 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Down => app.entries_list.next(),
 
                         KeyCode::Enter => app.display_entry(),
-                        KeyCode::Right | KeyCode::Left => app.select_entry(),
+                        KeyCode::Right => {
+                            if app.current_entry.is_none() {
+                                app.display_entry();
+                            }
+                            app.select_entry();
+                        } ,
 
                         // fill input field if no matching action
                         _ => {
@@ -95,7 +100,13 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Up => app.templates.previous(),
                         KeyCode::Down => app.templates.next(),
 
-                        KeyCode::Right => app.select_template(),
+                        KeyCode::Right => {
+                            if app.current_template.is_some() {
+                                app.select_template();
+                            } else {
+                                app.reset_input_fields();
+                            }
+                        }
                         KeyCode::Enter => app.reset_input_fields(),
 
                         _ => {}
