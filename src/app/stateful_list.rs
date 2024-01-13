@@ -78,4 +78,9 @@ impl<T> StatefulList<T> {
         // returns the currently selected item
         self.items.get(self.current_index().unwrap_or(self.items.len() + 1))
     }
+
+    pub fn current_item_mut(&mut self) -> Option<&mut T> {
+        let index = self.current_index().unwrap_or(self.items.len() + 1);
+        self.items.get_mut(index)
+    }
 }
