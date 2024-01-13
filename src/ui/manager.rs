@@ -348,7 +348,6 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         }
 
         // apply button style
-
         let block = set_border_color(confirm_button, color).border_type(border_type);
         confirm_button.set_block(block);
 
