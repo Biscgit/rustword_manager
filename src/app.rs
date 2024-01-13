@@ -158,7 +158,12 @@ impl<'a> App<'a> {
             .iter_mut()
             .zip(&template.elements)
         {
-            field.set_placeholder_text("Enter or paste credential\nPress Enter to generate secure password");
+            let mut placeholder = "Enter or paste credential".to_string();
+            if temp.private {
+                placeholder.push_str("\nPress Enter to generate secure password");
+            }
+
+            field.set_placeholder_text(placeholder);
             field.set_block(
                 Block::default()
                     .borders(Borders::ALL)

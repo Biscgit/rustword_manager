@@ -107,9 +107,12 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
+
                                 } else {
-                                    // fill with random credentials if empty
-                                    if fields.current_item().unwrap().is_empty() {
+                                    // fill with random credentials if empty and a private field
+                                    let curr_temp = app.templates.get(app.current_template.unwrap_or(0)).unwrap();
+
+                                    if fields.current_item().unwrap().is_empty() && curr_temp.elements[index].private {
                                         app.fill_random_password(index);
                                     }
 

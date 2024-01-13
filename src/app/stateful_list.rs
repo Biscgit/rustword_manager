@@ -65,6 +65,10 @@ impl<T> StatefulList<T> {
         }
     }
 
+    pub fn get(&self, index: usize) -> Option<&T> {
+        self.items.get(index)
+    }
+
     pub fn current_index(&self) -> Option<usize> {
         // returns currently selected if possible
         self.state.selected()

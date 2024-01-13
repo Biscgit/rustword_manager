@@ -249,7 +249,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     frame.render_stateful_widget(items, lists_layout[0], &mut app.templates.state);
 
     // right side: show template fields if something selected
-    if let Some(_index) = app.current_template {
+    if app.current_template.is_some() {
         display_template(frame, app, lists_layout[1]);
     } else {
         frame.render_widget(
