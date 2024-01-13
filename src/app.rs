@@ -19,7 +19,7 @@ use crate::{
 
 pub(crate) mod states;
 mod extras;
-mod clipboard;
+mod threads;
 mod stateful_list;
 
 pub struct App<'a> {

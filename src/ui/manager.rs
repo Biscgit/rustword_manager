@@ -157,22 +157,26 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
             // set color and style with responsive copy
             let mut color = Color::DarkGray;
+            let mut border_type = BorderType::Rounded;
 
             if app.page_selected {
                 if index == entries.current_index().unwrap() {
                     color = Color::White;
+                    border_type = BorderType::Thick;
 
                     if let Some(copied) = app.copied {
                         if copied == index {
                             color = Color::LightBlue;
                         }
                     }
+                } else {
+                    color = Color::Gray;
                 }
             }
 
             let mut p_block = Block::new()
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
+                .border_type(border_type)
                 .fg(color)
                 .title(entry.0);
 
@@ -197,15 +201,25 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
             )
         }
 
-        // create a delete button
-        let color = if entries.items.len() - 1 == entries.current_index().unwrap() && app.page_selected
-        { Color::LightRed } else { Color::DarkGray };
+        // create a delete button and theme it
+        let mut color = Color::DarkGray;
+        let mut border_type = BorderType::Rounded;
+
+        if app.page_selected {
+            if entries.items.len() - 1 == entries.current_index().unwrap() {
+                color = Color::LightRed;
+                border_type = BorderType::Thick;
+            } else {
+                color = Color::Red;
+            }
+        }
         let text = if app.delete_confirm { "Confirm Delete" } else { "Delete Entry" };
+
         frame.render_widget(
             Paragraph::new(text)
                 .block(Block::new()
                     .borders(Borders::ALL)
-                    .border_type(BorderType::Rounded)
+                    .border_type(border_type)
                     .fg(color)),
             *credentials_layout.last().unwrap(),
         );
@@ -296,7 +310,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
             if i == highlight_index && app.page_selected {
                 field_active(current);
             } else {
-                field_inactive(current);
+                field_inactive(current, app.page_selected);
             }
 
             // render widget in spot
@@ -311,18 +325,30 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
         let confirm_button = items.last_mut().unwrap();
 
         let mut color = Color::DarkGray;
-        if highlight_index == last_index {
+        let mut border_type = BorderType::Rounded;
 
+        if app.page_selected {
             // set button color depending if entry can be inserted
             if all_filled {
-                color = Color::LightGreen;
+                if highlight_index == last_index {
+                    border_type = BorderType::Thick;
+                    color = Color::LightGreen;
+                } else {
+                    color = Color::Green;
+                }
             } else {
-                color = Color::LightRed;
+                if highlight_index == last_index {
+                    border_type = BorderType::Thick;
+                    color = Color::LightRed;
+                } else {
+                    color = Color::Red;
+                }
             }
         }
 
         // apply button style
-        let block = set_border_color(confirm_button, color);
+
+        let block = set_border_color(confirm_button, color).border_type(border_type);
         confirm_button.set_block(block);
 
         frame.render_widget(
@@ -358,15 +384,25 @@ fn field_active(text_field: &mut TextArea<'_>) {
         color = Color::LightRed;
     }
 
-    let block = set_border_color(text_field, color);
+    let block = set_border_color(text_field, color).border_type(BorderType::Thick);
+
     text_field.set_block(block);
 }
 
-fn field_inactive(text_field: &mut TextArea<'_>) {
+fn field_inactive(text_field: &mut TextArea<'_>, can_select: bool) {
     // modifies block to look inactive
     text_field.set_cursor_line_style(Style::default());
     text_field.set_cursor_style(Style::default());
 
-    let block = set_border_color(text_field, Color::DarkGray);
+    let mut color = Color::DarkGray;
+    if can_select {
+        if text_field.is_empty() {
+            color = Color::Red;
+        } else {
+            color = Color::Gray;
+        }
+    }
+
+    let block = set_border_color(text_field, color).border_type(BorderType::Rounded);
     text_field.set_block(block);
 }
