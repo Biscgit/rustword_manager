@@ -5,7 +5,6 @@ use ratatui::{
     style::Stylize,
     widgets::{block::{Position, Title}, Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
 };
-use ratatui::text::Masked;
 use ratatui::widgets::Wrap;
 use tui_textarea::TextArea;
 use crate::app::App;
