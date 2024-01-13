@@ -195,7 +195,8 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         }
 
         // create a delete button
-        let color = if entries.items.len() - 1 == entries.current_index().unwrap() { Color::LightRed } else { Color::DarkGray };
+        let color = if entries.items.len() - 1 == entries.current_index().unwrap() && app.page_selected
+        { Color::LightRed } else { Color::DarkGray };
         let text = if app.delete_confirm { "Confirm Delete" } else { "Delete Entry" };
         frame.render_widget(
             Paragraph::new(text)
