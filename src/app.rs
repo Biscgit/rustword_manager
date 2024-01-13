@@ -2,13 +2,13 @@ use arboard::Clipboard;
 use ratatui::{
     layout::Alignment,
     prelude::Style,
-    widgets::{Block, Borders, BorderType}
+    widgets::{Block, Borders, BorderType},
 };
 use stateful_list::StatefulList;
 
 use self::{
     extras::*,
-    states::{LoginState, LoginStates}
+    states::{LoginState, LoginStates},
 };
 use crate::{
     event::handle_events,
@@ -30,7 +30,7 @@ pub struct App<'a> {
 
     pub entries_list: StatefulList<(&'a str, usize)>,
     pub current_entry: Option<StatefulList<(&'a str, &'a str)>>,
-    // pub selected_entry: json
+    pub delete_confirm: bool,
 
     pub templates: StatefulList<Template>,
     pub current_template: Option<usize>,
@@ -99,6 +99,8 @@ impl<'a> App<'a> {
                 ).unwrap(),
             ]),
             current_template: None,
+            delete_confirm: false,
+
             page_index: IndexManager::new(3),
             page_selected: false,
 
@@ -124,6 +126,7 @@ impl<'a> App<'a> {
                 ("Title1", "Content1 and this is a very long content or password or idk"),
                 ("Title2", "Content2"),
                 ("Title3", "Content3"),
+                ("", ""),
             ]));
 
             self.copied = None;
@@ -235,6 +238,15 @@ impl<'a> App<'a> {
 
             self.reset_input_fields();
         }
+    }
+
+    pub fn delete_entry(&mut self) {
+        // deletes entry from view and database
+        // ToDo: delete entry from database
+
+        // remove from view
+        self.current_entry = None;
+        self.page_selected = false;
     }
 
     pub fn all_fields_filled(&self) -> bool {

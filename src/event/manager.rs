@@ -36,15 +36,41 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     }
                     // credentials right side
                     true => match key.code {
-                        KeyCode::Esc | KeyCode::Right | KeyCode::Left => { app.unselect_right(); }
+                        KeyCode::Esc | KeyCode::Right | KeyCode::Left => {
+                            app.unselect_right();
+                            app.delete_confirm = false;
+                        }
 
                         // moves focus up or down on entries
-                        KeyCode::Up | KeyCode::BackTab => { app.current_entry.as_mut().unwrap().previous(); }
-                        KeyCode::Down | KeyCode::Tab => { app.current_entry.as_mut().unwrap().next(); }
+                        KeyCode::Up | KeyCode::BackTab => {
+                            app.current_entry.as_mut().unwrap().previous();
+                            app.delete_confirm = false;
+                        }
+                        KeyCode::Down | KeyCode::Tab => {
+                            app.current_entry.as_mut().unwrap().next();
+                            app.delete_confirm = false;
+                        }
 
+                        KeyCode::Enter => {
+                            let entries = app.current_entry.as_ref().unwrap();
+                            if entries.current_index().unwrap() == entries.items.len() - 1 {
+                                // delete entry when confirmed
+                                if app.delete_confirm {
+                                    app.delete_entry();
+                                    app.delete_confirm = false;
+                                } else {
+                                    app.delete_confirm = true;
+                                }
+                            }
+                        }
+
+                        // copy by pressing "c"
                         KeyCode::Char('c') => {
-                            let text = app.current_entry.as_ref().unwrap().current_item().unwrap().1;
-                            app.copy_to_clipboard(text);
+                            let entries = app.current_entry.as_ref().unwrap();
+                            if entries.current_index().unwrap() != entries.items.len() - 1 {
+                                let text = app.current_entry.as_ref().unwrap().current_item().unwrap().1;
+                                app.copy_to_clipboard(text);
+                            }
                         }
                         _ => {}
                     }

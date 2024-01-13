@@ -141,6 +141,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         // create all fields in a layout
         let mut fields = vec![Constraint::Length(4); entries.items.len()];
         fields.push(Constraint::Min(0));
+        fields.push(Constraint::Length(3));
 
         let credentials_layout = Layout::new(
             Direction::Vertical,
@@ -149,6 +150,11 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
         // fill fields with content and highlight
         for (entry, (index, field)) in entries.items.iter().zip(credentials_layout.iter().enumerate()) {
+            // skip last -> confirm button
+            if index == entries.items.len() - 1 {
+                break;
+            }
+
             // set color and style with responsive copy
             let mut color = Color::DarkGray;
 
@@ -183,10 +189,22 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
             frame.render_widget(
                 Paragraph::new(entry.1)
                     .block(p_block)
-                    .wrap(Wrap {trim: false}),
+                    .wrap(Wrap { trim: false }),
                 *field,
             )
         }
+
+        // create a delete button
+        let color = if entries.items.len() - 1 == entries.current_index().unwrap() { Color::LightRed } else { Color::DarkGray };
+        let text = if app.delete_confirm { "Confirm Delete" } else { "Delete Entry" };
+        frame.render_widget(
+            Paragraph::new(text)
+                .block(Block::new()
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .fg(color)),
+            *credentials_layout.last().unwrap(),
+        );
     }
 }
 
