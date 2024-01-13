@@ -42,12 +42,19 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         }
 
                         // moves focus up or down on entries
-                        KeyCode::Up | KeyCode::BackTab => {
+                        KeyCode::Up => {
                             app.current_entry.as_mut().unwrap().previous();
                             app.delete_confirm = false;
                         }
-                        KeyCode::Down | KeyCode::Tab => {
+                        KeyCode::Down => {
                             app.current_entry.as_mut().unwrap().next();
+                            app.delete_confirm = false;
+                        }
+
+                        KeyCode::Tab | KeyCode::BackTab => {
+                            let entry = app.current_entry.as_mut().unwrap().current_item_mut().unwrap();
+                            entry.2 = !entry.2;
+
                             app.delete_confirm = false;
                         }
 
@@ -107,10 +114,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
-
                                 } else {
                                     // fill with random credentials if empty and a private field
-                                    let curr_temp = app.templates.get(app.current_template.unwrap_or(0)).unwrap();
+                                    let curr_temp = app.templates.current_item().unwrap();
 
                                     if fields.current_item().unwrap().is_empty() && curr_temp.elements[index].private {
                                         app.fill_random_password(index);

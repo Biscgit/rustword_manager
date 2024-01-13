@@ -18,7 +18,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
             // quit application
             KeyCode::Esc => { return Ok(ControlFlow::Break(())); }
             // toggle character visibility
-            KeyCode::Tab => {
+            KeyCode::Tab | KeyCode::BackTab => {
                 let field = &mut app.text_fields.password_input;
                 if field.mask_char().is_none() {
                     field.set_mask_char('\u{2022}');

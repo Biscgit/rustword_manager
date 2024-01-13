@@ -5,6 +5,7 @@ use ratatui::{
     style::Stylize,
     widgets::{block::{Position, Title}, Block, Borders, BorderType, List, ListItem, Padding, Paragraph, Tabs},
 };
+use ratatui::text::Masked;
 use ratatui::widgets::Wrap;
 use tui_textarea::TextArea;
 use crate::app::App;
@@ -186,8 +187,11 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 }
             }
 
+            // display private credentials hidden until switched
+            let private_text: String = if entry.2 { "\u{2022}".repeat(entry.1.len()) } else { entry.1.to_string() };
+
             frame.render_widget(
-                Paragraph::new(entry.1)
+                Paragraph::new(private_text)
                     .block(p_block)
                     .wrap(Wrap { trim: false }),
                 *field,

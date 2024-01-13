@@ -29,7 +29,7 @@ pub struct App<'a> {
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<(&'a str, usize)>,
-    pub current_entry: Option<StatefulList<(&'a str, &'a str)>>,
+    pub current_entry: Option<StatefulList<(&'a str, &'a str, bool)>>,
     pub delete_confirm: bool,
 
     pub templates: StatefulList<Template>,
@@ -123,10 +123,10 @@ impl<'a> App<'a> {
         // ToDo: set entry from DB
         if self.entries_list.current_index().is_some() {
             self.current_entry = Some(StatefulList::with_items(vec![
-                ("Title1", "Content1 and this is a very long content or password or idk"),
-                ("Title2", "Content2"),
-                ("Title3", "Content3"),
-                ("", ""),
+                ("Title1", "Content1 and this is a very long content or password or idk", false),
+                ("Title2", "Content2 is hidden", true),
+                ("Title3", "Content3", false),
+                ("", "", false),
             ]));
 
             self.copied = None;
