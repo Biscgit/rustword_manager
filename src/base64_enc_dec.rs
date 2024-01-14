@@ -8,6 +8,6 @@ pub fn encode_base64(input: &str) -> String {
     encode(input)
 }
 
-pub fn decode_base64(input: &str) -> String {
+pub fn decode_base64(input: String) -> String {
     String::from_utf8(decode(input).unwrap()).expect("Item could not be processed.")
 }
