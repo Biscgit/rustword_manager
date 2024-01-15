@@ -38,7 +38,7 @@ pub fn establish_connection(db_name: &str, db_key: &str) -> Result<Connection, r
 // SENDING DATABASE INFORMATION TO MAINFRAME
 
 pub fn get_all_tables(conn: &Connection) -> Vec<String> {
-    let mut statement = conn.prepare("SELECT name FROM sqlite_master WHERE type='table';")
+    let mut statement = conn.prepare("SELECT name FROM sqlite_master WHERE type='table'")
                             .expect("Failed to prepare query");
     let table_names = statement
         .query_map((), |row| row.get(0))
@@ -108,7 +108,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
 // IMPLEMENTING SQL COMMANDS
 
 pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>) -> Result<()> {
-    conn.execute(&format!("CREATE TABLE {} (description TEXT, {}, nonce TEXT UNIQUE)", base64::encode(table_name), columns.iter()
+    conn.execute(&format!("CREATE TABLE {} (description TEXT, {})", base64::encode(table_name), columns.iter()
                                                                                 .map(|column| format!("{} TEXT", base64::encode(column)))
                                                                                 .collect::<Vec<String>>()
                                                                                 .join(", ")), params![])?;
@@ -125,43 +125,45 @@ pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>)
 
 pub fn insert_entry(conn: &Connection, table_name: String, args_str: Vec<String>, key: Vec<u8>) -> Result<()> {
     //Take input -> Encrypt using AES -> Encode in Base64 -> Store in 
-    let mut nonce: GenericArray<u8, U12>  = GenericArray::default();
-    loop {
-        nonce = nonce_generator();
-        if conn.query_row(&format!("SELECT 1 FROM nonces WHERE nonce = '{}'", base64::encode(&nonce)), params![], |_| Ok(1))
-        .is_err() {
-            //This query ensures that the generates nonce is unique; the odds of generating two same random 96 bit numbers are low, but never zero!
-            conn.execute(&format!("INSERT INTO nonces VALUES('{}')", base64::encode(&nonce)), params![]).expect("Something went wrong.");
-            break;
-        }
-    }
+    let mut enc_args_vec: Vec<Vec<u8>> = vec![];
     let key_as_array = u32_from_slice(&key);
 
-    let args_aes: Vec<Vec<u8>> = args_str.into_iter().map(|s| encrypt_aesgcm(&key_as_array, &nonce, &s)).collect(); 
-
-    let args_aes_b64: Vec<String> = args_aes.iter().map(|ciphertext| base64::encode(ciphertext)).collect();
+    for arg in args_str {   
+        loop {
+            let nonce = nonce_generator(); //Generate nonces on the fly for every entry -> No nonce reuse attack
+            if conn.query_row(&format!("SELECT 1 FROM nonces WHERE nonce = '{}'", base64::encode(&nonce)), params![], |_| Ok(1)).is_err() {
+                //This query ensures that the generates nonce is unique; the odds of generating two same random 96 bit numbers are low, but never zero!
+                conn.execute(&format!("INSERT INTO nonces VALUES('{}', '{}', '{}')", base64::encode(&nonce), base64::encode(&table_name), base64::encode(&arg)), params![]).expect("Something went wrong.");
+                let enc_arg: Vec<u8> = encrypt_aesgcm(&key_as_array, &nonce, &arg);
+                enc_args_vec.push(enc_arg);
+                break;
+            }
+        }
+    }
+    let args_aes_b64: Vec<String> = enc_args_vec.iter().map(|ciphertext| base64::encode(ciphertext)).collect();
 
     let args_aes_b64_string: String = format_args(args_aes_b64); //add ' ', around all entries
 
-    conn.execute(&format!("INSERT INTO {} VALUES('{}, {}');", &table_name, args_aes_b64_string, base64::encode(&nonce)), params![])?;
+    conn.execute(&format!("INSERT INTO {} VALUES({})", base64::encode(&table_name), args_aes_b64_string), params![])?;
 
     Ok(())
 }
 
 pub fn select_entry(conn: &Connection, table_name: String, description: String, column: String, key: Vec<u8>) -> String {
     //Inverse order: Decode from Base64 -> Decrypt using AES and given nonce -> return lé value
-    let query_result: String = conn.query_row(&format!("SELECT {} FROM {} WHERE description = '{}';", column, table_name, description), params![], |row| row.get(0)).expect("Didnt work lol");
-    let stmt: String = conn.query_row(&format!("SELECT nonce FROM {} WHERE description = '{}';", table_name, description), params![], |row| row.get(0)).expect("");
+    let query_result: String = conn.query_row(&format!("SELECT {} FROM {} WHERE description = '{}'", base64::encode(&column), base64::encode(&table_name), base64::encode(&description)), params![], |row| row.get(0)).expect("Didnt work lol");
+    let stmt: String = conn.query_row(&format!("SELECT nonce FROM nonces WHERE orig_table = '{}' AND orig_entry = '{}' AND orig_desc = '{}'", base64::encode(&table_name), base64::encode(&column), base64::encode(&description)), params![], |row| row.get(0)).expect("");
     let nonce: Vec<u8> = base64::decode(stmt).expect("Failed decoding.");
     
-    let key_usable:GenericArray<u8, U32> = u32_from_slice(&key);
+    let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = u12_from_slice(&nonce);
     
     decrypt_aesgcm(&key_usable, &nonce_usable, &base64::decode(&query_result).expect(""))
 }
 
-pub fn delete_entry(conn: &Connection, table_name: &String, description: String) -> Result<()> {
-    conn.execute(&format!("DELETE FROM {} WHERE description = '{}'", table_name, description), params![])?;
+pub fn delete_entry(conn: &Connection, table_name: String, description: String) -> Result<()> {
+    conn.execute(&format!("DELETE FROM {} WHERE description = '{}'", base64::encode(&table_name), base64::encode(&description)), params![])?;
+    conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", base64::encode(&table_name), base64::encode(&description)), params![]);
     Ok(())
 }
 
