@@ -1,9 +1,11 @@
-use std::{fs, io::{self, Read}};
-use std::path::PathBuf;
 use dirs;
+use std::path::PathBuf;
+use std::{
+    fs,
+    io::{self, Read},
+};
 
 const PATH: [&str; 2] = ["RustwordManager", "database.db"];
-
 
 pub struct FileManager {
     filepath: PathBuf,
@@ -12,7 +14,9 @@ pub struct FileManager {
 impl FileManager {
     pub fn new() -> FileManager {
         // create new file manager that holds path
-        FileManager { filepath: FileManager::get_db_path() }
+        FileManager {
+            filepath: FileManager::get_db_path(),
+        }
     }
 
     fn get_db_path() -> PathBuf {

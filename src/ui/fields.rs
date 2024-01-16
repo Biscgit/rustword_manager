@@ -1,7 +1,6 @@
 use ratatui::prelude::Style;
 use tui_textarea::TextArea;
 
-
 pub fn input_field<'a>() -> TextArea<'a> {
     // creates a new input field
     let mut text_input = TextArea::default();
