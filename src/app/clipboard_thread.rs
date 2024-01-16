@@ -67,11 +67,19 @@ impl ClipboardManager {
                 // waits until timeout, restart if reset send through pipe, return if pipe dropped
                 loop {
                     match receiver.recv_timeout(Duration::from_secs(TIMEOUT)) {
-                        Ok(Message::Reset(new_pw)) => { current_pw = SecureStorage::from_string(new_pw); }
-                        Ok(Message::Stop) => { break; }
+                        Ok(Message::Reset(new_pw)) => {
+                            current_pw = SecureStorage::from_string(new_pw);
+                        }
+                        Ok(Message::Stop) => {
+                            break;
+                        }
 
-                        Err(mpsc::RecvTimeoutError::Timeout) => { break; }
-                        Err(mpsc::RecvTimeoutError::Disconnected) => { return Ok(()); }
+                        Err(mpsc::RecvTimeoutError::Timeout) => {
+                            break;
+                        }
+                        Err(mpsc::RecvTimeoutError::Disconnected) => {
+                            return Ok(());
+                        }
                     }
                 }
 
@@ -102,7 +110,12 @@ impl ClipboardManager {
         // resets thread through pipe if it exists otherwise spawn a new with content
         if self.handle.is_some() && self.sender.is_some() {
             // possible error when thread is waiting for clipboard mutex. Stop and create new thread
-            if let Err(_) = self.sender.as_ref().unwrap().send(Message::Reset(copy.to_string())) {
+            if let Err(_) = self
+                .sender
+                .as_ref()
+                .unwrap()
+                .send(Message::Reset(copy.to_string()))
+            {
                 self.handle.take().unwrap().join().unwrap().unwrap();
                 self.spawn_thread(copy);
             }
@@ -114,7 +127,11 @@ impl ClipboardManager {
     fn stop_timer(&mut self) {
         // tries to stop thread through the message pipe if thread is running
         if let Some(handle) = self.handle.take() {
-            self.sender.take().unwrap().send(Message::Stop).unwrap_or(());
+            self.sender
+                .take()
+                .unwrap()
+                .send(Message::Stop)
+                .unwrap_or(());
 
             if let Err(_err) = handle.join() {
                 // ToDo: log if failed to join thread
