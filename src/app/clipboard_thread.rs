@@ -6,7 +6,7 @@ use std::{
     io,
 };
 
-use crate::key_processor::SecureStorage;
+use crate::{app::ClState, key_processor::SecureStorage};
 
 
 const PRECISION: isize = 5;
@@ -47,14 +47,16 @@ pub struct ClipboardManager {
     sender: Option<mpsc::Sender<Message>>,
     handle: Option<JoinHandle<io::Result<()>>>,
     shared_clipboard: Arc<Mutex<Clipboard>>,
+    shared_cl_state: ClState,
 }
 
 impl ClipboardManager {
-    pub fn new() -> ClipboardManager {
+    pub fn new(cl_state: ClState) -> ClipboardManager {
         ClipboardManager {
             sender: None,
             handle: None,
             shared_clipboard: Arc::new(Mutex::new(Clipboard::new().unwrap())),
+            shared_cl_state: cl_state,
         }
     }
 
@@ -72,6 +74,7 @@ impl ClipboardManager {
     fn spawn_thread(&mut self, content: &str) {
         let (sender, receiver) = mpsc::channel();
         let shared_clipboard = Arc::clone(&self.shared_clipboard);
+        let shared_cl_satet = Arc::clone(&self.shared_cl_state);
 
         // create timer to be sent to thread
         let mut timer = Timer::new(TIMEOUT);
@@ -104,6 +107,10 @@ impl ClipboardManager {
                         // ToDo: log if failed to clear clipboard
                     }
                 }
+
+                // clear visual copied
+                let mut cl_state = shared_cl_satet.lock().unwrap();
+                cl_state.value = None;
 
                 Ok(())
             })
