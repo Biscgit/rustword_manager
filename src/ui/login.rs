@@ -139,7 +139,7 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .border_type(BorderType::Thick)
                 .fg(Color::LightRed)
                 .padding(Padding::horizontal(1))
-                .title(error),
+                .title(format!("{} ({}%)", error, result.1)),
         );
     } else {
         pw_field.set_style(Style::default().fg(Color::LightGreen));

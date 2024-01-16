@@ -1,5 +1,5 @@
+use passwords::{analyzer, scorer, PasswordGenerator};
 use tui_textarea::TextArea;
-use passwords::{analyzer, PasswordGenerator, scorer};
 
 pub fn generate_strong_password(length: usize) -> String {
     // uses thread_rng which is marked as cryptographically secure, see:
@@ -12,9 +12,10 @@ pub fn generate_strong_password(length: usize) -> String {
         .symbols(true)
         .strict(true);
 
-    generator.generate_one().expect("Failed to generate Password")
+    generator
+        .generate_one()
+        .expect("Failed to generate Password")
 }
-
 
 pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u32) {
     // Returns an error if password not strong enough otherwise nothing
@@ -23,7 +24,6 @@ pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u
     let score = scorer::score(&analyzer::analyze(&input)).floor() as u32;
 
     if let Some(mut strength) = password_strength(&input) {
-        strength.push_str(&format!(" ({}%)", score));
         return (Some(strength), score);
     }
     (None, score)
@@ -48,7 +48,10 @@ fn password_strength(password: &String) -> Option<String> {
     }
 }
 
-fn process_letters<F>(input: &str, check: F) -> bool where F: Fn(&char) -> bool {
+fn process_letters<F>(input: &str, check: F) -> bool
+where
+    F: Fn(&char) -> bool,
+{
     // processes a strings characters with a provided function
     for char in input.chars() {
         if check(&char) {
