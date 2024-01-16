@@ -5,6 +5,7 @@ use ratatui::{
     style::Stylize,
     widgets::{Block, Borders, BorderType, Padding, Paragraph},
 };
+use ratatui::widgets::block::{Position, Title};
 
 use crate::{
     app::{App, states::LoginState},
@@ -12,11 +13,12 @@ use crate::{
 };
 
 const TITLE: [&str; 5] = [
-    r"   ___ _      __   __  ___                           ",
-    r"  / _ \ | /| / /  /  |/  /__ ____  ___ ____ ____ ____",
-    r" / , _/ |/ |/ /  / /|_/ / _ `/ _ \/ _ `/ _ `/ -_) __/",
-    r"/_/|_||__/|__/  /_/  /_/\_,_/_//_/\_,_/\_, /\__/_/   ",
-    r"                                      /___/          ",
+    r"    ___ _      __   __  ___                           ",
+    r"   / _ \ | /| / /  /  |/  /__ ____  ___ ____ ____ ____",
+    r"  / , _/ |/ |/ /  / /|_/ / _ `/ _ \/ _ `/ _ `/ -_) __/",
+    r" /_/|_||__/|__/  /_/  /_/\_,_/_//_/\_,_/\_, /\__/_/   ",
+    r"-------------------------------------- /___/ ------   ",
+
 ];
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
@@ -42,20 +44,21 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     ).split(main_layout[2]);
 
     // create title
-    let mut title = TITLE.join("\n");
+    let title = TITLE.join("\n");
+    let mut action = "";
 
     // render page and functionality depending on registering or logging in
     match app.vault_state.state {
         LoginState::Login |
         LoginState::IncorrectLogin => {
             login_with_password(frame, app, center_layout[1]);
-            title.push_str("\n❱ Vault Login ❰");
+            action = " ❱ Vault Login ❰ ";
         }
         LoginState::Register |
         LoginState::NewVaultConfirmMatch |
         LoginState::NewVaultConfirmNoMatch => {
             register_password(frame, app, center_layout[1]);
-            title.push_str("\n❱ Create new Vault ❰");
+            action = " ❱ Create new Vault ❰ ";
         }
         _ => unreachable!()
     }
@@ -68,6 +71,10 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
             .block(Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded)
+                .title(Title::from(action)
+                    .alignment(Alignment::Center)
+                    .position(Position::Bottom)
+                )
             ),
         main_layout[0],
     );
