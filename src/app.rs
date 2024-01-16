@@ -41,7 +41,7 @@ pub struct App<'a> {
     pub page_selected: bool,
 
     pub clipboard: clipboard_thread::ClipboardManager,
-    copied: ClState,
+    clip_copied: ClState,
 
     pub file_manager: FileManager,
 }
@@ -112,7 +112,7 @@ impl<'a> App<'a> {
             page_selected: false,
 
             clipboard: clipboard_thread::ClipboardManager::new(Arc::clone(&copied)),
-            copied,
+            clip_copied: copied,
             file_manager,
         }
     }
@@ -289,12 +289,12 @@ impl<'a> App<'a> {
     }
 
     pub fn set_copied_state(&mut self, state: Option<usize>) {
-        let mut copied_state = self.copied.lock().unwrap();
+        let mut copied_state = self.clip_copied.lock().unwrap();
         copied_state.value = state;
     }
 
     pub fn get_copied_state(&self) -> Option<usize> {
-        self.copied.lock().unwrap().value
+        self.clip_copied.lock().unwrap().value
     }
 
     pub fn update_shown_entries(&mut self, _filter: String) {
