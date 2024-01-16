@@ -37,6 +37,7 @@ impl FileManager {
     }
 
     pub fn get_salt(&self) -> io::Result<[u8; 16]> {
+        // sqlcipher stores a random salt as the first 16 bytes of a file
         let mut file = fs::File::open(self.filepath.as_path())?;
 
         let mut buf = [0; 16];
