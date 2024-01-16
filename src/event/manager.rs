@@ -137,19 +137,23 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         }
 
                         KeyCode::Tab | KeyCode::BackTab => {
-                            let current_input = app
+                            let fields = app
                                 .text_fields
                                 .edit_fields
                                 .as_mut()
-                                .unwrap()
-                                .current_item_mut()
                                 .unwrap();
 
-                            // toggle mask
-                            if current_input.mask_char().is_none() {
-                                current_input.set_mask_char('\u{2022}');
-                            } else {
-                                current_input.clear_mask_char();
+                            // toggle mask if not button
+                            if fields.current_index().unwrap() != fields.items.len() - 1 {
+                                let current_input = fields
+                                    .current_item_mut()
+                                    .unwrap();
+
+                                if current_input.mask_char().is_none() {
+                                    current_input.set_mask_char('\u{2022}');
+                                } else {
+                                    current_input.clear_mask_char();
+                                }
                             }
                         }
 
