@@ -1,10 +1,10 @@
-use std::sync::{Arc, Mutex};
 use ratatui::{
     layout::Alignment,
     prelude::Style,
-    widgets::{Block, Borders, BorderType},
+    widgets::{Block, BorderType, Borders},
 };
 use stateful_list::StatefulList;
+use std::sync::{Arc, Mutex};
 
 use self::{
     extras::*,
@@ -15,18 +15,19 @@ use crate::{
     file_manager::FileManager,
     password::generate_strong_password,
     types::{ClState, Terminal},
-    ui::{draw_ui, fields::{input_field, password_field}},
+    ui::{
+        draw_ui,
+        fields::{input_field, password_field},
+    },
 };
 
-pub(crate) mod states;
+mod clipboard_thread;
 pub(crate) mod extras;
 mod stateful_list;
-mod clipboard_thread;
-
+pub(crate) mod states;
 
 pub struct App<'a> {
     // App handling all states and storage of the application
-
     pub vault_state: LoginStates,
     pub text_fields: EditableTextFields<'a>,
 
@@ -80,7 +81,7 @@ impl<'a> App<'a> {
                           {"name":  "Username", "private":  false},
                           {"name":  "Password", "private":  true}
                         ]
-                    }"#
+                    }"#,
                 ).unwrap(),
                 serde_json::from_str(
                     r#"{
@@ -92,7 +93,7 @@ impl<'a> App<'a> {
                           {"name":  "SSH-Public", "private":  false},
                           {"name":  "SSH-Private", "private":  true}
                         ]
-                    }"#
+                    }"#,
                 ).unwrap(),
                 serde_json::from_str(
                     r#"{
@@ -102,7 +103,7 @@ impl<'a> App<'a> {
                           {"name":  "Name", "private":  false},
                           {"name":  "Note", "private":  false}
                         ]
-                    }"#
+                    }"#,
                 ).unwrap(),
             ]),
             current_template: None,
