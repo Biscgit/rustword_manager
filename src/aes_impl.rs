@@ -2,14 +2,16 @@ use rand::{Rng, thread_rng};
 use aes_gcm::{aead::{Aead, generic_array::GenericArray, KeyInit}, Aes256Gcm};
 use typenum::{U12, U32, B1, B0, UInt, UTerm};
 
-pub fn nonce_from_slice(slice: &[u8]) -> GenericArray<u8, U12> {
+pub fn u12_from_slice(slice: &[u8]) -> GenericArray<u8, U12> {
+    //Database will return a Vec<u8>, so use this function to convert the nonce
     let mut default_array: GenericArray<u8, U12> = GenericArray::default();
     default_array.clone_from_slice(&slice);
     default_array
 }
 
-pub fn array_from_slice(slice: &[u8]) -> GenericArray<u8, U32> {
-    let mut array: GenericArray<u8, UInt<UInt<UInt<UInt<UInt<UInt<UTerm, B1>, B0>, B0>, B0>, B0>, B0>> = GenericArray::default();
+pub fn u32_from_slice(slice: &[u8]) -> GenericArray<u8, U32> {
+    //Converts the key to a GenericArray
+    let mut array: GenericArray<u8, UInt<UInt<UInt<UInt<UInt<UInt<UTerm, B1>, B0>, B0>, B0>, B0>, B0>> = GenericArray::default(); //lol xdd
     array.copy_from_slice(slice);
     array
 }
