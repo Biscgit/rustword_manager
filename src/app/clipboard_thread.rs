@@ -6,6 +6,8 @@ use std::{
     io,
 };
 
+use crate::key_processor::SecureStorage;
+
 
 const PRECISION: isize = 5;
 const TIMEOUT: isize = 5;
@@ -67,22 +69,22 @@ impl ClipboardManager {
         self.stop_timer();
     }
 
-    fn spawn_thread(&mut self, copy: &str) {
+    fn spawn_thread(&mut self, content: &str) {
         let (sender, receiver) = mpsc::channel();
         let shared_clipboard = Arc::clone(&self.shared_clipboard);
 
         // create timer to be sent to thread
         let mut timer = Timer::new(TIMEOUT);
-        let mut current_pw = copy.to_string().clone();
+        let mut current_pw = SecureStorage::from_string(content.to_string());
 
         let handle: JoinHandle<io::Result<()>> = thread::Builder::new()
             .name("Clipboard clearer".to_string())
             .spawn(move || {
                 loop {
                     match receiver.recv_timeout(Duration::from_millis(1000 / PRECISION as u64)) {
-                        Ok(Message::Reset(new)) => {
+                        Ok(Message::Reset(new_pw)) => {
                             timer.reset_timer();
-                            current_pw = new;
+                            current_pw = SecureStorage::from_string(new_pw);
                         }
                         Ok(Message::Stop) => { break; }
 
@@ -95,7 +97,9 @@ impl ClipboardManager {
 
                 // only clear if same password
                 let mut clipboard = shared_clipboard.lock().unwrap();
-                if current_pw == clipboard.get_text().unwrap_or(String::new()) {
+                let copied = String::from_utf8(current_pw.get_contents()).unwrap_or(String::new());
+
+                if copied == clipboard.get_text().unwrap_or(String::new()) {
                     if let Err(_err) = clipboard.clear() {
                         // ToDo: log if failed to clear clipboard
                     }
