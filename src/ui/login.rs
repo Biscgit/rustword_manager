@@ -41,9 +41,28 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         ],
     ).split(main_layout[2]);
 
-    // draw title
+    // create title
+    let mut title = TITLE.join("\n");
+
+    // render page and functionality depending on registering or logging in
+    match app.vault_state.state {
+        LoginState::Login |
+        LoginState::IncorrectLogin => {
+            login_with_password(frame, app, center_layout[1]);
+            title.push_str("\n❱ Vault Login ❰");
+        }
+        LoginState::Register |
+        LoginState::NewVaultConfirmMatch |
+        LoginState::NewVaultConfirmNoMatch => {
+            register_password(frame, app, center_layout[1]);
+            title.push_str("\n❱ Create new Vault ❰");
+        }
+        _ => unreachable!()
+    }
+
+    // display title
     frame.render_widget(
-        Paragraph::new(TITLE.join("\n"))
+        Paragraph::new(title)
             .alignment(Alignment::Center)
             .style(Style::new().bold())
             .block(Block::default()
@@ -52,16 +71,6 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
             ),
         main_layout[0],
     );
-
-    // render page and functionality depending on registering or logging in
-    match app.vault_state.state {
-        LoginState::Login |
-        LoginState::IncorrectLogin => login_with_password(frame, app, center_layout[1]),
-        LoginState::Register |
-        LoginState::NewVaultConfirmMatch |
-        LoginState::NewVaultConfirmNoMatch => register_password(frame, app, center_layout[1]),
-        _ => unreachable!()
-    }
 }
 
 fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
