@@ -30,7 +30,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 app.display_entry();
                             }
                             app.select_entry();
-                        } ,
+                        }
 
                         // fill input field if no matching action
                         _ => {
@@ -116,8 +116,23 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Esc => { app.unselect_right(); }
 
                         // moves focus up or down on entries
-                        KeyCode::Up | KeyCode::BackTab => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
-                        KeyCode::Down | KeyCode::Tab => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
+                        KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
+                        KeyCode::Down => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
+
+                        KeyCode::Tab | KeyCode::BackTab => {
+                            let current_input = app.text_fields.edit_fields
+                                .as_mut()
+                                .unwrap()
+                                .current_item_mut()
+                                .unwrap();
+
+                            // toggle mask
+                            if current_input.mask_char().is_none() {
+                                current_input.set_mask_char('\u{2022}');
+                            } else {
+                                current_input.clear_mask_char();
+                            }
+                        }
 
                         KeyCode::Enter => {
                             // select next or confirm button
