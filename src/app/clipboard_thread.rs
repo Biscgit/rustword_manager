@@ -12,7 +12,7 @@ const TIMEOUT: isize = 5;
 
 pub enum Message {
     Stop,
-    Reset,
+    Reset(String),
 }
 
 pub struct Timer {
@@ -32,12 +32,11 @@ impl Timer {
         self.current = self.default
     }
 
-    // fn stop_timer(&mut self) { self.current = -1; }
-
     pub fn decrease(&mut self) -> isize {
         if self.default >= 0 {
             self.default -= 1;
         }
+
         self.default
     }
 }
@@ -58,7 +57,7 @@ impl ClipboardManager {
     }
 
     pub fn copy_to_clipboard(&mut self, text: &str) {
-        self.reset_timer();
+        self.reset_timer(text);
 
         let mut clipboard = self.shared_clipboard.lock().unwrap();
         clipboard.set_text(text).unwrap();
@@ -68,19 +67,23 @@ impl ClipboardManager {
         self.stop_timer();
     }
 
-    fn spawn_thread(&mut self) {
+    fn spawn_thread(&mut self, copy: &str) {
         let (sender, receiver) = mpsc::channel();
         let shared_clipboard = Arc::clone(&self.shared_clipboard);
 
         // create timer to be sent to thread
         let mut timer = Timer::new(TIMEOUT);
+        let mut current_pw = copy.to_string().clone();
 
         let handle: JoinHandle<io::Result<()>> = thread::Builder::new()
             .name("Clipboard clearer".to_string())
             .spawn(move || {
                 loop {
                     match receiver.recv_timeout(Duration::from_millis(1000 / PRECISION as u64)) {
-                        Ok(Message::Reset) => { timer.reset_timer(); }
+                        Ok(Message::Reset(new)) => {
+                            timer.reset_timer();
+                            current_pw = new;
+                        }
                         Ok(Message::Stop) => { break; }
 
                         Err(mpsc::RecvTimeoutError::Timeout) => {}
@@ -90,10 +93,12 @@ impl ClipboardManager {
                     if timer.decrease().is_negative() { break; }
                 }
 
-                // only clear if still password
+                // only clear if same password
                 let mut clipboard = shared_clipboard.lock().unwrap();
-                if let Err(_err) = clipboard.clear() {
-                    // ToDo: log if failed to clear clipboard
+                if current_pw == clipboard.get_text().unwrap_or(String::new()) {
+                    if let Err(_err) = clipboard.clear() {
+                        // ToDo: log if failed to clear clipboard
+                    }
                 }
 
                 Ok(())
@@ -104,14 +109,14 @@ impl ClipboardManager {
         self.handle = Some(handle);
     }
 
-    fn reset_timer(&mut self) {
+    fn reset_timer(&mut self, copy: &str) {
         if self.handle.is_some() && self.sender.is_some() {
-            if let Err(_) = self.sender.as_ref().unwrap().send(Message::Reset) {
+            if let Err(_) = self.sender.as_ref().unwrap().send(Message::Reset(copy.to_string())) {
                 self.handle.take().unwrap().join().unwrap().unwrap();
-                self.spawn_thread();
+                self.spawn_thread(copy);
             }
         } else {
-            self.spawn_thread();
+            self.spawn_thread(copy);
         }
     }
 
