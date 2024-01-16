@@ -17,7 +17,7 @@ impl FileManager {
         // gets the db path if not exist
         let mut home_dir = dirs::home_dir().expect("Failed to open Home directory");
 
-        home_dir.push("rustword_manager");
+        home_dir.push("RustwordManager");
         home_dir.push("database.db");
 
         home_dir
