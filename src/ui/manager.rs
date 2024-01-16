@@ -164,7 +164,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                     color = Color::White;
                     border_type = BorderType::Thick;
 
-                    if let Some(copied) = app.copied {
+                    if let Some(copied) = app.get_copied_state() {
                         if copied == index {
                             color = Color::LightBlue;
                         }
@@ -181,7 +181,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 .title(entry.0);
 
             // apply theme if copied field
-            if let Some(copied) = app.copied {
+            if let Some(copied) = app.get_copied_state() {
                 if copied == index {
                     p_block = p_block.title(
                         Title::from("Copied to clipboard!")

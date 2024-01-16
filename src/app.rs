@@ -1,4 +1,4 @@
-use arboard::Clipboard;
+use std::sync::{Arc, Mutex};
 use ratatui::{
     layout::Alignment,
     prelude::Style,
@@ -14,14 +14,14 @@ use crate::{
     event::handle_events,
     file_manager::FileManager,
     password::generate_strong_password,
-    types::Terminal,
+    types::{ClState, Terminal},
     ui::{draw_ui, fields::{input_field, password_field}},
 };
 
 pub(crate) mod states;
-mod extras;
+pub(crate) mod extras;
 mod stateful_list;
-mod threads;
+mod clipboard_thread;
 
 
 pub struct App<'a> {
@@ -40,8 +40,8 @@ pub struct App<'a> {
     pub page_index: IndexManager,
     pub page_selected: bool,
 
-    pub clipboard: Clipboard,
-    pub copied: Option<usize>,
+    pub clipboard: clipboard_thread::ClipboardManager,
+    copied: ClState,
 
     pub file_manager: FileManager,
 }
@@ -50,6 +50,8 @@ impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         // creates a new with testing values
         let file_manager = FileManager::new();
+        let copied = Arc::new(Mutex::new(SingleValue { value: None }));
+
         App {
             vault_state: LoginStates::new(file_manager.check_db_exist()),
             text_fields: EditableTextFields::new(),
@@ -109,9 +111,8 @@ impl<'a> App<'a> {
             page_index: IndexManager::new(3),
             page_selected: false,
 
-            clipboard: Clipboard::new().unwrap(),
-            copied: None,
-
+            clipboard: clipboard_thread::ClipboardManager::new(Arc::clone(&copied)),
+            copied,
             file_manager,
         }
     }
@@ -138,7 +139,7 @@ impl<'a> App<'a> {
                 ("", "", false),
             ]));
 
-            self.copied = None;
+            self.set_copied_state(None);
         }
     }
 
@@ -222,6 +223,10 @@ impl<'a> App<'a> {
         // disconnects from database and locks vault
         // ToDo: remove connection from DB etc.
         self.vault_state.state = LoginState::Login;
+
+
+        // clear clipboard on exiting
+        self.clipboard.force_clear_clipboard();
     }
 
     pub fn unlock_vault(&mut self) {
@@ -279,8 +284,17 @@ impl<'a> App<'a> {
         // copies a string to clipboard
         // ToDo: thread to reset clipboard after time
 
-        self.copied = Some(self.current_entry.as_ref().unwrap().current_index().unwrap());
-        self.clipboard.set_text(text).unwrap();
+        self.clipboard.copy_to_clipboard(text);
+        self.set_copied_state(Some(self.current_entry.as_ref().unwrap().current_index().unwrap()));
+    }
+
+    pub fn set_copied_state(&mut self, state: Option<usize>) {
+        let mut copied_state = self.copied.lock().unwrap();
+        copied_state.value = state;
+    }
+
+    pub fn get_copied_state(&self) -> Option<usize> {
+        self.copied.lock().unwrap().value
     }
 
     pub fn update_shown_entries(&mut self, _filter: String) {

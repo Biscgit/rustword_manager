@@ -1,8 +1,14 @@
+use std::io::Sink;
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
 use crate::ui::fields::{input_field, password_field};
 use crate::app::stateful_list::StatefulList;
+
+
+pub struct SingleValue<T> {
+    pub value: T
+}
 
 
 pub struct IndexManager {
