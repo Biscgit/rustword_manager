@@ -13,6 +13,7 @@ mod types;
 mod terminal;
 mod password;
 mod file_manager;
+mod key_processor;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
