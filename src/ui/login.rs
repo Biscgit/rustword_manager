@@ -11,17 +11,25 @@ use crate::{
     password::validate_password_strength,
 };
 
+const TITLE: [&str; 5] = [
+    r"   ___ _      __  __  ___                            ",
+    r"  / _ \ | /| / /  /  |/  /__ ____  ___ ____ ____ ____",
+    r" / , _/ |/ |/ /  / /|_/ / _ `/ _ \/ _ `/ _ `/ -_) __/",
+    r"/_/|_||__/|__/  /_/  /_/\_,_/_//_/\_,_/\_, /\__/_/   ",
+    r"                                     /___/           ",
+];
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     // layout to center field dynamically
     let area = frame.size();
+
     let main_layout = Layout::new(
         Direction::Vertical,
         [
+            Constraint::Length(7),
+            Constraint::Length(area.height / 2 - 5),
             Constraint::Length(3),
-            Constraint::Length(area.height / 2 - 3),
-            Constraint::Length(3),
-            Constraint::Length(area.height / 2 - 3)
+            Constraint::Length(area.height / 2 - 5)
         ],
     ).split(area);
     let center_layout = Layout::new(
@@ -35,8 +43,9 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 
     // draw title
     frame.render_widget(
-        Paragraph::new("Welcome to the RustwordManager!")
+        Paragraph::new(TITLE.join("\n"))
             .alignment(Alignment::Center)
+            .style(Style::new().bold())
             .block(Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded)
