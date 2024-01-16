@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS templates
 -- username-password template
 CREATE TABLE IF NOT EXISTS tp_simple
 (
-    description TEXT,
+    description TEXT UNIQUE,
     clear_1     TEXT,
     hidden_1    Text
 );
@@ -22,7 +22,7 @@ VALUES ('Simple', CAST('{
 -- ssh key pair
 CREATE TABLE IF NOT EXISTS tp_ssh_keypair
 (
-    description TEXT,
+    description TEXT UNIQUE,
     clear_1     TEXT,
     clear_2     Text,
     hidden_1    Text
@@ -33,3 +33,11 @@ VALUES ('SSH-Keypair', CAST('{
   "clear_2": "public_key",
   "hidden_1": "private_key"
 }' AS BLOB));
+
+CREATE TABLE IF NOT EXISTS nonces
+(
+  nonce TEXT UNIQUE,
+  orig_table TEXT,
+  orig_desc TEXT,
+  orig_entry TEXT
+);
