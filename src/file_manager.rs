@@ -2,6 +2,8 @@ use std::{fs, io::{self, Read}};
 use std::path::PathBuf;
 use dirs;
 
+const PATH: [&str; 2] = ["RustwordManager", "database.db"];
+
 
 pub struct FileManager {
     filepath: PathBuf,
@@ -16,9 +18,9 @@ impl FileManager {
     fn get_db_path() -> PathBuf {
         // gets the db path if not exist
         let mut home_dir = dirs::home_dir().expect("Failed to open Home directory");
-
-        home_dir.push("RustwordManager");
-        home_dir.push("database.db");
+        for part in PATH {
+            home_dir.push(part);
+        }
 
         home_dir
     }
