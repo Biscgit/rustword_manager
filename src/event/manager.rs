@@ -1,11 +1,7 @@
-use std::{
-    error::Error,
-    ops::ControlFlow,
-};
+use std::{error::Error, ops::ControlFlow};
 
-use crossterm::event::{self, Event, KeyCode};
 use crate::app::App;
-
+use crossterm::event::{self, Event, KeyCode};
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
     // handles events when vault is unlocked
@@ -16,7 +12,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                 match app.page_selected {
                     // credentials left side
                     false => match key.code {
-                        KeyCode::Esc => { app.lock_vault(); }
+                        KeyCode::Esc => {
+                            app.lock_vault();
+                        }
 
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
@@ -38,7 +36,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             app.update_shown_entries(app.text_fields.search_bar.lines()[0].clone());
                             app.entries_list.default_selected();
                         }
-                    }
+                    },
                     // credentials right side
                     true => match key.code {
                         KeyCode::Esc | KeyCode::Right | KeyCode::Left => {
@@ -57,7 +55,12 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         }
 
                         KeyCode::Tab | KeyCode::BackTab => {
-                            let entry = app.current_entry.as_mut().unwrap().current_item_mut().unwrap();
+                            let entry = app
+                                .current_entry
+                                .as_mut()
+                                .unwrap()
+                                .current_item_mut()
+                                .unwrap();
                             entry.2 = !entry.2;
 
                             app.delete_confirm = false;
@@ -80,19 +83,27 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Char('c') => {
                             let entries = app.current_entry.as_ref().unwrap();
                             if entries.current_index().unwrap() != entries.items.len() - 1 {
-                                let text = app.current_entry.as_ref().unwrap().current_item().unwrap().1;
+                                let text = app
+                                    .current_entry
+                                    .as_ref()
+                                    .unwrap()
+                                    .current_item()
+                                    .unwrap()
+                                    .1;
                                 app.copy_to_clipboard(text);
                             }
                         }
                         _ => {}
-                    }
+                    },
                 }
             }
             1 => {
                 match app.page_selected {
                     // insert left side
                     false => match key.code {
-                        KeyCode::Esc => { app.lock_vault(); }
+                        KeyCode::Esc => {
+                            app.lock_vault();
+                        }
 
                         KeyCode::Tab => app.page_index.page_up(),
                         KeyCode::BackTab => app.page_index.page_down(),
@@ -110,17 +121,25 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Enter => app.reset_input_fields(),
 
                         _ => {}
-                    }
+                    },
                     // insert right side
                     true => match key.code {
-                        KeyCode::Esc => { app.unselect_right(); }
+                        KeyCode::Esc => {
+                            app.unselect_right();
+                        }
 
                         // moves focus up or down on entries
-                        KeyCode::Up => { app.text_fields.edit_fields.as_mut().unwrap().previous(); }
-                        KeyCode::Down => { app.text_fields.edit_fields.as_mut().unwrap().next(); }
+                        KeyCode::Up => {
+                            app.text_fields.edit_fields.as_mut().unwrap().previous();
+                        }
+                        KeyCode::Down => {
+                            app.text_fields.edit_fields.as_mut().unwrap().next();
+                        }
 
                         KeyCode::Tab | KeyCode::BackTab => {
-                            let current_input = app.text_fields.edit_fields
+                            let current_input = app
+                                .text_fields
+                                .edit_fields
                                 .as_mut()
                                 .unwrap()
                                 .current_item_mut()
@@ -144,7 +163,8 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                     // fill with random credentials if empty and a private field
                                     let curr_temp = app.templates.current_item().unwrap();
 
-                                    if fields.current_item().unwrap().is_empty() && curr_temp.elements[index].private {
+                                    if fields.current_item().unwrap().is_empty()
+                                        && curr_temp.elements[index].private {
                                         app.fill_random_password(index);
                                     }
 
@@ -158,17 +178,20 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             let fields = app.text_fields.edit_fields.as_mut().unwrap();
                             if let Some(index) = fields.current_index() {
                                 if index != fields.items.len() - 1 {
-                                    app.text_fields.edit_fields.as_mut().unwrap().items[index].input(key);
+                                    app.text_fields.edit_fields.as_mut().unwrap().items[index]
+                                        .input(key);
                                 }
                             }
                         }
-                    }
+                    },
                 }
             }
             2 => {
                 // template page (under construction)
                 match key.code {
-                    KeyCode::Esc => { app.lock_vault(); }
+                    KeyCode::Esc => {
+                        app.lock_vault();
+                    }
 
                     KeyCode::Tab => app.page_index.page_up(),
                     KeyCode::BackTab => app.page_index.page_down(),
@@ -176,7 +199,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     _ => {}
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
