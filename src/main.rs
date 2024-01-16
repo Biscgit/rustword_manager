@@ -1,20 +1,15 @@
 use std::error::Error;
 
-use crate::{
-    app::App,
-    terminal::*,
-    types::*,
-};
+use crate::{app::App, terminal::*, types::*};
 
-mod ui;
 mod app;
 mod event;
-mod types;
-mod terminal;
-mod password;
 mod file_manager;
 mod key_processor;
-
+mod password;
+mod terminal;
+mod types;
+mod ui;
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
     // main function to setup app and run
