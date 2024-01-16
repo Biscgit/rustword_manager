@@ -1,13 +1,9 @@
-use std::{
-    error::Error,
-    ops::ControlFlow,
-    time::Duration,
-};
+use crate::app::{states::LoginState, App};
 use crossterm::event;
-use crate::{app::{App, states::LoginState}};
+use std::{error::Error, ops::ControlFlow, time::Duration};
 
- mod manager;
- mod login;
+mod login;
+mod manager;
 
 const POLL_RATE: u64 = 100;
 
@@ -16,8 +12,8 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
     // processes depending on current app state and display
     if event::poll(Duration::from_millis(POLL_RATE))? {
         return match app.vault_state.state {
-            LoginState::Unlocked => { manager::handle_events(app) }
-            _ => { login::handle_events(app) }
+            LoginState::Unlocked => manager::handle_events(app),
+            _ => login::handle_events(app),
         };
     }
 

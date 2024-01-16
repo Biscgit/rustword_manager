@@ -1,17 +1,15 @@
 use arboard::Clipboard;
 use std::{
+    io,
+    sync::{mpsc, Arc, Mutex},
     thread::{self, JoinHandle},
     time::Duration,
-    sync::{Arc, Mutex, mpsc},
-    io,
 };
 
 use crate::{app::ClState, key_processor::SecureStorage};
 
-
 // const that holds timeout of clipboard
 const TIMEOUT: u64 = 30;
-
 
 pub enum Message {
     // communication message sent to thread

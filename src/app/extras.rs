@@ -1,15 +1,12 @@
-use std::io::Sink;
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
-use crate::ui::fields::{input_field, password_field};
 use crate::app::stateful_list::StatefulList;
-
+use crate::ui::fields::{input_field, password_field};
 
 pub struct SingleValue<T> {
-    pub value: T
+    pub value: T,
 }
-
 
 pub struct IndexManager {
     // manages page indexes
@@ -20,10 +17,7 @@ pub struct IndexManager {
 impl IndexManager {
     pub fn new(size: usize) -> IndexManager {
         // create new with specific size
-        IndexManager {
-            index: 0,
-            size,
-        }
+        IndexManager { index: 0, size }
     }
 
     pub fn page_up(&mut self) {
