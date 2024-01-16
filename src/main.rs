@@ -12,6 +12,7 @@ mod event;
 mod types;
 mod terminal;
 mod password;
+mod file_manager;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
