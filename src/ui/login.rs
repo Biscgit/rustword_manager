@@ -26,10 +26,10 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
     let main_layout = Layout::new(
         Direction::Vertical,
         [
-            Constraint::Length(7),
+            Constraint::Length(8),
             Constraint::Length(area.height / 2 - 5),
             Constraint::Length(3),
-            Constraint::Length(area.height / 2 - 5)
+            Constraint::Length(area.height / 2 - 6)
         ],
     ).split(area);
     let center_layout = Layout::new(
