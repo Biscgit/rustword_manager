@@ -18,7 +18,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         Direction::Vertical,
         [Constraint::Length(3), Constraint::Min(3)],
     )
-    .split(frame.size());
+        .split(frame.size());
 
     // create and name tabs
     let color = if app.page_selected {
@@ -55,14 +55,14 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         Direction::Horizontal,
         [Constraint::Percentage(50), Constraint::Percentage(50)],
     )
-    .split(area);
+        .split(area);
 
     // left side
     let password_list = Layout::new(
         Direction::Vertical,
         [Constraint::Min(1), Constraint::Length(3)],
     )
-    .split(lists_layout[0]);
+        .split(lists_layout[0]);
 
     // create items to be displayed
     let entry_color = if app.page_selected {
@@ -242,7 +242,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
         Direction::Horizontal,
         [Constraint::Percentage(50), Constraint::Percentage(50)],
     )
-    .split(area);
+        .split(area);
 
     // create items to be displayed
     let color = if app.page_selected {
@@ -342,13 +342,11 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
                 } else {
                     color = Color::Green;
                 }
+            } else if highlight_index == last_index {
+                border_type = BorderType::Thick;
+                color = Color::LightRed;
             } else {
-                if highlight_index == last_index {
-                    border_type = BorderType::Thick;
-                    color = Color::LightRed;
-                } else {
-                    color = Color::Red;
-                }
+                color = Color::Red;
             }
         }
 

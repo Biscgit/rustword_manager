@@ -44,22 +44,21 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 
     // create title
     let title = TITLE.join("\n");
-    let mut action = "";
 
     // render page and functionality depending on registering or logging in
-    match app.vault_state.state {
+    let action = match app.vault_state.state {
         LoginState::Login | LoginState::IncorrectLogin => {
             login_with_password(frame, app, center_layout[1]);
-            action = " ❱ Vault Login ❰ ";
+            " ❱ Vault Login ❰ "
         }
         LoginState::Register
         | LoginState::NewVaultConfirmMatch
         | LoginState::NewVaultConfirmNoMatch => {
             register_password(frame, app, center_layout[1]);
-            action = " ❱ Create new Vault ❰ ";
+            " ❱ Create new Vault ❰ "
         }
         _ => unreachable!(),
-    }
+    };
 
     // display title
     frame.render_widget(

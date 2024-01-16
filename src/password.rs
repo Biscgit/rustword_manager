@@ -23,10 +23,7 @@ pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u
     let input = textarea.lines()[0].clone();
     let score = scorer::score(&analyzer::analyze(&input)).floor() as u32;
 
-    if let Some(mut strength) = password_strength(&input) {
-        return (Some(strength), score);
-    }
-    (None, score)
+    (password_strength(&input), score)
 }
 
 fn password_strength(password: &String) -> Option<String> {

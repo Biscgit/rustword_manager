@@ -85,9 +85,9 @@ impl ClipboardManager {
 
                 // clear clipboard if current password is still same (no new copies)
                 let mut clipboard = shared_clipboard.lock().unwrap();
-                let copied = String::from_utf8(current_pw.get_contents()).unwrap_or(String::new());
+                let copied = String::from_utf8(current_pw.get_contents()).unwrap_or_default();
 
-                if copied == clipboard.get_text().unwrap_or(String::new()) {
+                if copied == clipboard.get_text().unwrap_or_default() {
                     if let Err(_err) = clipboard.clear() {
                         // ToDo: log if failed to clear clipboard
                     }
@@ -110,11 +110,12 @@ impl ClipboardManager {
         // resets thread through pipe if it exists otherwise spawn a new with content
         if self.handle.is_some() && self.sender.is_some() {
             // possible error when thread is waiting for clipboard mutex. Stop and create new thread
-            if let Err(_) = self
+            if self
                 .sender
                 .as_ref()
                 .unwrap()
                 .send(Message::Reset(copy.to_string()))
+                .is_err()
             {
                 self.handle.take().unwrap().join().unwrap().unwrap();
                 self.spawn_thread(copy);
