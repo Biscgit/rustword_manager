@@ -12,6 +12,7 @@ use self::{
 };
 use crate::{
     event::handle_events,
+    file_manager::FileManager,
     password::generate_strong_password,
     types::Terminal,
     ui::{draw_ui, fields::{input_field, password_field}},
@@ -19,8 +20,9 @@ use crate::{
 
 pub(crate) mod states;
 mod extras;
-mod threads;
 mod stateful_list;
+mod threads;
+
 
 pub struct App<'a> {
     // App handling all states and storage of the application
@@ -40,13 +42,16 @@ pub struct App<'a> {
 
     pub clipboard: Clipboard,
     pub copied: Option<usize>,
+
+    pub file_manager: FileManager,
 }
 
 impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         // creates a new with testing values
+        let file_manager = FileManager::new();
         App {
-            vault_state: LoginStates::new(),
+            vault_state: LoginStates::new(file_manager.check_db_exist()),
             text_fields: EditableTextFields::new(),
 
             entries_list: StatefulList::with_items(vec![
@@ -106,16 +111,19 @@ impl<'a> App<'a> {
 
             clipboard: Clipboard::new().unwrap(),
             copied: None,
+
+            file_manager,
         }
     }
 
     pub fn run(mut self, terminal: &mut Terminal) -> crate::Result<()> {
         // runs application forever until exited. Draws to the screen and handles events
         loop {
-            terminal.draw(|f| draw_ui(f, &mut self))?;
             if handle_events(&mut self)?.is_break() {
                 return Ok(());
             }
+
+            terminal.draw(|f| draw_ui(f, &mut self))?;
         }
     }
 
@@ -162,6 +170,7 @@ impl<'a> App<'a> {
             let mut placeholder = "Enter or paste credential".to_string();
             if temp.private {
                 placeholder.push_str("\nPress Enter to generate secure password");
+                field.set_mask_char('\u{2022}');
             }
 
             field.set_placeholder_text(placeholder);
@@ -230,6 +239,7 @@ impl<'a> App<'a> {
 
     pub fn setup_vault(&mut self) {
         // creates a new vault with entered credential
+        // ToDo: init database
 
         // unlock vault and clear password
         self.vault_state.clear_password();
