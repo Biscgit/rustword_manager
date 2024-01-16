@@ -126,7 +126,7 @@ impl ClipboardManager {
 
     fn stop_timer(&mut self) {
         if let Some(handle) = self.handle.take() {
-            self.sender.take().unwrap().send(Message::Stop).expect("Failed to communicate with Timer");
+            self.sender.take().unwrap().send(Message::Stop).unwrap_or(());
 
             if let Err(_err) = handle.join() {
                 // ToDo: log if failed to join thread
