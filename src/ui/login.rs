@@ -1,14 +1,14 @@
+use ratatui::widgets::block::{Position, Title};
 use ratatui::{
-    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     prelude::{Color, Style},
     style::Stylize,
-    widgets::{Block, Borders, BorderType, Padding, Paragraph},
+    widgets::{Block, BorderType, Borders, Padding, Paragraph},
+    Frame,
 };
-use ratatui::widgets::block::{Position, Title};
 
 use crate::{
-    app::{App, states::LoginState},
+    app::{states::LoginState, App},
     password::validate_password_strength,
 };
 
@@ -30,7 +30,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
             Constraint::Length(8),
             Constraint::Length(area.height / 2 - 5),
             Constraint::Length(3),
-            Constraint::Length(area.height / 2 - 6)
+            Constraint::Length(area.height / 2 - 6),
         ],
     ).split(area);
     let center_layout = Layout::new(
@@ -38,7 +38,7 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         [
             Constraint::Percentage(10),
             Constraint::Percentage(80),
-            Constraint::Percentage(10)
+            Constraint::Percentage(10),
         ],
     ).split(main_layout[2]);
 
@@ -48,18 +48,17 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
 
     // render page and functionality depending on registering or logging in
     match app.vault_state.state {
-        LoginState::Login |
-        LoginState::IncorrectLogin => {
+        LoginState::Login | LoginState::IncorrectLogin => {
             login_with_password(frame, app, center_layout[1]);
             action = " ❱ Vault Login ❰ ";
         }
-        LoginState::Register |
-        LoginState::NewVaultConfirmMatch |
-        LoginState::NewVaultConfirmNoMatch => {
+        LoginState::Register
+        | LoginState::NewVaultConfirmMatch
+        | LoginState::NewVaultConfirmNoMatch => {
             register_password(frame, app, center_layout[1]);
             action = " ❱ Create new Vault ❰ ";
         }
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 
     // display title
@@ -67,13 +66,15 @@ pub fn draw_ui(frame: &mut Frame, app: &mut App) {
         Paragraph::new(title)
             .alignment(Alignment::Center)
             .style(Style::new().bold())
-            .block(Block::default()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .title(Title::from(action)
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom)
-                )
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .title(
+                        Title::from(action)
+                            .alignment(Alignment::Center)
+                            .position(Position::Bottom),
+                    ),
             ),
         main_layout[0],
     );
@@ -93,7 +94,7 @@ fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .border_type(BorderType::Thick)
                 .fg(Color::LightYellow)
                 .padding(Padding::horizontal(1))
-                .title("Enter password")
+                .title("Enter password"),
         );
     } else {
         password_field.set_style(Style::default().fg(Color::LightRed));
@@ -103,7 +104,7 @@ fn login_with_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .border_type(BorderType::Thick)
                 .fg(Color::LightRed)
                 .padding(Padding::horizontal(1))
-                .title("Invalid Password! Try again!")
+                .title("Invalid Password! Try again!"),
         );
     }
 
@@ -114,12 +115,12 @@ fn register_password(frame: &mut Frame, app: &mut App, area: Rect) {
     // page for registering
     match app.vault_state.state {
         // new vault password create
-        LoginState::Register => { first_password(frame, app, area) }
+        LoginState::Register => first_password(frame, app, area),
         // confirm password on register
         LoginState::NewVaultConfirmMatch | LoginState::NewVaultConfirmNoMatch => {
             confirm_password(frame, app, area)
         }
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
 
@@ -138,7 +139,7 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .border_type(BorderType::Thick)
                 .fg(Color::LightRed)
                 .padding(Padding::horizontal(1))
-                .title(error)
+                .title(error),
         );
     } else {
         pw_field.set_style(Style::default().fg(Color::LightGreen));
@@ -147,7 +148,7 @@ fn first_password(frame: &mut Frame, app: &mut App, area: Rect) {
                 .borders(Borders::ALL)
                 .fg(Color::LightGreen)
                 .padding(Padding::horizontal(1))
-                .title(format!("Strong Password ({}%)", result.1))
+                .title(format!("Strong Password ({}%)", result.1)),
         );
     }
 
@@ -168,7 +169,7 @@ fn confirm_password(frame: &mut Frame, app: &mut App, area: Rect) {
                     .borders(Borders::ALL)
                     .fg(Color::LightGreen)
                     .padding(Padding::horizontal(1))
-                    .title("Press Enter to confirm")
+                    .title("Press Enter to confirm"),
             );
         }
         LoginState::NewVaultConfirmNoMatch => {
@@ -178,10 +179,10 @@ fn confirm_password(frame: &mut Frame, app: &mut App, area: Rect) {
                     .borders(Borders::ALL)
                     .fg(Color::LightRed)
                     .padding(Padding::horizontal(1))
-                    .title("Password do not match!")
+                    .title("Password do not match!"),
             )
         }
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 
     frame.render_widget(pw_field.widget(), area);
