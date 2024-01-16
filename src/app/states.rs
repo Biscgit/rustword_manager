@@ -6,10 +6,12 @@ pub struct LoginStates {
 }
 
 impl LoginStates {
-    pub fn new() -> LoginStates {
-        // create a default state
+    pub fn new(db_exists: bool) -> LoginStates {
+        // loads default state depending on registering or logging in
+        let state = if db_exists { LoginState::Login } else { LoginState::Register };
+
         LoginStates {
-            state: LoginState::Login,
+            state,
             last_password: None,
         }
     }
