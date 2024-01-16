@@ -1,9 +1,7 @@
-use std::{error::Error, io::Stdout};
-use std::sync::{Arc, Mutex};
-use ratatui::backend::CrosstermBackend;
 use crate::app::extras::SingleValue;
-
-
+use ratatui::backend::CrosstermBackend;
+use std::sync::{Arc, Mutex};
+use std::{error::Error, io::Stdout};
 
 // often used types
 pub type Terminal = ratatui::Terminal<CrosstermBackend<Stdout>>;

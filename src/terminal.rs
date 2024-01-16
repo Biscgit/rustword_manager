@@ -1,12 +1,11 @@
-use std::{error::Error, io::stdout};
 use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::backend::CrosstermBackend;
+use std::{error::Error, io::stdout};
 
 use crate::types::Terminal;
-
 
 pub fn setup_terminal() -> Result<Terminal, Box<dyn Error>> {
     // helper method to setup terminal. See Ratatui Manuals
