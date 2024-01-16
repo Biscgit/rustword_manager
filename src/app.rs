@@ -155,13 +155,19 @@ impl<'a> App<'a> {
         self.current_template = self.templates.current_index();
 
         // get current template
-        let template: &Template = self.templates.items.get(self.current_template.unwrap()).unwrap();
+        let template: &Template = self
+            .templates
+            .items
+            .get(self.current_template.unwrap())
+            .unwrap();
         self.text_fields.edit_fields = Some(StatefulList::with_items(
             vec![input_field(); template.elements.len() + 1])
         );
 
         // fill fields with new formatted inputs from the template
-        for (field, temp) in self.text_fields.edit_fields
+        for (field, temp) in self
+            .text_fields
+            .edit_fields
             .as_mut()
             .unwrap()
             .items
@@ -179,13 +185,20 @@ impl<'a> App<'a> {
                 Block::default()
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded)
-                    .title(temp.name.clone())
+                    .title(temp.name.clone()),
             )
         }
 
         // setup confirm button
         // (for simplicity the last field is also a text field disguised as a button)
-        let confirm_button = self.text_fields.edit_fields.as_mut().unwrap().items.last_mut().unwrap();
+        let confirm_button = self
+            .text_fields
+            .edit_fields
+            .as_mut()
+            .unwrap()
+            .items
+            .last_mut()
+            .unwrap();
 
         // style confirm button
         confirm_button.insert_str("Insert");
@@ -194,7 +207,7 @@ impl<'a> App<'a> {
         confirm_button.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
+                .border_type(BorderType::Rounded),
         );
 
         // move focus to right side
@@ -223,7 +236,6 @@ impl<'a> App<'a> {
         // disconnects from database and locks vault
         // ToDo: remove connection from DB etc.
         self.vault_state.state = LoginState::Login;
-
 
         // clear clipboard on exiting
         self.clipboard.force_clear_clipboard();
@@ -285,7 +297,13 @@ impl<'a> App<'a> {
         // ToDo: thread to reset clipboard after time
 
         self.clipboard.copy_to_clipboard(text);
-        self.set_copied_state(Some(self.current_entry.as_ref().unwrap().current_index().unwrap()));
+        self.set_copied_state(Some(
+            self.current_entry
+                .as_ref()
+                .unwrap()
+                .current_index()
+                .unwrap(),
+        ));
     }
 
     pub fn set_copied_state(&mut self, state: Option<usize>) {
