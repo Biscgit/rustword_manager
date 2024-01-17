@@ -1,16 +1,75 @@
+use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
+use crate::base64_enc_dec::{encode_base64, decode_base64};
+use crate::logger;
+
+
+use base64::decode;
+use log4rs::encode;
 use rusqlite::{Connection, params, Result};
 use aes_gcm::aead::generic_array::GenericArray;
 use typenum::{U12, U32};
 use chrono::prelude::Utc;
 
-use super::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
-use super::base64_enc_dec::{encode_base64, decode_base64};
-use super::logger;
+pub fn create_file() -> Vec<u8> {
+    //Used when first creating a file; first 16 bytes of the file are returned as a salt
+    let conn: Connection = Connection::open("database.db").expect("");
+    conn.execute_batch("PRAGMA key = 'WillBeChangedInASec'").expect("");
+    conn.execute("CREATE TABLE IF NOT EXISTS templates
+    (
+        template_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name        TEXT,
+        structure   BLOB
+    );", params![]).expect("");
+    conn.execute("CREATE TABLE IF NOT EXISTS tp_simple
+    (
+        description TEXT UNIQUE,
+        clear_1     TEXT,
+        hidden_1    Text
+    )", params![]).expect("");
 
-pub fn establish_connection(db_name: &str, db_key: &str) -> Result<Connection, rusqlite::Error> {
+    conn.execute("INSERT INTO templates (name, structure)
+    VALUES ('Simple', CAST('{
+      \"clear_1\": \"username\",
+      \"hidden_1\": \"password\"
+    }' AS BLOB))", params![]).expect("");
+
+    conn.execute("CREATE TABLE IF NOT EXISTS tp_ssh_keypair
+    (
+        description TEXT UNIQUE,
+        clear_1     TEXT,
+        clear_2     Text,
+        hidden_1    Text
+    )", params![]).expect("");
+    conn.execute("INSERT INTO templates (name, structure)
+    VALUES ('SSH-Keypair', CAST('{
+      \"clear_1\": \"name\",
+      \"clear_2\": \"public_key\",
+      \"hidden_1\": \"private_key\"
+    }' AS BLOB))",params![]).expect("");
+    
+    conn.execute("CREATE TABLE IF NOT EXISTS nonces
+    (
+      nonce TEXT UNIQUE,
+      orig_table TEXT,
+      orig_desc TEXT,
+      orig_entry TEXT
+    )",params![]).expect("");
+    
+    conn.execute("CREATE TABLE IF NOT EXISTS descriptions(
+      description TEXT UNIQUE,
+      template TEXT
+    );", params![]).expect("");
+    //Get first 16 bytes here: Salt
+    //Calculate new Key; pass as Vec<u8>
+    let new_key: String = String::from("abcd");
+    conn.execute_batch(&format!("PRAGMA rekey = '{}'", new_key)).expect("");
+    return Vec::new();
+}
+
+pub fn establish_connection(db_name: &str, db_key: String) -> Result<Connection, rusqlite::Error> {
     let db_path = db_name;
-    let key = db_key; //NEED SECURE STORAGE HERE
-    logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
+    let key = db_key;
+    //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
 
     let conn = Connection::open(db_path)?;
 
@@ -23,30 +82,35 @@ pub fn establish_connection(db_name: &str, db_key: &str) -> Result<Connection, r
     Ok(conn)
 }
 
-/*fn validate_connection() {
-    //Placeholder; just integrate that into mainframe
-    match establish_connection(db_name, db_key) {
-        Ok(conn) => {change_status(&conn)}
-        Err(err) => {eprintln!("Validation failed.")}
+pub fn validate_key(db_name: &str, db_key: String) -> bool {
+    let db_path = db_name;
+    let key = db_key;
+    //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
+
+    let conn = Connection::open(db_path).expect("");
+
+    conn.execute_batch(&format!("PRAGMA key = '{}'", key))
+        .expect("Failed to set encryption key");
+
+    //Should be 0; default query to check if decryption failed; writing to _ is necessary because of row.get()
+    if let Ok(_) = conn.query_row("SELECT COUNT(*) FROM sqlite_master", params![], |row| row.get::<usize, usize>(0)) {
+        true
+    } else {
+        false
     }
-}*/
-
-
+}
 
 // SENDING DATABASE INFORMATION TO MAINFRAME
 
 pub fn get_all_tables(conn: &Connection) -> Vec<String> {
-    let mut statement = conn.prepare("SELECT name FROM sqlite_master WHERE type='table'")
-                            .expect("Failed to prepare query");
-    let table_names = statement
-        .query_map((), |row| row.get::<usize, String>(0))
-        .expect("Failed to execute query")
-        .map(|result| decode_base64(result.expect("Failed to retrieve table name")))
-        .collect::<Vec<String>>();
+    let mut stmt = conn.prepare("SELECT name FROM sqlite_master WHERE type='table';").expect("");
+    let table_names: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("")
+        .collect::<Result<Vec<String>, >>().expect("");
     
     let filtered_table_names: Vec<String> = table_names
         .into_iter()
-        .filter(|table_name| decode_base64(table_name.to_string()) != "sqlite_sequence" && decode_base64(table_name.to_string()) != "templates" && decode_base64(table_name.to_string()) != "nonce")
+        .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Dont use backend-only tables
+        .map(|table_name| decode_base64(table_name))
         .collect();
 
     filtered_table_names
@@ -57,7 +121,10 @@ pub fn get_columns_from_table(conn: &Connection, table_name: &str) -> Vec<String
     let column_names: Vec<String> = stmt.query_map([], |row| row.get(1)).expect("Failed to get column names.")
         .collect::<Result<Vec<String>, _>>()
         .expect("Failed to collect results.");
-    column_names
+
+    let filtered_column_names: Vec<String> = column_names.into_iter().filter(|column| column.to_string() != "description")
+        .collect();
+    filtered_column_names
 }
 
 pub fn decode_vec_string_b64(encoded_vec: Vec<String>) -> Vec<String> {
@@ -73,7 +140,7 @@ pub fn get_all_columns_total(conn: &Connection) -> Vec<String> {
 
     let all_columns: Vec<String> = all_tables
         .iter()
-        .flat_map(|table_name| get_columns_from_table(conn, table_name))
+        .flat_map(|table_name| get_columns_from_table(conn, &encode_base64(table_name)))
         .collect();
 
     all_columns
@@ -85,11 +152,9 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
     let all_tables: Vec<String> = get_all_tables(conn);
     let mut all_descriptions: Vec<String> = vec![];
     for table in &all_tables {
-        if let Ok(description) = conn.query_row(
-            &format!("SELECT description FROM \"{}\"", table),
-            params![],
-            |row| row.get::<usize, String>(0),
-        ) {
+        let mut stmt = conn.prepare(&format!("SELECT description FROM \"{}\"", encode_base64(table))).expect("");
+        let descriptions_from_table = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect(""); 
+        for description in descriptions_from_table {
             all_descriptions.push(decode_base64(description));
         }
     }
@@ -101,6 +166,19 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
         
     return_vec
 
+}
+
+pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (String, Vec<(String, String)>) {
+    let encoded_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    //let mut stmt = conn.prepare(&format!("SELECT * FROM \"{}\" WHERE description = '{}'", encoded_table, encode_base64(description))).expect("");
+    //let args: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
+    let cols: Vec<String> = get_columns_from_table(conn, &encoded_table);
+    let mut combined_vec: Vec<(String, String)> = vec![];
+    for col in cols.iter().skip(1) { //Skip description
+        combined_vec.push((decode_base64(col), select_entry(conn, decode_base64(&encoded_table), description.clone(), col.to_string(), key.clone())))
+    };
+
+    (decode_base64(encoded_table), combined_vec)
 }
 
 // IMPLEMENTING SQL COMMANDS
@@ -124,16 +202,21 @@ pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>)
 pub fn insert_entry(conn: &Connection, table_name: String, args_str: Vec<String>, key: Vec<u8>) -> Result<()> {
     //Take input -> Encrypt using AES -> Encode in Base64 -> Store in 
     //args_str[0] is description!!!! = shown name of entry like Email, Skype, etc.!!!
-    let description = args_str[0].clone();
+    let description = args_str[0].clone().into_bytes();
     let mut enc_args_vec: Vec<Vec<u8>> = vec![];
     let key_as_array = u32_from_slice(&key);
 
-    for arg in args_str {   
+    enc_args_vec.push(description.clone());
+
+    let table_columns: Vec<String> = get_columns_from_table(&conn, &encode_base64(&table_name));
+
+    for (col_index, arg) in args_str.iter().skip(1).enumerate() {
         loop {
             let nonce = nonce_generator(); //Generate nonces on the fly for every entry -> No nonce reuse attack
             if conn.query_row(&format!("SELECT 1 FROM nonces WHERE nonce = '{}'", encode_base64(&nonce)), params![], |_| Ok(1)).is_err() {
                 //This query ensures that the generates nonce is unique; the odds of generating two same random 96 bit numbers are low, but never zero!
-                conn.execute(&format!("INSERT INTO nonces VALUES('{}', '{}', '{}', '{}')", encode_base64(&nonce), encode_base64(&table_name), encode_base64(&description), encode_base64(&arg)), params![]).expect("Something went wrong.");
+                let current_col: &str = &table_columns[col_index];
+                conn.execute(&format!("INSERT INTO nonces VALUES('{}', '{}', '{}', '{}')", encode_base64(&nonce), encode_base64(&table_name), encode_base64(&description), current_col), params![]).expect("Something went wrong.");
                 let enc_arg: Vec<u8> = encrypt_aesgcm(&key_as_array, &nonce, &arg);
                 enc_args_vec.push(enc_arg);
                 break;
@@ -146,28 +229,31 @@ pub fn insert_entry(conn: &Connection, table_name: String, args_str: Vec<String>
 
     conn.execute(&format!("INSERT INTO \"{}\" VALUES({})", encode_base64(&table_name), args_aes_b64_string), params![])?;
 
+    conn.execute(&format!("INSERT INTO descriptions VALUES('{}', '{}')", encode_base64(&args_str[0]), encode_base64(&table_name)), params![])?;
+
     Ok(())
 }
 
 pub fn select_entry(conn: &Connection, table_name: String, description: String, column: String, key: Vec<u8>) -> String {
     //Inverse order: Decode from Base64 -> Decrypt using AES and given nonce -> return lé value
-    let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("Didnt work lol");
+    let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let stmt: String = conn.query_row(&format!("SELECT nonce FROM nonces WHERE orig_table = '{}' AND orig_entry = '{}' AND orig_desc = '{}'", encode_base64(&table_name), encode_base64(&column), encode_base64(&description)), params![], |row| row.get(0)).expect("");
-    let nonce: Vec<u8> = decode_base64(stmt).into_bytes();
+    let nonce: Vec<u8> = base64::decode(stmt).expect("");
     
     let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = u12_from_slice(&nonce);
     
-    decrypt_aesgcm(&key_usable, &nonce_usable, &decode_base64(query_result).into_bytes())
+    decrypt_aesgcm(&key_usable, &nonce_usable, &base64::decode(query_result).expect(""))
 }
 
-pub fn delete_entry(conn: &Connection, table_name: String, description: String) -> Result<()> {
-    conn.execute(&format!("DELETE FROM \"{}\" WHERE description = '{}'", encode_base64(&table_name), encode_base64(&description)), params![])?;
-    conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", encode_base64(&table_name), encode_base64(&description)), params![])?;
-    Ok(())
+pub fn delete_entry(conn: &Connection, description: String) {
+    let enc_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    conn.execute(&format!("DELETE FROM \"{}\" WHERE description = '{}'", enc_table, encode_base64(&description)), params![]);
+    conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", enc_table, encode_base64(&description)), params![]);
 }
 
 pub fn update_entry(conn: &Connection, table_name: String, description: String, edited_entry: String, edited_column: String, key: Vec<u8>) -> Result<()> {
+    //Not yet used nor tested!
     let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = loop {
             let nonce = nonce_generator(); //Generate nonces on the fly for every entry -> No nonce reuse attack
@@ -198,3 +284,16 @@ fn format_args(args_vec: Vec<String>) -> String {
 
     formatted_args
 }
+
+pub fn close_conn(conn: Connection) {
+    conn.close().unwrap();
+}
+
+pub fn check_name_available(conn: &Connection, description: String) -> bool {
+    if conn.execute(&format!("SELECT 1 FROM descriptions WHERE description = '{}'", encode_base64(description)), params![]).is_err() {
+        true
+    } else {
+        false
+    }
+}
+
