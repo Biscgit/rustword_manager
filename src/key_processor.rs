@@ -6,10 +6,10 @@ use std::thread::available_parallelism;
 static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
 
 fn derive_key(password: String) -> Vec<u8> {
+    // derives a strong key from a password with argon2
     let mut key = [0u8; 64];
 
-    // uses half of the available logical cpu cores
-    // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+    // uses half of the available logical cpu cores to derive key
     let config = Argon2::new(
         Algorithm::Argon2d,
         Version::default(),
@@ -21,18 +21,19 @@ fn derive_key(password: String) -> Vec<u8> {
                 .get() as u32
                 / 2.max(1),
             Some(key.len()),
-        )
-        .unwrap(),
+        ).unwrap(),
     );
 
     config
         .hash_password_into(password.as_bytes(), SALT, &mut key)
         .unwrap();
 
+    // return key as a vector
     key.to_vec()
 }
 
 pub struct SecureStorage {
+    // wrapper for shielded memory
     memory: Shielded,
 }
 
