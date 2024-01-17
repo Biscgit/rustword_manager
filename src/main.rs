@@ -11,6 +11,7 @@ mod terminal;
 mod types;
 mod ui;
 
+
 fn main() -> std::result::Result<(), Box<dyn Error>> {
     // main function to setup app and run
     let mut terminal = setup_terminal()?;

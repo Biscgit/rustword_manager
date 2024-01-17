@@ -138,7 +138,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     // function for rendering selected credentials
     if let Some(entries) = &app.current_entry {
         // create all fields in a layout
-        let mut fields = vec![Constraint::Length(4); entries.items.len()];
+        let mut fields = vec![Constraint::Length(4); entries.items.len() - 1];
         fields.push(Constraint::Min(0));
         fields.push(Constraint::Length(3));
 
