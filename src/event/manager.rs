@@ -34,7 +34,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         _ => {
                             app.text_fields.search_bar.input(key);
                             app.update_shown_entries(app.text_fields.search_bar.lines()[0].clone());
-                            app.entries_list.default_selected();
+                            app.update_entries();
                         }
                     },
                     // credentials right side

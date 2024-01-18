@@ -247,13 +247,15 @@ impl<'a> App<'a> {
             self.text_fields.password_input = password_field();
 
             // load entries
-            self.update_entries("");
+            self.update_entries();
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
         }
     }
 
-    pub fn update_entries(&mut self, filter: &str) {
+    pub fn update_entries(&mut self) {
+        let filter = self.text_fields.search_bar.lines()[0].as_str();
+
         self.entries_list.set_items(
             self.db_manager.get_entry_names(filter)
                 .iter()
@@ -317,7 +319,7 @@ impl<'a> App<'a> {
             );
 
             // load entries and clear fields
-            self.update_entries("");
+            self.update_entries();
             self.reset_input_fields();
         }
     }
