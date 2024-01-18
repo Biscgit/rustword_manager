@@ -256,8 +256,9 @@ pub fn select_entry(conn: &Connection, table_name: String, description: String, 
 
 pub fn delete_entry(conn: &Connection, description: String) {
     let enc_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
-    conn.execute(&format!("DELETE FROM \"{}\" WHERE description = '{}'", enc_table, encode_base64(&description)), params![]);
-    conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", enc_table, encode_base64(&description)), params![]);
+    conn.execute(&format!("DELETE FROM \"{}\" WHERE description = '{}'", enc_table, encode_base64(&description)), params![]).expect("");
+    conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", enc_table, encode_base64(&description)), params![]).expect("");
+    conn.execute(&format!("DELETE FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![]).expect("");
 }
 
 pub fn update_entry(conn: &Connection, table_name: String, description: String, edited_entry: String, edited_column: String, key: Vec<u8>) -> Result<()> {
