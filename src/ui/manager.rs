@@ -10,6 +10,7 @@ use ratatui::{
     },
     Frame,
 };
+use ratatui::text::Line;
 use tui_textarea::TextArea;
 
 pub fn draw_ui(frame: &mut Frame, app: &mut App) {
@@ -70,11 +71,28 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     } else {
         Color::Yellow
     };
+
+    let search = app.text_fields.search_bar.lines()[0].clone();
     let items: Vec<ListItem> = app
         .entries_list
         .items
         .iter()
-        .map(|i| ListItem::new(i.0.clone()).style(Style::default().fg(entry_color)))
+        .map(|i| {
+            let name = i.0.clone();
+
+            if app.page_selected {
+                ListItem::new(name)
+                    .style(Style::default().fg(entry_color))
+            } else {
+                let (first, last) = name.split_once(search.as_str()).unwrap_or_default();
+
+                ListItem::new(Line::from(vec![
+                    first.to_string().yellow(),
+                    search.clone().light_cyan().bold(),
+                    last.to_string().yellow(),
+                ]))
+            }
+        })
         .collect();
 
     // create a list from all list items and highlight the currently selected one
@@ -250,6 +268,7 @@ fn page_new_entry(frame: &mut Frame, app: &mut App, area: Rect) {
     } else {
         Color::Yellow
     };
+
     let items: Vec<ListItem> = app
         .templates
         .items
