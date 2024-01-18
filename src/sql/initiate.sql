@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS templates
 );
 
 -- username-password template
-CREATE TABLE IF NOT EXISTS tp_simple
+CREATE TABLE IF NOT EXISTS "dHBfc2ltcGxl"
 (
     description TEXT UNIQUE,
     clear_1     TEXT,
@@ -20,7 +20,7 @@ VALUES ('Simple', CAST('{
 }' AS BLOB));
 
 -- ssh key pair
-CREATE TABLE IF NOT EXISTS tp_ssh_keypair
+CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
 (
     description TEXT UNIQUE,
     clear_1     TEXT,

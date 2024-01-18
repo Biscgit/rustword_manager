@@ -1,5 +1,6 @@
 use std::fmt::format;
 use std::panic::panic_any;
+use std::fs;
 use std::path::Path;
 use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
 use crate::base64_enc_dec::{encode_base64, decode_base64};
@@ -16,6 +17,9 @@ use crate::app_db_conn::AppDBConnector;
 
 use crate::password::generate_char_only_password;
 
+const SQL_INITIALIZE: &str = include_str!("./sql/initiate.sql");
+
+
 pub fn create_database(path: &Box<Path>) -> Connection {
     //Used when first creating a file; returns connection
     let conn: Connection = Connection::open(path)
@@ -25,6 +29,12 @@ pub fn create_database(path: &Box<Path>) -> Connection {
     let temp_key = generate_char_only_password(32);
     conn.execute_batch(&format!("PRAGMA key = '{}'", temp_key))
         .expect("Failed to set key");
+
+    // fill database with default config from .sql file
+    conn.execute_batch(SQL_INITIALIZE)
+        .expect("Failed to initialize database");
+
+    return conn;
 
     // fill database default config
     conn.execute("CREATE TABLE IF NOT EXISTS templates
