@@ -80,7 +80,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         .map(|i| {
             let name = i.0.clone();
 
-            if app.page_selected {
+            if app.page_selected || search.is_empty() {
                 ListItem::new(name)
                     .style(Style::default().fg(entry_color))
             } else {
@@ -88,7 +88,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
                 ListItem::new(Line::from(vec![
                     first.to_string().yellow(),
-                    search.clone().light_cyan().bold(),
+                    search.clone().light_yellow().bold().on_dark_gray(),
                     last.to_string().yellow(),
                 ]))
             }
