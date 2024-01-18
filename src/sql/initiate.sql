@@ -41,3 +41,8 @@ CREATE TABLE IF NOT EXISTS nonces
   orig_desc TEXT,
   orig_entry TEXT
 );
+
+CREATE TABLE IF NOT EXISTS descriptions(
+  description TEXT UNIQUE,
+  template TEXT
+);
