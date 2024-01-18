@@ -6,8 +6,10 @@ use std::{
 
 const PATH: [&str; 1] = ["RustwordManager"];
 const DB_NAME: &str = "passwords.sqlite3";
+
 pub struct FileManager {
     pub filepath: PathBuf,
+    pub salt: Option<[u8; 16]>,
 }
 
 impl FileManager {
@@ -15,6 +17,7 @@ impl FileManager {
         // create new file manager that holds path
         FileManager {
             filepath: FileManager::get_db_path(),
+            salt: None
         }
     }
 
@@ -50,13 +53,19 @@ impl FileManager {
         false
     }
 
-    pub fn get_salt(&self) -> io::Result<[u8; 16]> {
+    pub fn get_salt(&mut self) -> io::Result<[u8; 16]> {
         // sqlcipher stores a random salt as the first 16 bytes of a file
-        let mut file = fs::File::open(self.filepath.as_path())?;
 
-        let mut buf = [0; 16];
-        file.read_exact(&mut buf)?;
+        if let Some(salt) = self.salt {
+            Ok(salt)
+        } else {
+            let mut file = fs::File::open(self.create_path().unwrap())?;
 
-        Ok(buf)
+            let mut buf = [0; 16];
+            file.read_exact(&mut buf)?;
+
+            self.salt = Some(buf);
+            Ok(buf)
+        }
     }
 }

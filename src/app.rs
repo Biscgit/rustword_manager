@@ -225,7 +225,10 @@ impl<'a> App<'a> {
         // unlocks existing vault
         // sets app state according to if password is correct
 
-        let master_key = derive_key(self.text_fields.password_input.lines()[0].clone());
+        let master_key = derive_key(
+            self.text_fields.password_input.lines()[0].clone(),
+            &self.file_manager.get_salt().unwrap()
+        );
 
         // login if password correct
         if self.db_manager.check_key_correct(master_key.clone()) {
@@ -256,7 +259,7 @@ impl<'a> App<'a> {
         self.db_manager.create_new_db();
 
         // derive key and store securely in memory
-        let master_key = derive_key(master_key);
+        let master_key = derive_key(master_key, &self.file_manager.get_salt().unwrap());
         self.master_key = Some(SecureStorage::new(master_key.clone()));
 
         // set password to new key which needed the sqlite3 salt

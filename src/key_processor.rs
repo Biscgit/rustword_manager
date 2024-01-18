@@ -3,9 +3,9 @@ use shielded::Shielded;
 use std::num::NonZeroUsize;
 use std::thread::available_parallelism;
 
-static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
+// static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
 
-pub fn derive_key(password: String) -> Vec<u8> {
+pub fn derive_key(password: String, salt: &[u8; 16]) -> Vec<u8> {
     // derives a strong 256-bit key from a password with argon2
     let mut key = [0u8; 32];
 
@@ -25,7 +25,7 @@ pub fn derive_key(password: String) -> Vec<u8> {
     );
 
     config
-        .hash_password_into(password.as_bytes(), SALT, &mut key)
+        .hash_password_into(password.as_bytes(), salt, &mut key)
         .unwrap();
 
     // return key as a vector
