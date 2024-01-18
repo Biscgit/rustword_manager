@@ -246,11 +246,12 @@ impl<'a> App<'a> {
         // sets app state according to if password is correct
 
         let master_key = derive_key(self.text_fields.password_input.lines()[0].clone());
-        let path = self.file_manager.create_path().unwrap();
 
         // login if password correct
-        if self.db_manager.connect_to_db(path, master_key.clone()) {
+        // if self.db_manager.connect_to_db(path, master_key.clone()) {
+        if self.db_manager.check_key_correct(master_key.clone()) {
             // unlock vault and clear password
+            self.db_manager.connect_to_db(master_key.clone());
             self.master_key = Some(SecureStorage::new(master_key));
 
             self.vault_state.state = LoginState::Unlocked;
@@ -278,8 +279,7 @@ impl<'a> App<'a> {
         self.text_fields.password_input = password_field();
 
         // setup database
-        let path = self.file_manager.create_path().unwrap();
-        self.db_manager.create_new_db(path);
+        self.db_manager.create_new_db();
 
         // derive key and store securely in memory
         let master_key = derive_key(master_key);
