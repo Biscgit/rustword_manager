@@ -7,7 +7,7 @@ static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
 
 pub fn derive_key(password: String) -> Vec<u8> {
     // derives a strong 256-bit key from a password with argon2
-    let mut key = [0u8; 64];
+    let mut key = [0u8; 32];
 
     // uses half of the available logical cpu cores to derive key
     let config = Argon2::new(
