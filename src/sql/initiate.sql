@@ -17,6 +17,7 @@ INSERT INTO templates (name, structure)
 VALUES ('Web Credential', CAST('{
   "deletable": false,
   "name": "Web Credential",
+  "db_name": "tp_web_credential",
   "elements": [
     {
       "name": "Name",
@@ -45,6 +46,7 @@ INSERT INTO templates (name, structure)
 VALUES ('SSH-Keypair', CAST('{
   "deletable": false,
   "name": "SSH-Keypair",
+  "db_name": "tp_ssh_keypair",
   "elements": [
     {
       "name": "Name",
@@ -77,6 +79,7 @@ INSERT INTO templates (name, structure)
 VALUES ('Banking', CAST('{
   "deletable": false,
   "name": "Banking",
+  "db_name": "tp_banking",
   "elements": [
     {
       "name": "Name",

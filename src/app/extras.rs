@@ -39,6 +39,7 @@ pub struct Template {
     // template struct which gets created from json
     pub deletable: bool,
     pub name: String,
+    pub db_name: String,
     pub elements: Vec<TemplateElement>,
 }
 
