@@ -11,8 +11,10 @@ use self::{
     states::{LoginState, LoginStates},
 };
 use crate::{
+    app_db_conn::AppDBConnector,
     event::handle_events,
     file_manager::FileManager,
+    key_processor::{derive_key, SecureStorage},
     password::generate_strong_password,
     types::{ClState, Terminal},
     ui::{
@@ -45,6 +47,8 @@ pub struct App<'a> {
     clip_copied: ClState,
 
     pub file_manager: FileManager,
+    db_manager: AppDBConnector,
+    master_key: Option<SecureStorage>,
 }
 
 impl<'a> App<'a> {
@@ -115,6 +119,9 @@ impl<'a> App<'a> {
             clipboard: clipboard_thread::ClipboardManager::new(Arc::clone(&copied)),
             clip_copied: copied,
             file_manager,
+
+            db_manager: AppDBConnector::new(),
+            master_key: None,
         }
     }
 
@@ -233,15 +240,6 @@ impl<'a> App<'a> {
         self.page_selected = false;
     }
 
-    pub fn lock_vault(&mut self) {
-        // disconnects from database and locks vault
-        // ToDo: remove connection from DB etc.
-        self.vault_state.state = LoginState::Login;
-
-        // clear clipboard on exiting
-        self.clipboard.force_clear_clipboard();
-    }
-
     pub fn unlock_vault(&mut self) {
         // unlocks existing vault
         // sets app state according to if password is correct
@@ -255,14 +253,33 @@ impl<'a> App<'a> {
         }
     }
 
+    pub fn lock_vault(&mut self) {
+        // disconnects from database and locks vault
+        // ToDo: remove connection from DB etc.
+        self.vault_state.state = LoginState::Login;
+
+        // clear clipboard on exiting
+        self.clipboard.force_clear_clipboard();
+    }
+
     pub fn setup_vault(&mut self) {
         // creates a new vault with entered credential
-        // ToDo: init database
+        // get key and clear fields
+        let master_key = self.text_fields.password_input.lines()[0].clone();
 
-        // unlock vault and clear password
         self.vault_state.clear_password();
-        self.vault_state.state = LoginState::Unlocked;
         self.text_fields.password_input = password_field();
+
+        // derive key and store securely in memory
+        let master_key= derive_key(master_key);
+        self.master_key = Some(SecureStorage::new(master_key.clone()));
+
+        // setup database with derived key and path
+        let path = self.file_manager.create_path().unwrap();
+        self.db_manager.connect_to_db(path, master_key);
+
+        // unlock vault
+        self.vault_state.state = LoginState::Unlocked;
     }
 
     pub fn save_entry(&mut self) {
