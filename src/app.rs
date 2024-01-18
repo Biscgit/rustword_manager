@@ -241,6 +241,20 @@ impl<'a> App<'a> {
         self.page_selected = false;
     }
 
+
+    pub fn update_entries(&mut self) {
+        // updates the currently cached names according to the set filter if set
+        let filter = self.text_fields.search_bar.lines()[0].as_str();
+
+        self.entries_list.set_items(
+            self.db_manager.get_entry_names(filter)
+                .iter()
+                .enumerate()
+                .map(|(i, s)| (s.clone(), i))
+                .collect()
+        );
+    }
+
     pub fn unlock_vault(&mut self) {
         // unlocks existing vault
         // sets app state according to if password is correct
@@ -263,29 +277,6 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn update_entries(&mut self) {
-        // updates the currently cached names according to the set filter if set
-        let filter = self.text_fields.search_bar.lines()[0].as_str();
-
-        self.entries_list.set_items(
-            self.db_manager.get_entry_names(filter)
-                .iter()
-                .enumerate()
-                .map(|(i, s)| (s.clone(), i))
-                .collect()
-        );
-    }
-
-    pub fn lock_vault(&mut self) {
-        // disconnects from database and locks vault
-        self.db_manager.disconnect_from_db();
-        self.vault_state.state = LoginState::Login;
-
-        // clear clipboard and clean search field on exiting
-        self.clipboard.force_clear_clipboard();
-        self.text_fields.search_bar = input_field();
-    }
-
     pub fn setup_vault(&mut self) {
         // creates a new vault with entered credential
         // get key and clear fields
@@ -306,6 +297,16 @@ impl<'a> App<'a> {
 
         // unlock vault
         self.vault_state.state = LoginState::Unlocked;
+    }
+
+    pub fn lock_vault(&mut self) {
+        // disconnects from database and locks vault
+        self.db_manager.disconnect_from_db();
+        self.vault_state.state = LoginState::Login;
+
+        // clear clipboard and clean search field on exiting
+        self.clipboard.force_clear_clipboard();
+        self.text_fields.search_bar = input_field();
     }
 
     pub fn save_entry(&mut self) {

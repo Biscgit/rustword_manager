@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 use tui_textarea::TextArea;
 
-use crate::app::stateful_list::StatefulList;
-use crate::ui::fields::{input_field, password_field};
+use crate::{
+    app::stateful_list::StatefulList,
+    ui::fields::{input_field, password_field}
+};
 
 
 pub struct SingleValue<T> {
