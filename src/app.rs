@@ -55,6 +55,7 @@ impl<'a> App<'a> {
     pub fn new() -> App<'a> {
         // creates a new with testing values
         let file_manager = FileManager::new();
+        let path = file_manager.create_path().unwrap();
         let copied = Arc::new(Mutex::new(SingleValue { value: None }));
 
         App {
@@ -120,7 +121,7 @@ impl<'a> App<'a> {
             clip_copied: copied,
             file_manager,
 
-            db_manager: AppDBConnector::new(),
+            db_manager: AppDBConnector::new(path),
             master_key: None,
         }
     }
