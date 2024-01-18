@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "dHBfc2ltcGxl"
     hidden_1    Text
 );
 INSERT INTO templates (name, structure)
-VALUES ('Simple', CAST('{
+VALUES ('Web Credential', CAST('{
   "deletable": false,
   "name": "Web Credential",
   "elements": [
