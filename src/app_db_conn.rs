@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use aead::Key;
 use rusqlite::Connection;
 
 use crate::db_interface;
@@ -14,15 +15,28 @@ impl AppDBConnector {
         AppDBConnector { connection: None }
     }
 
+    fn vec_key_to_hex(key: Vec<u8>) -> String {
+        key.iter().map(|byte| format!("{:02X}", byte)).collect()
+    }
+
+    pub fn create_new_db(&mut self, path: PathBuf) {
+        // creates a new database
+        db_interface::create_database(path);
+    }
+
+    pub fn set_db_key(&mut self, key: Vec<u8>) {
+        let db_key = AppDBConnector::vec_key_to_hex(key);
+        db_interface::change_password(self.connection.as_ref().unwrap(), db_key);
+    }
+
     pub fn connect_to_db(&mut self, path: PathBuf, key: Vec<u8>) -> bool {
-        // tries to connect to db if correct key
-        let db_key: String = key.iter().map(|byte| format!("{:02X}", byte)).collect();
+        // tries to connect to db if correct key (returned as bool)
+        let db_key = AppDBConnector::vec_key_to_hex(key);
 
         if let Ok(conn) = db_interface::establish_connection(path, db_key) {
             self.connection = Some(conn);
             true
         } else {
-            //panic!("Error establishing connection");
             false
         }
     }

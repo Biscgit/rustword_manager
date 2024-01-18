@@ -11,10 +11,18 @@ use aes_gcm::aead::generic_array::GenericArray;
 use typenum::{U12, U32};
 use chrono::prelude::Utc;
 
-pub fn create_file() -> Vec<u8> {
-    //Used when first creating a file; first 16 bytes of the file are returned as a salt
-    let conn: Connection = Connection::open("database.db").expect("");
-    conn.execute_batch("PRAGMA key = 'WillBeChangedInASec'").expect("");
+use crate::password::generate_strong_password;
+
+pub fn create_database(path: PathBuf) -> Connection {
+    //Used when first creating a file; returns connection
+    let conn: Connection = Connection::open(path.as_path())
+        .expect("Failed to create db");
+
+    // sent temporary key for protection while initializing
+    let temp_key = generate_strong_password(32);
+    change_password(&conn, temp_key);
+
+    // fill database default config
     conn.execute("CREATE TABLE IF NOT EXISTS templates
     (
         template_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,25 +54,27 @@ pub fn create_file() -> Vec<u8> {
       \"clear_1\": \"name\",
       \"clear_2\": \"public_key\",
       \"hidden_1\": \"private_key\"
-    }' AS BLOB))",params![]).expect("");
-    
+    }' AS BLOB))", params![]).expect("");
+
     conn.execute("CREATE TABLE IF NOT EXISTS nonces
     (
       nonce TEXT UNIQUE,
       orig_table TEXT,
       orig_desc TEXT,
       orig_entry TEXT
-    )",params![]).expect("");
-    
+    )", params![]).expect("");
+
     conn.execute("CREATE TABLE IF NOT EXISTS descriptions(
       description TEXT UNIQUE,
       template TEXT
     );", params![]).expect("");
-    //Get first 16 bytes here: Salt
-    //Calculate new Key; pass as Vec<u8>
-    let new_key: String = String::from("abcd");
-    conn.execute_batch(&format!("PRAGMA rekey = '{}'", new_key)).expect("");
-    return Vec::new();
+
+    conn
+}
+
+pub fn change_password(conn: &Connection, new_key: String) {
+    conn.execute_batch(&format!("PRAGMA rekey = '{}'", new_key))
+        .expect("Failed to change key");
 }
 
 pub fn establish_connection(mut db_path: PathBuf, db_key: String) -> Result<Connection, rusqlite::Error> {
@@ -107,7 +117,7 @@ pub fn get_all_tables(conn: &Connection) -> Vec<String> {
     let mut stmt = conn.prepare("SELECT name FROM sqlite_master WHERE type='table';").expect("");
     let table_names: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("")
         .collect::<Result<Vec<String>, >>().expect("");
-    
+
     let filtered_table_names: Vec<String> = table_names
         .into_iter()
         .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Dont use backend-only tables
@@ -154,7 +164,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
     let mut all_descriptions: Vec<String> = vec![];
     for table in &all_tables {
         let mut stmt = conn.prepare(&format!("SELECT description FROM \"{}\"", encode_base64(table))).expect("");
-        let descriptions_from_table = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect(""); 
+        let descriptions_from_table = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
         for description in descriptions_from_table {
             all_descriptions.push(decode_base64(description));
         }
@@ -164,9 +174,8 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
             return_vec.push(desc.to_string());
         }
     }
-        
-    return_vec
 
+    return_vec
 }
 
 pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (String, Vec<(String, String)>) {
@@ -186,9 +195,9 @@ pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (Str
 
 pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>) -> Result<()> {
     conn.execute(&format!("CREATE TABLE \"{}\" (description TEXT, {})", encode_base64(table_name), columns.iter()
-                                                                                .map(|column| format!("\"{}\" TEXT", encode_base64(column)))
-                                                                                .collect::<Vec<String>>()
-                                                                                .join(", ")), params![])?;
+        .map(|column| format!("\"{}\" TEXT", encode_base64(column)))
+        .collect::<Vec<String>>()
+        .join(", ")), params![])?;
     Ok(())
 
     /*
@@ -240,10 +249,10 @@ pub fn select_entry(conn: &Connection, table_name: String, description: String, 
     let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let stmt: String = conn.query_row(&format!("SELECT nonce FROM nonces WHERE orig_table = '{}' AND orig_entry = '{}' AND orig_desc = '{}'", encode_base64(&table_name), encode_base64(&column), encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let nonce: Vec<u8> = base64::decode(stmt).expect("");
-    
+
     let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = u12_from_slice(&nonce);
-    
+
     decrypt_aesgcm(&key_usable, &nonce_usable, &base64::decode(query_result).expect(""))
 }
 
@@ -257,20 +266,20 @@ pub fn update_entry(conn: &Connection, table_name: String, description: String, 
     //Not yet used nor tested!
     let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = loop {
-            let nonce = nonce_generator(); //Generate nonces on the fly for every entry -> No nonce reuse attack
-            if conn.query_row(&format!("SELECT 1 FROM nonces WHERE nonce = '{}'", encode_base64(&nonce)), params![], |_| Ok(1)).is_err() {
-                //This query ensures that the generates nonce is unique; the odds of generating two same random 96 bit numbers are low, but never zero!
-                break(nonce)
-            }
+        let nonce = nonce_generator(); //Generate nonces on the fly for every entry -> No nonce reuse attack
+        if conn.query_row(&format!("SELECT 1 FROM nonces WHERE nonce = '{}'", encode_base64(&nonce)), params![], |_| Ok(1)).is_err() {
+            //This query ensures that the generates nonce is unique; the odds of generating two same random 96 bit numbers are low, but never zero!
+            break (nonce);
+        }
     };
 
     let enc_message: Vec<u8> = encrypt_aesgcm(&key_usable, &nonce_usable, &edited_entry);
-    
+
     conn.execute(&format!("UPDATE \"{}\" SET \"{}\" = '{}' WHERE description = '{}'", encode_base64(&table_name), encode_base64(&edited_column), encode_base64(&enc_message), encode_base64(&description)), params![])?;
     //If the database crashes between these queries, the database is going to be corrupted lol
     conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", encode_base64(&table_name), encode_base64(&description)), params![]).expect("How did this not work, what");
     conn.execute(&format!("INSERT INTO nonces VALUES('{}', '{}', '{}', '{}')", encode_base64(&nonce_usable), encode_base64(&table_name), encode_base64(&description), encode_base64(&edited_column)), params![]).expect("Something went wrong.");
-    
+
     Ok(())
 }
 
