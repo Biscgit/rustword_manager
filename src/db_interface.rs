@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
 use crate::base64_enc_dec::{encode_base64, decode_base64};
 use crate::logger;
@@ -66,12 +67,11 @@ pub fn create_file() -> Vec<u8> {
     return Vec::new();
 }
 
-pub fn establish_connection(db_name: &str, db_key: String) -> Result<Connection, rusqlite::Error> {
-    let db_path = db_name;
+pub fn establish_connection(db_path: PathBuf, db_key: String) -> Result<Connection, rusqlite::Error> {
     let key = db_key;
     //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
 
-    let conn = Connection::open(db_path)?;
+    let conn = Connection::open(db_path.as_path())?;
 
     conn.execute_batch(&format!("PRAGMA key = '{}'", key))
         .expect("Failed to set encryption key");

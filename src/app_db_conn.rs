@@ -1,10 +1,10 @@
+use std::path::PathBuf;
 use rusqlite::Connection;
 
 use crate::db_interface;
 
-const PATH: [&str; 2] = ["RustwordManager", "passwords.db"];
 
-struct AppDBConnector {
+pub struct AppDBConnector {
     // a connector to interact with the database
     connection: Option<Connection>,
 }
@@ -14,25 +14,28 @@ impl AppDBConnector {
         AppDBConnector { connection: None }
     }
 
-    pub fn connect_to_db(&mut self, key: Vec<u8>) {
+    pub fn connect_to_db(&mut self, path: PathBuf, key: Vec<u8>) {
         // tries to connect to db if correct key
         let db_key: String = key.iter().map(|byte| format!("{:02X}", byte)).collect();
 
-        if let Ok(conn) = db_interface::establish_connection("", db_key) {
+        if let Ok(conn) = db_interface::establish_connection(path, db_key) {
             self.connection = Some(conn);
         } else {
-            eprintln!("Error establishing connection");
+            panic!("Error establishing connection");
         }
-
     }
 
     pub fn disconnect_from_db(&mut self) {
         // disconnects from db
-        self.connection = None;
+        if let Some(conn) = self.connection.take() {
+            if conn.close().is_err() {
+                // ToDo: log failed connection
+            }
+        }
     }
 
     //pub fn check_key_correct(key: &str) -> bool { Should not be necessary; is implemented in connect_to_db()
-        // checks if the entered key is correct
+    // checks if the entered key is correct
     //}
 
     pub fn get_entry_names(&self, filter: &str) -> Vec<String> {
@@ -50,7 +53,6 @@ impl AppDBConnector {
         // gets all templates
         // todo here: turn templates with json_serde into objects
         db_interface::get_all_tables(self.connection.as_ref().unwrap())
-
     }
 
     pub fn insert_entry(&self, template_name: String, elementes: Vec<String>, key: Vec<u8>) {
