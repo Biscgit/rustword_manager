@@ -50,6 +50,7 @@ pub struct App<'a> {
     pub file_manager: FileManager,
     db_manager: AppDBConnector,
     master_key: Option<SecureStorage>,
+    login_count: u32,
 }
 
 impl<'a> App<'a> {
@@ -80,6 +81,7 @@ impl<'a> App<'a> {
 
             db_manager: AppDBConnector::new(path),
             master_key: None,
+            login_count: 0,
         }
     }
 
@@ -232,6 +234,8 @@ impl<'a> App<'a> {
 
         // login if password correct
         if self.db_manager.check_key_correct(master_key.clone()) {
+            log::info!("Login successful after {} failed attempts.", self.login_count);
+            self.login_count = 0;
             // unlock vault and clear password
             self.db_manager.connect_to_db(master_key.clone());
             self.master_key = Some(SecureStorage::new(master_key));
@@ -244,6 +248,7 @@ impl<'a> App<'a> {
             self.update_entries();
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
+            self.login_count += 1;
         }
     }
 

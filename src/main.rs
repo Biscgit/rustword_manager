@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::{app::App, terminal::*, types::*};
+use chrono::prelude::Utc;
 
 mod aes_impl;
 mod app;
@@ -19,6 +20,7 @@ mod ui;
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
     // main function to setup app and run
+    logger::init_logger(&format!("RustwortManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //Init logger; works globally
     let mut terminal = setup_terminal()?;
     let app = App::new();
 

@@ -1,13 +1,10 @@
 use std::path::Path;
 use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
 use crate::base64_enc_dec::{encode_base64, decode_base64};
-use crate::logger;
 
 use rusqlite::{Connection, params, Result};
 use aes_gcm::aead::generic_array::GenericArray;
 use typenum::{U12, U32};
-use chrono::prelude::Utc;
-use crate::app_db_conn::AppDBConnector;
 
 use crate::password::generate_char_only_password;
 
@@ -32,24 +29,26 @@ pub fn create_database(path: &Box<Path>) -> Connection {
 }
 
 pub fn change_password(conn: &Connection, new_key: String) {
+    //Only called during database creation; sets a new password for the database.
     conn.execute_batch(&format!("PRAGMA rekey = '{}'", new_key))
         .expect("Failed to change key");
 }
 
 pub fn establish_connection(db_path: &Box<Path>, db_key: String) -> Result<Connection, rusqlite::Error> {
-    //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
+    //Connect to database. Will return an Error if it didn't work.
     let conn = Connection::open(db_path)?;
 
     conn.execute_batch(&format!("PRAGMA key = '{}'", db_key))
         .expect("Failed to set encryption key");
 
-    //Should be 0; default query to check if decryption failed; writing to _ is necessary because of row.get()
+    //If the database was not decrypted successfully, this operation will fail and throw an Error. Else, it will work.
     let _: u32 = conn.query_row("SELECT COUNT(*) FROM sqlite_master", params![], |row| row.get(0))?;
 
     Ok(conn)
 }
 
 pub fn validate_key(db_path: &Box<Path>, db_key: String) -> bool {
+    // Returns true if given key is valid.
     let key = db_key;
     //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
 
@@ -65,13 +64,14 @@ pub fn validate_key(db_path: &Box<Path>, db_key: String) -> bool {
 // SENDING DATABASE INFORMATION TO MAINFRAME
 
 pub fn get_all_tables(conn: &Connection) -> Vec<String> {
+    // Returns all tables created by a user; return-values are NOT base64-encoded.
     let mut stmt = conn.prepare("SELECT name FROM sqlite_master WHERE type='table';").expect("");
     let table_names: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("")
         .collect::<Result<Vec<String>, >>().expect("");
 
     let filtered_table_names: Vec<String> = table_names
         .into_iter()
-        .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Dont use backend-only tables
+        .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Exclude backend-only tables
         .map(|table_name| decode_base64(table_name))
         .collect();
 
@@ -79,6 +79,7 @@ pub fn get_all_tables(conn: &Connection) -> Vec<String> {
 }
 
 pub fn get_columns_from_table(conn: &Connection, table_name: &str) -> Vec<String> {
+    // Returns all columns inside of a table. Columns stay base64-encoded.
     let mut stmt = conn.prepare(&format!("PRAGMA table_info(\"{}\")", table_name)).expect("Invalid table.");
     let column_names: Vec<String> = stmt.query_map([], |row| row.get(1)).expect("Failed to get column names.")
         .collect::<Result<Vec<String>, _>>()
@@ -89,15 +90,8 @@ pub fn get_columns_from_table(conn: &Connection, table_name: &str) -> Vec<String
     filtered_column_names
 }
 
-pub fn decode_vec_string_b64(encoded_vec: Vec<String>) -> Vec<String> {
-    let decoded_vec: Vec<String> = encoded_vec
-        .iter()
-        .map(|encoded_column| decode_base64(encoded_column.to_string()))
-        .collect();
-    decoded_vec
-}
-
 pub fn get_all_columns_total(conn: &Connection) -> Vec<String> {
+    //Helper function; returns all columns across all tables.
     let all_tables = get_all_tables(conn);
 
     let all_columns: Vec<String> = all_tables
@@ -109,6 +103,7 @@ pub fn get_all_columns_total(conn: &Connection) -> Vec<String> {
 }
 
 pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { // %<Word>% is a before-and-after wildcard in SQL.
+    // Returns all descriptions from all tables that match a given filter. Can handle empty input and can also return an empty Vec.
     let mut return_vec: Vec<String> = vec![];
 
     let all_tables: Vec<String> = get_all_tables(conn);
@@ -132,6 +127,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
 }
 
 pub fn get_all_templates(conn: &Connection) -> Vec<Vec<u8>> {
+    // Returns the structures of all templates as a Vec<Vec<u8>>. Can be decoded into JSON strings.
     let mut stmt = conn.prepare("SELECT structure FROM templates").expect("");
 
     let templates_structures: Vec<Vec<u8>> = stmt.query_map([], |row| row.get(0)).expect("Failed to get column names.")
@@ -141,6 +137,7 @@ pub fn get_all_templates(conn: &Connection) -> Vec<Vec<u8>> {
 }
 
 pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (String, Vec<(String, String)>) {
+    // Dangerous: Returns table where description is found and also all columns with their corresponding DECRYPTED values. Might have to change.
     let encoded_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
     //let mut stmt = conn.prepare(&format!("SELECT * FROM \"{}\" WHERE description = '{}'", encoded_table, encode_base64(description))).expect("");
     //let args: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
@@ -153,9 +150,36 @@ pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (Str
     (decode_base64(encoded_table), combined_vec)
 }
 
+pub fn select_line_encrypted(conn: &Connection, description: String) -> (String, Vec<(String, Vec<u8>)>) {
+    //select_line() but doesn't decrypt. Use this combined with decrypt_single_entry() instead of select_line.
+    let encoded_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    let cols: Vec<String> = get_columns_from_table(conn, &encoded_table);
+    let mut combined_vec: Vec<(String, Vec<u8>)> = vec![];
+    for col in cols.iter().skip(1) {
+        let decrypted_val: Vec<u8> = conn.query_row(&format!("SELECT {} FROM {} WHERE description = '{}'", col, encoded_table, encode_base64(&description)), params![], |row| row.get(0)).expect("");
+        combined_vec.push((decode_base64(col), decrypted_val));
+    }
+    
+    (decode_base64(encoded_table), combined_vec)
+}
+
+pub fn decrypt_single_entry(conn: &Connection, description: String, column: String, key: Vec<u8>) -> String {
+    //Decrypts just one entry instead of a whole row. Use this combined with select_line_encrypted() instead of select_line.
+    let table_name: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    let stmt: String = conn.query_row(&format!("SELECT nonce FROM nonces WHERE orig_table = '{}' AND orig_entry = '{}' AND orig_desc = '{}'", encode_base64(&table_name), encode_base64(&column), encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    let nonce: Vec<u8> = base64::decode(stmt).expect("");
+
+    let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
+    let nonce_usable: GenericArray<u8, U12> = u12_from_slice(&nonce);
+
+    decrypt_aesgcm(&key_usable, &nonce_usable, &base64::decode(query_result).expect(""))
+}
+
 // IMPLEMENTING SQL COMMANDS
 
 pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>) -> Result<()> {
+    //Create new template with columns
     conn.execute(&format!("CREATE TABLE \"{}\" (description TEXT, {})", encode_base64(table_name), columns.iter()
         .map(|column| format!("\"{}\" TEXT", encode_base64(column)))
         .collect::<Vec<String>>()
@@ -219,6 +243,7 @@ pub fn select_entry(conn: &Connection, table_name: String, description: String, 
 }
 
 pub fn delete_entry(conn: &Connection, description: String) {
+    //Deletes an entry and all associated information from other tables.
     let enc_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
     conn.execute(&format!("DELETE FROM \"{}\" WHERE description = '{}'", enc_table, encode_base64(&description)), params![]).expect("");
     conn.execute(&format!("DELETE FROM nonces WHERE orig_table = '{}' AND orig_desc = '{}'", enc_table, encode_base64(&description)), params![]).expect("");
@@ -262,3 +287,12 @@ pub fn check_name_available(conn: &Connection, description: String) -> bool {
     conn.execute(&format!("SELECT 1 FROM descriptions WHERE description = '{}'", encode_base64(description)), params![]).is_ok()
 }
 
+
+pub fn decode_vec_string_b64(encoded_vec: Vec<String>) -> Vec<String> {
+    //Decode a full vector of base64-encoded values
+    let decoded_vec: Vec<String> = encoded_vec
+        .iter()
+        .map(|encoded_column| decode_base64(encoded_column.to_string()))
+        .collect();
+    decoded_vec
+}
