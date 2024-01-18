@@ -227,7 +227,7 @@ impl<'a> App<'a> {
 
         let master_key = derive_key(
             self.text_fields.password_input.lines()[0].clone(),
-            &self.file_manager.get_salt().unwrap()
+            &self.file_manager.get_salt().unwrap(),
         );
 
         // login if password correct
@@ -295,9 +295,11 @@ impl<'a> App<'a> {
             values.pop();
 
             // ToDo: correct template
-            let template_name = "tp_simple".to_string();
+            let database_name = self.templates.get_ref(
+                self.current_template.unwrap()
+            ).unwrap().db_name.clone();
             let success = self.db_manager.insert_entry(
-                template_name,
+                database_name,
                 values,
                 self.master_key.as_mut().unwrap().get_contents(),
             );

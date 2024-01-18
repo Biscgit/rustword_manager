@@ -74,6 +74,11 @@ impl<T> StatefulList<T> {
         }
     }
 
+    pub fn get_ref(&mut self, index: usize) -> Option<&T> {
+        // get an item from index
+        self.items.get(index)
+    }
+
     pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         // get an item from index
         self.items.get_mut(index)
