@@ -270,8 +270,9 @@ impl<'a> App<'a> {
         self.db_manager.disconnect_from_db();
         self.vault_state.state = LoginState::Login;
 
-        // clear clipboard on exiting
+        // clear clipboard and clean search field on exiting
         self.clipboard.force_clear_clipboard();
+        self.text_fields.search_bar = input_field();
     }
 
     pub fn setup_vault(&mut self) {
