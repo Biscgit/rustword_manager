@@ -6,16 +6,22 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-argon2 = { version = "0.5.2", features = ["simple"] }
-cli-clipboard = "0.4.0"
-lazy_static = "1.4.0"
-rusqlite = {version = "0.30.0", features = ["bundled-sqlcipher"]}
-shielded = "0.1.2"
-base64 = "0.21.5"
 aead = "0.5.2"
 aes-gcm = "0.10.3"
-rand = "0.8.5"
+arboard = "3.3.0"
+argon2 = "0.5.2"
+base64 = "0.21.5"
+chrono = "0.4.31"
+crossterm = "0.27.0"
+dirs = "5.0.1"
 log = "0.4.20"
 log4rs = "1.2.0"
+passwords = "3.1.16"
+rand = "0.8.5"
+ratatui = "0.25.0"
+rusqlite = "0.30.0"
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = "1.0.111"
+shielded = "0.1.2"
+tui-textarea = "0.4.0"
 typenum = "1.17.0"
-chrono = "0.4.31"
