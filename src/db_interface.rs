@@ -33,7 +33,7 @@ pub fn create_database(path: &Box<Path>) -> Connection {
         name        TEXT,
         structure   BLOB
     );", params![]).expect("");
-    conn.execute("CREATE TABLE IF NOT EXISTS tp_simple
+    conn.execute("CREATE TABLE IF NOT EXISTS \"dHBfc2ltcGxl\"
     (
         description TEXT UNIQUE,
         clear_1     TEXT,
@@ -46,7 +46,7 @@ pub fn create_database(path: &Box<Path>) -> Connection {
       \"hidden_1\": \"password\"
     }' AS BLOB))", params![]).expect("");
 
-    conn.execute("CREATE TABLE IF NOT EXISTS tp_ssh_keypair
+    conn.execute("CREATE TABLE IF NOT EXISTS \"dHBfc3NoX2tleXBhaXI=\"
     (
         description TEXT UNIQUE,
         clear_1     TEXT,
@@ -117,13 +117,7 @@ pub fn get_all_tables(conn: &Connection) -> Vec<String> {
     let filtered_table_names: Vec<String> = table_names
         .into_iter()
         .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Dont use backend-only tables
-        .map(|table_name| {
-            if table_name != "tp_simple" && table_name != "tp_ssh_keypair" {
-                decode_base64(table_name)
-            } else {
-                table_name.to_string()
-            }
-        })
+        .map(|table_name| decode_base64(table_name))
         .collect();
 
     filtered_table_names
