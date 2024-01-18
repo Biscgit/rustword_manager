@@ -81,7 +81,7 @@ impl AppDBConnector {
         let blobs: Vec<Vec<u8>> = Vec::new();
         blobs
             .iter()
-            .map(|t| serde_json::from_slice(t))
+            .map(|t| serde_json::from_slice::<Template>(t).unwrap())
             .collect()
     }
 
