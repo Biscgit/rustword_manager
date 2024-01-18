@@ -69,10 +69,10 @@ impl AppDBConnector {
         db_interface::select_line(self.connection.as_ref().unwrap(), name, key)
     }
 
-    pub fn get_all_templates(&self) -> Vec<String> {
+    pub fn get_all_templates(&self) -> Vec<Vec<u8>> {
         // gets all templates
         // todo here: turn templates with json_serde into objects
-        db_interface::get_all_tables(self.connection.as_ref().unwrap())
+        db_interface::get_all_templates(self.connection.as_ref().unwrap())
     }
 
     pub fn insert_entry(&self, template_name: String, elementes: Vec<String>, key: Vec<u8>) -> bool {
