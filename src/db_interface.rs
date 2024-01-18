@@ -117,7 +117,13 @@ pub fn get_all_tables(conn: &Connection) -> Vec<String> {
     let filtered_table_names: Vec<String> = table_names
         .into_iter()
         .filter(|table_name| table_name.to_string() != "sqlite_sequence" && table_name.to_string() != "templates" && table_name.to_string() != "nonces" && table_name.to_string() != "descriptions") //Dont use backend-only tables
-        .map(|table_name| decode_base64(table_name))
+        .map(|table_name| {
+            if table_name != "tp_simple" && table_name != "tp_ssh_keypair" {
+                decode_base64(table_name)
+            } else {
+                table_name.to_string()
+            }
+        })
         .collect();
 
     filtered_table_names
