@@ -78,13 +78,12 @@ pub fn change_password(conn: &Connection, new_key: String) {
 }
 
 pub fn establish_connection(mut db_path: PathBuf, db_key: String) -> Result<Connection, rusqlite::Error> {
-    let key = db_key;
     //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
 
     db_path.push("database.db3");
     let conn = Connection::open(db_path)?;
 
-    conn.execute_batch(&format!("PRAGMA key = '{}'", key))
+    conn.execute_batch(&format!("PRAGMA key = '{}'", db_key))
         .expect("Failed to set encryption key");
 
     //Should be 0; default query to check if decryption failed; writing to _ is necessary because of row.get()

@@ -31,7 +31,10 @@ impl FileManager {
     pub fn create_path(&self) -> io::Result<PathBuf> {
         // creates the db path if not exists
         fs::create_dir_all(self.filepath.as_path())?;
-        Ok(self.filepath.clone())
+
+        let mut filepath = self.filepath.clone();
+        filepath.push("database.db3");
+        Ok(filepath)
     }
 
     pub fn check_db_exist(&self) -> bool {

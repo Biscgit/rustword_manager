@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use aead::Key;
 use rusqlite::Connection;
 
 use crate::db_interface;
@@ -21,7 +20,7 @@ impl AppDBConnector {
 
     pub fn create_new_db(&mut self, path: PathBuf) {
         // creates a new database
-        db_interface::create_database(path);
+        self.connection  = Some(db_interface::create_database(path));
     }
 
     pub fn set_db_key(&mut self, key: Vec<u8>) {

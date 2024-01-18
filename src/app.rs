@@ -243,9 +243,15 @@ impl<'a> App<'a> {
     pub fn unlock_vault(&mut self) {
         // unlocks existing vault
         // sets app state according to if password is correct
-        // ToDo: check password
-        if self.text_fields.password_input.lines()[0] == "pass" {
+
+        let master_key = derive_key(self.text_fields.password_input.lines()[0].clone());
+        let path = self.file_manager.create_path().unwrap();
+
+        // login if password correct
+        if self.db_manager.connect_to_db(path, master_key.clone()) {
             // unlock vault and clear password
+            self.master_key = Some(SecureStorage::new(master_key));
+
             self.vault_state.state = LoginState::Unlocked;
             self.text_fields.password_input = password_field();
         } else {
@@ -255,7 +261,7 @@ impl<'a> App<'a> {
 
     pub fn lock_vault(&mut self) {
         // disconnects from database and locks vault
-        // ToDo: remove connection from DB etc.
+        self.db_manager.disconnect_from_db();
         self.vault_state.state = LoginState::Login;
 
         // clear clipboard on exiting
@@ -270,13 +276,16 @@ impl<'a> App<'a> {
         self.vault_state.clear_password();
         self.text_fields.password_input = password_field();
 
+        // setup database
+        let path = self.file_manager.create_path().unwrap();
+        self.db_manager.create_new_db(path);
+
         // derive key and store securely in memory
-        let master_key= derive_key(master_key);
+        let master_key = derive_key(master_key);
         self.master_key = Some(SecureStorage::new(master_key.clone()));
 
-        // setup database with derived key and path
-        let path = self.file_manager.create_path().unwrap();
-        self.db_manager.connect_to_db(path, master_key);
+        // set password to new key which needed the sqlite3 salt
+        self.db_manager.set_db_key(master_key);
 
         // unlock vault
         self.vault_state.state = LoginState::Unlocked;
