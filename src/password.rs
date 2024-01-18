@@ -17,6 +17,18 @@ pub fn generate_strong_password(length: usize) -> String {
         .expect("Failed to generate Password")
 }
 
+pub fn generate_char_only_password(length: usize) -> String {
+    let generator = PasswordGenerator::new()
+        .length(length)
+        .lowercase_letters(true)
+        .uppercase_letters(true)
+        .strict(true);
+
+    generator
+        .generate_one()
+        .expect("Failed to generate Password")
+}
+
 pub fn validate_password_strength(textarea: &mut TextArea) -> (Option<String>, u32) {
     // Returns an error if password not strong enough otherwise nothing
     // Returns an integer with an external password score
