@@ -85,7 +85,7 @@ pub fn get_all_tables(conn: &Connection) -> Vec<String> {
 }
 
 pub fn get_columns_from_table(conn: &Connection, table_name: &str) -> Vec<String> {
-    let mut stmt = conn.prepare(&format!("PRAGMA table_info({})", table_name)).expect("Invalid table.");
+    let mut stmt = conn.prepare(&format!("PRAGMA table_info(\"{}\")", table_name)).expect("Invalid table.");
     let column_names: Vec<String> = stmt.query_map([], |row| row.get(1)).expect("Failed to get column names.")
         .collect::<Result<Vec<String>, _>>()
         .expect("Failed to collect results.");
