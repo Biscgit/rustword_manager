@@ -67,41 +67,7 @@ impl<'a> App<'a> {
             current_entry: None,
             delete_confirm: false,
 
-            templates: StatefulList::with_items(vec![
-                serde_json::from_str(
-                    r#"{
-                        "deletable": false,
-                        "name": "Web Credential",
-                        "elements": [
-                          {"name":  "Name", "private":  false},
-                          {"name":  "Username", "private":  false},
-                          {"name":  "Password", "private":  true}
-                        ]
-                    }"#,
-                ).unwrap(),
-                serde_json::from_str(
-                    r#"{
-                        "deletable": false,
-                        "name": "SSH-Keypair",
-                        "elements": [
-                          {"name":  "Name", "private":  false},
-                          {"name":  "Website", "private":  false},
-                          {"name":  "SSH-Public", "private":  false},
-                          {"name":  "SSH-Private", "private":  true}
-                        ]
-                    }"#,
-                ).unwrap(),
-                serde_json::from_str(
-                    r#"{
-                        "deletable": false,
-                        "name": "Note",
-                        "elements": [
-                          {"name":  "Name", "private":  false},
-                          {"name":  "Note", "private":  false}
-                        ]
-                    }"#,
-                ).unwrap(),
-            ]),
+            templates: StatefulList::with_items(Vec::new()),
             current_template: None,
             insert_success: None,
 
@@ -270,7 +236,8 @@ impl<'a> App<'a> {
             self.vault_state.state = LoginState::Unlocked;
             self.text_fields.password_input = password_field();
 
-            // load entries
+            // load entries and templates
+            self.templates.set_items(self.db_manager.get_all_templates());
             self.update_entries();
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
@@ -295,7 +262,8 @@ impl<'a> App<'a> {
         // set password to new key which needed the sqlite3 salt
         self.db_manager.set_db_key(master_key);
 
-        // unlock vault
+        // unlock vault and load templates
+        self.templates.set_items(self.db_manager.get_all_templates());
         self.vault_state.state = LoginState::Unlocked;
     }
 

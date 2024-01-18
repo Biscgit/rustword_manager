@@ -74,11 +74,8 @@ impl AppDBConnector {
 
     pub fn get_all_templates(&self) -> Vec<Template>  {
         // gets all templates
-        // todo here: turn templates with json_serde into objects
-        db_interface::get_all_tables(self.connection.as_ref().unwrap());
+        let blobs: Vec<Vec<u8>> = db_interface::get_all_templates(self.connection.as_ref().unwrap());
 
-
-        let blobs: Vec<Vec<u8>> = Vec::new();
         blobs
             .iter()
             .map(|t| serde_json::from_slice::<Template>(t).unwrap())
