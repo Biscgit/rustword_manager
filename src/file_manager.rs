@@ -7,7 +7,7 @@ use std::{
 const PATH: [&str; 2] = ["RustwordManager", "database.db"];
 
 pub struct FileManager {
-    filepath: PathBuf,
+    pub filepath: PathBuf,
 }
 
 impl FileManager {
