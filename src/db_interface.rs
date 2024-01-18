@@ -1,14 +1,8 @@
-use std::fmt::format;
-use std::panic::panic_any;
-use std::fs;
 use std::path::Path;
 use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
 use crate::base64_enc_dec::{encode_base64, decode_base64};
 use crate::logger;
 
-
-use base64::decode;
-use log4rs::encode;
 use rusqlite::{Connection, params, Result};
 use aes_gcm::aead::generic_array::GenericArray;
 use typenum::{U12, U32};
@@ -262,10 +256,6 @@ fn format_args(args_vec: Vec<String>) -> String {
         .join(", ");
 
     formatted_args
-}
-
-pub fn close_conn(conn: Connection) {
-    conn.close().unwrap();
 }
 
 pub fn check_name_available(conn: &Connection, description: String) -> bool {
