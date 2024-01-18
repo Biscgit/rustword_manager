@@ -4,7 +4,7 @@ use std::{
     io::{self, Read},
 };
 
-const PATH: [&str; 2] = ["RustwordManager", "database.db"];
+const PATH: [&str; 1] = ["RustwordManager"];
 
 pub struct FileManager {
     pub filepath: PathBuf,
@@ -28,16 +28,21 @@ impl FileManager {
         home_dir
     }
 
-    pub fn create_path(&self) -> io::Result<()> {
+    pub fn create_path(&self) -> io::Result<PathBuf> {
         // creates the db path if not exists
-        fs::create_dir_all(self.filepath.as_path())
+        fs::create_dir_all(self.filepath.as_path())?;
+        Ok(self.filepath.clone())
     }
 
     pub fn check_db_exist(&self) -> bool {
         // returns a boolean weather the Database file exists
-        if let Ok(metadata) = fs::metadata(self.filepath.as_path()) {
+        let mut filepath = self.filepath.clone();
+        filepath.push("database.db3");
+
+        if let Ok(metadata) = fs::metadata(filepath) {
             return metadata.is_file();
         }
+
         false
     }
 

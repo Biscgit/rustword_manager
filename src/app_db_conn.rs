@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::PathBuf;
 use rusqlite::Connection;
 
 use crate::db_interface;
@@ -14,7 +14,7 @@ impl AppDBConnector {
         AppDBConnector { connection: None }
     }
 
-    pub fn connect_to_db(&mut self, path: &Path, key: Vec<u8>) -> bool {
+    pub fn connect_to_db(&mut self, path: PathBuf, key: Vec<u8>) -> bool {
         // tries to connect to db if correct key
         let db_key: String = key.iter().map(|byte| format!("{:02X}", byte)).collect();
 
