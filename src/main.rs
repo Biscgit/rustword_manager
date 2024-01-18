@@ -2,10 +2,15 @@ use std::error::Error;
 
 use crate::{app::App, terminal::*, types::*};
 
+mod aes_impl;
 mod app;
+mod app_db_conn;
+mod base64_enc_dec;
+mod db_interface;
 mod event;
 mod file_manager;
 mod key_processor;
+mod logger;
 mod password;
 mod terminal;
 mod types;
