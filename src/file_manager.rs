@@ -34,6 +34,7 @@ impl FileManager {
 
         let mut filepath = self.filepath.clone();
         filepath.push("database.db3");
+
         Ok(filepath)
     }
 

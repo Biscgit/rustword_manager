@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use rusqlite::Connection;
 
 use crate::db_interface;
@@ -7,20 +7,24 @@ use crate::db_interface;
 pub struct AppDBConnector {
     // a connector to interact with the database
     connection: Option<Connection>,
+    path: Box<Path>,
 }
 
 impl AppDBConnector {
-    pub fn new() -> AppDBConnector {
-        AppDBConnector { connection: None }
+    pub fn new(path: PathBuf) -> AppDBConnector {
+        AppDBConnector {
+            connection: None,
+            path: path.clone().into_boxed_path(),
+        }
     }
 
-    fn vec_key_to_hex(key: Vec<u8>) -> String {
+    pub fn vec_key_to_hex(key: Vec<u8>) -> String {
         key.iter().map(|byte| format!("{:02X}", byte)).collect()
     }
 
-    pub fn create_new_db(&mut self, path: PathBuf) {
+    pub fn create_new_db(&mut self) {
         // creates a new database
-        self.connection  = Some(db_interface::create_database(path));
+        self.connection = Some(db_interface::create_database(&self.path));
     }
 
     pub fn set_db_key(&mut self, key: Vec<u8>) {
@@ -28,15 +32,14 @@ impl AppDBConnector {
         db_interface::change_password(self.connection.as_ref().unwrap(), db_key);
     }
 
-    pub fn connect_to_db(&mut self, path: PathBuf, key: Vec<u8>) -> bool {
+    pub fn connect_to_db(&mut self, key: Vec<u8>) {
         // tries to connect to db if correct key (returned as bool)
         let db_key = AppDBConnector::vec_key_to_hex(key);
 
-        if let Ok(conn) = db_interface::establish_connection(path, db_key) {
+        if let Ok(conn) = db_interface::establish_connection(&self.path, db_key) {
             self.connection = Some(conn);
-            true
         } else {
-            false
+            panic!("Failed to connect to database!")
         }
     }
 
@@ -49,9 +52,11 @@ impl AppDBConnector {
         }
     }
 
-    //pub fn check_key_correct(key: &str) -> bool { Should not be necessary; is implemented in connect_to_db()
-    // checks if the entered key is correct
-    //}
+    pub fn check_key_correct(&mut self, key: Vec<u8>) -> bool {
+        // returns a boolean weather the entered key is correct
+        let db_key = AppDBConnector::vec_key_to_hex(key);
+        return db_interface::validate_key(&self.path, db_key);
+    }
 
     pub fn get_entry_names(&self, filter: &str) -> Vec<String> {
         // gets the entry names for display (which is their id at the same time)

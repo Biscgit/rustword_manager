@@ -1,4 +1,6 @@
-use std::path::PathBuf;
+use std::fmt::format;
+use std::panic::panic_any;
+use std::path::Path;
 use crate::aes_impl::{decrypt_aesgcm, encrypt_aesgcm, nonce_generator, u12_from_slice, u32_from_slice};
 use crate::base64_enc_dec::{encode_base64, decode_base64};
 use crate::logger;
@@ -10,17 +12,19 @@ use rusqlite::{Connection, params, Result};
 use aes_gcm::aead::generic_array::GenericArray;
 use typenum::{U12, U32};
 use chrono::prelude::Utc;
+use crate::app_db_conn::AppDBConnector;
 
-use crate::password::generate_strong_password;
+use crate::password::generate_char_only_password;
 
-pub fn create_database(path: PathBuf) -> Connection {
+pub fn create_database(path: &Box<Path>) -> Connection {
     //Used when first creating a file; returns connection
-    let conn: Connection = Connection::open(path.as_path())
+    let conn: Connection = Connection::open(path)
         .expect("Failed to create db");
 
     // sent temporary key for protection while initializing
-    let temp_key = generate_strong_password(32);
-    change_password(&conn, temp_key);
+    let temp_key = generate_char_only_password(32);
+    conn.execute_batch(&format!("PRAGMA key = '{}'", temp_key))
+        .expect("Failed to set key");
 
     // fill database default config
     conn.execute("CREATE TABLE IF NOT EXISTS templates
@@ -77,10 +81,8 @@ pub fn change_password(conn: &Connection, new_key: String) {
         .expect("Failed to change key");
 }
 
-pub fn establish_connection(mut db_path: PathBuf, db_key: String) -> Result<Connection, rusqlite::Error> {
+pub fn establish_connection(db_path: &Box<Path>, db_key: String) -> Result<Connection, rusqlite::Error> {
     //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
-
-    db_path.push("database.db3");
     let conn = Connection::open(db_path)?;
 
     conn.execute_batch(&format!("PRAGMA key = '{}'", db_key))
@@ -92,8 +94,7 @@ pub fn establish_connection(mut db_path: PathBuf, db_key: String) -> Result<Conn
     Ok(conn)
 }
 
-pub fn validate_key(db_name: &str, db_key: String) -> bool {
-    let db_path = db_name;
+pub fn validate_key(db_path: &Box<Path>, db_key: String) -> bool {
     let key = db_key;
     //logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))); //PUT THIS INTO main.rs
 
@@ -103,11 +104,7 @@ pub fn validate_key(db_name: &str, db_key: String) -> bool {
         .expect("Failed to set encryption key");
 
     //Should be 0; default query to check if decryption failed; writing to _ is necessary because of row.get()
-    if let Ok(_) = conn.query_row("SELECT COUNT(*) FROM sqlite_master", params![], |row| row.get::<usize, usize>(0)) {
-        true
-    } else {
-        false
-    }
+    conn.query_row("SELECT COUNT(*) FROM sqlite_master", params![], |row| row.get::<usize, usize>(0)).is_ok()
 }
 
 // SENDING DATABASE INFORMATION TO MAINFRAME
