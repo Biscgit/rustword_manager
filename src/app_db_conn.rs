@@ -1,7 +1,10 @@
 use std::path::{Path, PathBuf};
 use rusqlite::Connection;
 
-use crate::db_interface;
+use crate::{
+    app::extras::Template,
+    db_interface,
+};
 
 
 pub struct AppDBConnector {
@@ -69,10 +72,17 @@ impl AppDBConnector {
         db_interface::select_line(self.connection.as_ref().unwrap(), name, key)
     }
 
-    pub fn get_all_templates(&self) -> Vec<String> {
+    pub fn get_all_templates(&self) -> Vec<Template>  {
         // gets all templates
         // todo here: turn templates with json_serde into objects
-        db_interface::get_all_tables(self.connection.as_ref().unwrap())
+        db_interface::get_all_tables(self.connection.as_ref().unwrap());
+
+
+        let blobs: Vec<Vec<u8>> = Vec::new();
+        blobs
+            .iter()
+            .map(|t| serde_json::from_slice(t))
+            .collect()
     }
 
     pub fn insert_entry(&self, template_name: String, elementes: Vec<String>, key: Vec<u8>) -> bool {
