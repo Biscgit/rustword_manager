@@ -6,7 +6,7 @@ use std::thread::available_parallelism;
 static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
 
 pub fn derive_key(password: String) -> Vec<u8> {
-    // derives a strong key from a password with argon2
+    // derives a strong 256-bit key from a password with argon2
     let mut key = [0u8; 64];
 
     // uses half of the available logical cpu cores to derive key
@@ -15,11 +15,11 @@ pub fn derive_key(password: String) -> Vec<u8> {
         Version::default(),
         Params::new(
             1024 * 256,
-            10,
+            8,
             available_parallelism()
-                .unwrap_or(NonZeroUsize::new(1).unwrap())
-                .get() as u32
-                / 2.max(1),
+                 .unwrap_or(NonZeroUsize::new(1).unwrap())
+                 .get() as u32
+                 / 2.max(1),
             Some(key.len()),
         ).unwrap(),
     );
