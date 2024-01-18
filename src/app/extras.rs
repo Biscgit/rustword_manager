@@ -4,6 +4,7 @@ use tui_textarea::TextArea;
 use crate::app::stateful_list::StatefulList;
 use crate::ui::fields::{input_field, password_field};
 
+
 pub struct SingleValue<T> {
     pub value: T,
 }

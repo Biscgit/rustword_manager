@@ -322,6 +322,12 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
                 field_inactive(current, app.page_selected);
             }
 
+            // exception for name field
+            if i == 0 && !app.insert_success.unwrap_or(true) {
+                let block = set_border_color(current, Color::LightYellow);
+                current.set_block(block);
+            }
+
             // render widget in spot
             frame.render_widget(current.widget(), input_layout[i]);
         }
@@ -335,7 +341,7 @@ fn display_template(frame: &mut Frame, app: &mut App, area: Rect) {
 
         if app.page_selected {
             // set button color depending if entry can be inserted
-            if all_filled {
+            if all_filled && app.insert_success.unwrap_or(all_filled) {
                 if highlight_index == last_index {
                     border_type = BorderType::Thick;
                     color = Color::LightGreen;

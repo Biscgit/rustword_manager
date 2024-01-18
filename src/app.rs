@@ -39,6 +39,7 @@ pub struct App<'a> {
 
     pub templates: StatefulList<Template>,
     pub current_template: Option<usize>,
+    pub insert_success: Option<bool>,
 
     pub page_index: IndexManager,
     pub page_selected: bool,
@@ -64,6 +65,7 @@ impl<'a> App<'a> {
 
             entries_list: StatefulList::with_items(vec![]),
             current_entry: None,
+            delete_confirm: false,
 
             templates: StatefulList::with_items(vec![
                 serde_json::from_str(
@@ -101,7 +103,7 @@ impl<'a> App<'a> {
                 ).unwrap(),
             ]),
             current_template: None,
-            delete_confirm: false,
+            insert_success: None,
 
             page_index: IndexManager::new(3),
             page_selected: false,
@@ -189,27 +191,36 @@ impl<'a> App<'a> {
 
         // setup confirm button
         // (for simplicity the last field is also a text field disguised as a button)
-        let confirm_button = self
-            .text_fields
-            .edit_fields
-            .as_mut()
-            .unwrap()
-            .items
-            .last_mut()
-            .unwrap();
-
-        // style confirm button
-        confirm_button.insert_str("Insert");
-        confirm_button.set_alignment(Alignment::Center);
-        confirm_button.set_cursor_style(Style::default());
-        confirm_button.set_block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded),
-        );
+        self.style_editable_confirm("Insert");
 
         // move focus to right side
         self.select_template();
+    }
+
+    pub fn style_editable_confirm(&mut self, text: &str) {
+        // styles the confirm button if available of a template
+        if let Some(fields) = self
+            .text_fields
+            .edit_fields
+            .as_mut()
+        {
+            if fields.len() > 0 {
+                // style a confirm button
+                let mut confirm_button = input_field();
+
+                confirm_button.insert_str(text);
+                confirm_button.set_alignment(Alignment::Center);
+                confirm_button.set_cursor_style(Style::default());
+                confirm_button.set_block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .border_type(BorderType::Rounded),
+                );
+
+                let index = fields.len() - 1;
+                fields.items[index] = confirm_button;
+            }
+        }
     }
 
     pub fn select_template(&mut self) {
@@ -237,7 +248,6 @@ impl<'a> App<'a> {
         let master_key = derive_key(self.text_fields.password_input.lines()[0].clone());
 
         // login if password correct
-        // if self.db_manager.connect_to_db(path, master_key.clone()) {
         if self.db_manager.check_key_correct(master_key.clone()) {
             // unlock vault and clear password
             self.db_manager.connect_to_db(master_key.clone());
@@ -254,6 +264,7 @@ impl<'a> App<'a> {
     }
 
     pub fn update_entries(&mut self) {
+        // updates the currently cached names according to the set filter if set
         let filter = self.text_fields.search_bar.lines()[0].as_str();
 
         self.entries_list.set_items(
@@ -313,25 +324,44 @@ impl<'a> App<'a> {
 
             // ToDo: correct template
             let template_name = "tp_simple".to_string();
-            self.db_manager.insert_entry(
+            let success = self.db_manager.insert_entry(
                 template_name,
                 values,
                 self.master_key.as_mut().unwrap().get_contents(),
             );
+            self.insert_success = Some(success);
 
-            // load entries and clear fields
-            self.update_entries();
-            self.reset_input_fields();
+            if success {
+                // load entries and clear fields
+                self.update_entries();
+                self.reset_input_fields();
+
+                // apply field style
+                let fields = self.text_fields.edit_fields.as_mut().unwrap();
+                fields.state.select(Some(fields.len() - 1));
+
+                self.style_editable_confirm("Insert successful!");
+            } else {
+                // apply field style
+                let fields = self.text_fields.edit_fields.as_mut().unwrap();
+                let last = fields.len() - 1;
+                fields.state.select(Some(last));
+
+                self.style_editable_confirm("Name exists!");
+            }
         }
     }
 
     pub fn delete_entry(&mut self) {
         // deletes entry from view and database
-        // ToDo: delete entry from database
+        let current = self.entries_list.current_item().unwrap().0.clone();
+        self.db_manager.delete_entry(current);
 
-        // remove from view
+        // remove from view and update entries
         self.current_entry = None;
         self.page_selected = false;
+
+        self.update_entries();
     }
 
     pub fn all_fields_filled(&self) -> bool {

@@ -17,6 +17,10 @@ impl<T> StatefulList<T> {
         list
     }
 
+    pub fn len(&self) -> usize {
+        self.items.len()
+    }
+
     pub fn set_items(&mut self, items: Vec<T>) {
         self.items = items;
         self.default_selected();
@@ -70,9 +74,9 @@ impl<T> StatefulList<T> {
         }
     }
 
-    pub fn _get(&self, index: usize) -> Option<&T> {
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         // get an item from index
-        self.items.get(index)
+        self.items.get_mut(index)
     }
 
     pub fn current_index(&self) -> Option<usize> {

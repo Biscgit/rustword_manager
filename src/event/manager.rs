@@ -3,6 +3,7 @@ use std::{error::Error, ops::ControlFlow};
 use crate::app::App;
 use crossterm::event::{self, Event, KeyCode};
 
+
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
     // handles events when vault is unlocked
     if let Event::Key(key) = event::read()? {
@@ -131,9 +132,15 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         // moves focus up or down on entries
                         KeyCode::Up => {
                             app.text_fields.edit_fields.as_mut().unwrap().previous();
+                            if app.insert_success.unwrap_or(false) {
+                                app.style_editable_confirm("Insert");
+                            }
                         }
                         KeyCode::Down => {
                             app.text_fields.edit_fields.as_mut().unwrap().next();
+                            if app.insert_success.unwrap_or(false) {
+                                app.style_editable_confirm("Insert");
+                            }
                         }
 
                         KeyCode::Tab | KeyCode::BackTab => {
@@ -159,10 +166,11 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         KeyCode::Enter => {
                             // select next or confirm button
-                            let fields = app.text_fields.edit_fields.as_ref().unwrap();
+                            let mut fields = app.text_fields.edit_fields.as_ref().unwrap();
                             if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
+
                                 } else {
                                     // fill with random credentials if empty and a private field
                                     let curr_temp = app.templates.current_item().unwrap();
@@ -184,6 +192,11 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 if index != fields.items.len() - 1 {
                                     app.text_fields.edit_fields.as_mut().unwrap().items[index]
                                         .input(key);
+                                }
+
+                                if index == 0 {
+                                    app.insert_success = None;
+                                    app.style_editable_confirm("Insert");
                                 }
                             }
                         }
