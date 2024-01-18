@@ -35,55 +35,6 @@ pub fn create_database(path: &Box<Path>) -> Connection {
         .expect("Failed to initialize database");
 
     return conn;
-
-    // fill database default config
-    conn.execute("CREATE TABLE IF NOT EXISTS templates
-    (
-        template_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name        TEXT,
-        structure   BLOB
-    );", params![]).expect("");
-    conn.execute("CREATE TABLE IF NOT EXISTS \"dHBfc2ltcGxl\"
-    (
-        description TEXT UNIQUE,
-        clear_1     TEXT,
-        hidden_1    Text
-    )", params![]).expect("");
-
-    conn.execute("INSERT INTO templates (name, structure)
-    VALUES ('Simple', CAST('{
-      \"clear_1\": \"username\",
-      \"hidden_1\": \"password\"
-    }' AS BLOB))", params![]).expect("");
-
-    conn.execute("CREATE TABLE IF NOT EXISTS \"dHBfc3NoX2tleXBhaXI=\"
-    (
-        description TEXT UNIQUE,
-        clear_1     TEXT,
-        clear_2     Text,
-        hidden_1    Text
-    )", params![]).expect("");
-    conn.execute("INSERT INTO templates (name, structure)
-    VALUES ('SSH-Keypair', CAST('{
-      \"clear_1\": \"name\",
-      \"clear_2\": \"public_key\",
-      \"hidden_1\": \"private_key\"
-    }' AS BLOB))", params![]).expect("");
-
-    conn.execute("CREATE TABLE IF NOT EXISTS nonces
-    (
-      nonce TEXT UNIQUE,
-      orig_table TEXT,
-      orig_desc TEXT,
-      orig_entry TEXT
-    )", params![]).expect("");
-
-    conn.execute("CREATE TABLE IF NOT EXISTS descriptions(
-      description TEXT UNIQUE,
-      template TEXT
-    );", params![]).expect("");
-
-    conn
 }
 
 pub fn change_password(conn: &Connection, new_key: String) {
