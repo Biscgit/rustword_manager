@@ -176,6 +176,15 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
     return_vec
 }
 
+pub fn get_all_templates(conn: &Connection) -> Vec<Vec<u8>> {
+    let mut stmt = conn.prepare("SELECT structure FROM templates").expect("");
+
+    let templates_structures: Vec<Vec<u8>> = stmt.query_map([], |row| row.get(0)).expect("Failed to get column names.")
+        .collect::<Result<Vec<Vec<u8>>>>()
+        .expect("Failed to collect results.");
+    templates_structures
+}
+
 pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (String, Vec<(String, String)>) {
     let encoded_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
     //let mut stmt = conn.prepare(&format!("SELECT * FROM \"{}\" WHERE description = '{}'", encoded_table, encode_base64(description))).expect("");
