@@ -5,7 +5,7 @@ use std::thread::available_parallelism;
 
 static SALT: &[u8; 16] = b"cru5tw0rd5a1ty!!";
 
-fn derive_key(password: String) -> Vec<u8> {
+pub fn derive_key(password: String) -> Vec<u8> {
     // derives a strong key from a password with argon2
     let mut key = [0u8; 64];
 
@@ -39,10 +39,8 @@ pub struct SecureStorage {
 
 impl SecureStorage {
     //  key gets deleted after being stored
-    fn new(key_vector: Vec<u8>) -> SecureStorage {
-        SecureStorage {
-            memory: Shielded::new(key_vector),
-        }
+    pub fn new(key_vector: Vec<u8>) -> SecureStorage {
+        SecureStorage { memory: Shielded::new(key_vector), }
     }
 
     pub fn from_string(input: String) -> SecureStorage {
