@@ -33,7 +33,7 @@ pub struct App<'a> {
     pub vault_state: LoginStates,
     pub text_fields: EditableTextFields<'a>,
 
-    pub entries_list: StatefulList<(&'a str, usize)>,
+    pub entries_list: StatefulList<(String, usize)>,
     pub current_entry: Option<StatefulList<(&'a str, &'a str, bool)>>,
     pub delete_confirm: bool,
 
@@ -62,18 +62,7 @@ impl<'a> App<'a> {
             vault_state: LoginStates::new(file_manager.check_db_exist()),
             text_fields: EditableTextFields::new(),
 
-            entries_list: StatefulList::with_items(vec![
-                ("Item0", 0),
-                ("Item1", 1),
-                ("Item2", 2),
-                ("Item3", 3),
-                ("Item4", 4),
-                ("Item5", 5),
-                ("Item6", 6),
-                ("Item7", 7),
-                ("Item8", 8),
-                ("Item9", 9),
-            ]),
+            entries_list: StatefulList::with_items(vec![]),
             current_entry: None,
 
             templates: StatefulList::with_items(vec![
@@ -256,9 +245,22 @@ impl<'a> App<'a> {
 
             self.vault_state.state = LoginState::Unlocked;
             self.text_fields.password_input = password_field();
+
+            // load entries
+            self.update_entries("");
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
         }
+    }
+
+    pub fn update_entries(&mut self, filter: &str) {
+        self.entries_list.set_items(
+            self.db_manager.get_entry_names(filter)
+                .iter()
+                .enumerate()
+                .map(|(i, s)| (s.clone(), i))
+                .collect()
+        );
     }
 
     pub fn lock_vault(&mut self) {
@@ -295,8 +297,27 @@ impl<'a> App<'a> {
     pub fn save_entry(&mut self) {
         // tries to save a new entry to database
         if self.all_fields_filled() {
-            // ToDo: send input to database
+            let mut values: Vec<String> = self.text_fields.edit_fields
+                .as_ref()
+                .unwrap()
+                .items
+                .iter()
+                .map(|t| t.lines()[0].clone())
+                .collect::<Vec<String>>();
 
+            // remove button
+            values.pop();
+
+            // ToDo: correct template
+            let template_name = "tp_simple".to_string();
+            self.db_manager.insert_entry(
+                template_name,
+                values,
+                self.master_key.as_mut().unwrap().get_contents(),
+            );
+
+            // load entries and clear fields
+            self.update_entries("");
             self.reset_input_fields();
         }
     }

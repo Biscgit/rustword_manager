@@ -74,7 +74,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         .entries_list
         .items
         .iter()
-        .map(|i| ListItem::new(i.0).style(Style::default().fg(entry_color)))
+        .map(|i| ListItem::new(i.0.clone()).style(Style::default().fg(entry_color)))
         .collect();
 
     // create a list from all list items and highlight the currently selected one

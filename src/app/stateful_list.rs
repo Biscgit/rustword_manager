@@ -17,6 +17,11 @@ impl<T> StatefulList<T> {
         list
     }
 
+    pub fn set_items(&mut self, items: Vec<T>) {
+        self.items = items;
+        self.default_selected();
+    }
+
     pub fn default_selected(&mut self) {
         // select first element if possible
         if !self.items.is_empty() {

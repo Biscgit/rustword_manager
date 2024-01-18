@@ -75,12 +75,17 @@ impl AppDBConnector {
         db_interface::get_all_tables(self.connection.as_ref().unwrap())
     }
 
-    pub fn insert_entry(&self, template_name: String, elementes: Vec<String>, key: Vec<u8>) {
+    pub fn insert_entry(&self, template_name: String, elementes: Vec<String>, key: Vec<u8>) -> bool {
         // inserts an entry in the correct table if unique
-        let description: String = elementes.first().unwrap().to_string();
-        if self.check_name_available(description) {
-            db_interface::insert_entry(self.connection.as_ref().unwrap(), template_name, elementes, key);
+        let description = elementes.first().unwrap().clone();
+        let unique = self.check_name_available(description);
+
+        if unique {
+            db_interface::insert_entry(self.connection.as_ref().unwrap(), template_name, elementes, key)
+                .expect("Failed to insert");
         }
+
+        unique
     }
 
     pub fn check_name_available(&self, name: String) -> bool {

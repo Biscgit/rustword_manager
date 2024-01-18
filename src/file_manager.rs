@@ -5,7 +5,7 @@ use std::{
 };
 
 const PATH: [&str; 1] = ["RustwordManager"];
-
+const DB_NAME: &str = "passwords.sqlite3";
 pub struct FileManager {
     pub filepath: PathBuf,
 }
@@ -33,7 +33,7 @@ impl FileManager {
         fs::create_dir_all(self.filepath.as_path())?;
 
         let mut filepath = self.filepath.clone();
-        filepath.push("database.db3");
+        filepath.push(DB_NAME);
 
         Ok(filepath)
     }
@@ -41,7 +41,7 @@ impl FileManager {
     pub fn check_db_exist(&self) -> bool {
         // returns a boolean weather the Database file exists
         let mut filepath = self.filepath.clone();
-        filepath.push("database.db3");
+        filepath.push(DB_NAME);
 
         if let Ok(metadata) = fs::metadata(filepath) {
             return metadata.is_file();
