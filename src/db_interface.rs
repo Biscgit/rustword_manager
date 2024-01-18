@@ -158,6 +158,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
 
     let all_tables: Vec<String> = get_all_tables(conn);
     let mut all_descriptions: Vec<String> = vec![];
+
     for table in &all_tables {
         let mut stmt = conn.prepare(&format!("SELECT description FROM \"{}\"", encode_base64(table))).expect("");
         let descriptions_from_table = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
@@ -165,6 +166,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
             all_descriptions.push(decode_base64(description));
         }
     }
+
     for desc in all_descriptions.iter() {
         if desc.contains(input) {
             return_vec.push(desc.to_string());
@@ -296,10 +298,6 @@ pub fn close_conn(conn: Connection) {
 }
 
 pub fn check_name_available(conn: &Connection, description: String) -> bool {
-    if conn.execute(&format!("SELECT 1 FROM descriptions WHERE description = '{}'", encode_base64(description)), params![]).is_err() {
-        true
-    } else {
-        false
-    }
+    conn.execute(&format!("SELECT 1 FROM descriptions WHERE description = '{}'", encode_base64(description)), params![]).is_ok()
 }
 
