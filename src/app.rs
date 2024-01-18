@@ -303,7 +303,7 @@ impl<'a> App<'a> {
                 .items
                 .iter()
                 .map(|t| t.lines()[0].clone())
-                .collect::<Vec<String>>();
+                .collect();
 
             // remove button
             values.pop();
