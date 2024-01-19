@@ -28,11 +28,13 @@ impl AppDBConnector {
     pub fn create_new_db(&mut self) {
         // creates a new database
         self.connection = Some(db_interface::create_database(&self.path));
+        log::info!("Created a database file.");
     }
 
     pub fn set_db_key(&mut self, key: Vec<u8>) {
         let db_key = AppDBConnector::vec_key_to_hex(key);
         db_interface::change_password(self.connection.as_ref().unwrap(), db_key);
+        log::info!("Set a password for the database.");
     }
 
     pub fn connect_to_db(&mut self, key: Vec<u8>) {
@@ -41,7 +43,9 @@ impl AppDBConnector {
 
         if let Ok(conn) = db_interface::establish_connection(&self.path, db_key) {
             self.connection = Some(conn);
+            log::info!("Connection to database established successfully.");
         } else {
+            log::error!("Connection to database could not be established!");
             panic!("Failed to connect to database!")
         }
     }
@@ -50,7 +54,7 @@ impl AppDBConnector {
         // disconnects from db
         if let Some(conn) = self.connection.take() {
             if conn.close().is_err() {
-                // ToDo: log failed connection
+                log::error!("Could not close database correctly!");
             }
         }
     }
@@ -69,6 +73,7 @@ impl AppDBConnector {
     pub fn get_entry(&self, name: String, key: Vec<u8>) -> (String, Vec<(String, String)>) {
         // returns a tuple with the template name the entry belongs to
         // and a list with the unencrypted entries names and the entries themselves
+        log::info!("Selected an entry.");
         db_interface::select_line(self.connection.as_ref().unwrap(), name, key)
     }
 
@@ -90,6 +95,7 @@ impl AppDBConnector {
         if unique {
             db_interface::insert_entry(self.connection.as_ref().unwrap(), template_name, elementes, key)
                 .expect("Failed to insert");
+            log::info!("Created entry.");
         }
 
         unique
@@ -104,6 +110,7 @@ impl AppDBConnector {
         // tries to delete an entry if possible
         if !self.check_name_available(name.clone()) {
             db_interface::delete_entry(self.connection.as_ref().unwrap(), name);
+            log::info!("Deleted entry.");
         }
     }
 }

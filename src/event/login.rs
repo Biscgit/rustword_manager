@@ -13,6 +13,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
         match key.code {
             // quit application
             KeyCode::Esc => {
+                if app.login_count > 0 {
+                    log::warn!("Exit with {} failed login attempts.", app.login_count); //If program is quit after failed logins, this will be logged!
+                }
                 return Ok(ControlFlow::Break(()));
             }
             // toggle character visibility
