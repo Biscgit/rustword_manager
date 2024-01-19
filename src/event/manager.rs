@@ -34,7 +34,6 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         // fill input field if no matching action
                         _ => {
                             app.text_fields.search_bar.input(key);
-                            app.update_shown_entries(app.text_fields.search_bar.lines()[0].clone());
                             app.update_entries();
                         }
                     },

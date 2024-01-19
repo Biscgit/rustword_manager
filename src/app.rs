@@ -33,7 +33,7 @@ pub struct App<'a> {
     pub vault_state: LoginStates,
     pub text_fields: EditableTextFields<'a>,
 
-    pub entries_list: StatefulList<(String, usize)>,
+    pub entries_list: StatefulList<String>,
     pub current_entry: Option<StatefulList<(&'a str, &'a str, bool)>>,
     pub delete_confirm: bool,
 
@@ -217,8 +217,7 @@ impl<'a> App<'a> {
         self.entries_list.set_items(
             self.db_manager.get_entry_names(filter)
                 .iter()
-                .enumerate()
-                .map(|(i, s)| (s.clone(), i))
+                .map(|s| s.clone())
                 .collect()
         );
     }
@@ -334,7 +333,7 @@ impl<'a> App<'a> {
 
     pub fn delete_entry(&mut self) {
         // deletes entry from view and database
-        let current = self.entries_list.current_item().unwrap().0.clone();
+        let current = self.entries_list.current_item().unwrap().clone();
         self.db_manager.delete_entry(current);
 
         // remove from view and update entries
@@ -356,8 +355,6 @@ impl<'a> App<'a> {
 
     pub fn copy_to_clipboard(&mut self, text: &str) {
         // copies a string to clipboard
-        // ToDo: thread to reset clipboard after time
-
         self.clipboard.copy_to_clipboard(text);
         self.set_copied_state(Some(
             self.current_entry
@@ -374,6 +371,7 @@ impl<'a> App<'a> {
     }
 
     pub fn get_copied_state(&self) -> Option<usize> {
+        // returns the copied state behind a mutex
         self.clip_copied.lock().unwrap().value
     }
 

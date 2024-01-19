@@ -78,7 +78,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         .items
         .iter()
         .map(|i| {
-            let name = i.0.clone();
+            let name = i.clone();
 
             if app.page_selected || search.is_empty() {
                 ListItem::new(name)
