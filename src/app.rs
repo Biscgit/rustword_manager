@@ -50,7 +50,7 @@ pub struct App<'a> {
     pub file_manager: FileManager,
     db_manager: AppDBConnector,
     master_key: Option<SecureStorage>,
-    login_count: u32,
+    pub login_count: u32,
 }
 
 impl<'a> App<'a> {
