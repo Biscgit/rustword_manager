@@ -374,8 +374,4 @@ impl<'a> App<'a> {
         // returns the copied state behind a mutex
         self.clip_copied.lock().unwrap().value
     }
-
-    pub fn update_shown_entries(&mut self, _filter: String) {
-        // updates entries in list in relation to search filter
-    }
 }
