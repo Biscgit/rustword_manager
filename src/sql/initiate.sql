@@ -68,7 +68,7 @@ VALUES ('SSH-Keypair', CAST('{
 }' AS BLOB));
 
 -- banking information
-CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
+CREATE TABLE IF NOT EXISTS "dHBfYmFua2luZw=="
 (
     description TEXT UNIQUE,
     "Y2xlYXJfMQ=="     TEXT,
