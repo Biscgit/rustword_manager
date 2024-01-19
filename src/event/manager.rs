@@ -25,10 +25,15 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         KeyCode::Enter => app.display_entry(),
                         KeyCode::Right => {
-                            if app.current_entry.is_none() {
-                                app.display_entry();
+                            if app.text_fields.search_bar.is_empty() {
+                                if app.current_entry.is_none() {
+                                    app.display_entry();
+                                }
+                                app.select_entry();
+                            } else {
+                                app.text_fields.search_bar.input(key);
+                                app.update_entries();
                             }
-                            app.select_entry();
                         }
 
                         // fill input field if no matching action
@@ -177,7 +182,6 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
-
                                 } else {
                                     // fill with random credentials if empty and a private field
                                     let curr_temp = app.templates.current_item().unwrap();
