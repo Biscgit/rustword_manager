@@ -143,7 +143,8 @@ pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (Str
     //let args: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
     let cols: Vec<String> = get_columns_from_table(conn, &encoded_table);
     let mut combined_vec: Vec<(String, String)> = vec![];
-    for col in cols.iter().skip(1) { //Skip description
+
+    for col in cols.iter() {
         combined_vec.push((decode_base64(col), select_entry(conn, decode_base64(&encoded_table), description.clone(), col.to_string(), key.clone())))
     };
 
