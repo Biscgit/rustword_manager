@@ -162,7 +162,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
         // show template name
         frame.render_widget(
-            Paragraph::new(temp_name.clone().bold())
+            Paragraph::new(temp_name.as_str().bold())
                 .alignment(Alignment::Center),
             title_content[0]
         );

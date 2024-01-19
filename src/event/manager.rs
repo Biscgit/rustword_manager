@@ -63,8 +63,6 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 .current_item_mut()
                                 .unwrap();
                             entry.2 = !entry.2;
-
-                            app.delete_confirm = false;
                         }
 
                         KeyCode::Enter => {

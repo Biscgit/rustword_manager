@@ -98,12 +98,17 @@ impl<'a> App<'a> {
     }
 
     pub fn display_entry(&mut self) {
+        // displays a selected entry in ui
         if let Some(item) = self.entries_list.current_item() {
+            // get data from database
             let (template_name, elements) = self.db_manager.get_entry(
                 item.clone(),
                 self.master_key.as_mut().unwrap().get_contents(),
             );
 
+            self.set_copied_state(None);
+
+            // create list for ui renderer to interpret
             let template = self.templates
                 .items
                 .iter()
@@ -111,7 +116,7 @@ impl<'a> App<'a> {
                 .unwrap();
 
             self.current_entry = Some((template.name.clone(), StatefulList::with_items(template
-                .elements
+                .elements[1..]
                 .iter()
                 .zip(elements)
                 .map(|(temp, elem)| {
@@ -120,8 +125,6 @@ impl<'a> App<'a> {
                 .chain(std::iter::once((String::new(), String::new(), false)))
                 .collect()
             )));
-
-            self.set_copied_state(None);
         }
     }
 
@@ -249,6 +252,7 @@ impl<'a> App<'a> {
         if self.db_manager.check_key_correct(master_key.clone()) {
             log::info!("Login successful after {} failed attempts.", self.login_count);
             self.login_count = 0;
+
             // unlock vault and clear password
             self.db_manager.connect_to_db(master_key.clone());
             self.master_key = Some(SecureStorage::new(master_key));
