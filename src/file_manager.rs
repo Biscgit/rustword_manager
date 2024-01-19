@@ -1,13 +1,15 @@
-use std::path::PathBuf;
 use std::{
-    fs,
+    fs::{self, File},
     io::{self, Read},
+    path::PathBuf,
 };
+
 
 const PATH: [&str; 1] = ["RustwordManager"];
 const DB_NAME: &str = "passwords.sqlite3";
 
 pub struct FileManager {
+    // interacts with the filesystem
     pub filepath: PathBuf,
     pub salt: Option<[u8; 16]>,
 }
@@ -17,7 +19,7 @@ impl FileManager {
         // create new file manager that holds path
         FileManager {
             filepath: FileManager::get_db_path(),
-            salt: None
+            salt: None,
         }
     }
 
@@ -51,6 +53,43 @@ impl FileManager {
         }
 
         false
+    }
+
+    pub fn check_lock_set(&self) -> io::Result<bool> {
+        // sets a file-lock if instance is running
+        // returns weather an instance is already running
+
+        let mut filepath = self.filepath.clone();
+        filepath.push("lock");
+
+        // checks if file exists
+        let mut exists = false;
+        if let Ok(metadata) = fs::metadata(filepath.as_path()) {
+            if metadata.is_file() {
+                exists = true;
+            }
+        }
+
+        // locks file
+        if !exists {
+            File::create(filepath.as_path())?;
+        }
+
+        Ok(exists)
+    }
+
+    pub fn release_file_lock(&self) -> io::Result<()> {
+        // release the lock of the instance
+
+        let mut filepath = self.filepath.clone();
+        filepath.push("lock");
+
+        if fs::metadata(filepath.as_path()).is_ok() {
+            // Attempt to remove the file
+            fs::remove_file(filepath.as_path())?;
+        }
+
+        Ok(())
     }
 
     pub fn get_salt(&mut self) -> io::Result<[u8; 16]> {

@@ -47,18 +47,18 @@ pub struct App<'a> {
     pub clipboard: clipboard_thread::ClipboardManager,
     clip_copied: ClState,
 
-    pub file_manager: FileManager,
+    pub file_manager: &'a mut FileManager,
     db_manager: AppDBConnector,
     master_key: Option<SecureStorage>,
 }
 
 impl<'a> App<'a> {
-    pub fn new() -> App<'a> {
+    pub fn new(file_manager: &'a mut FileManager) -> App<'a> {
         // creates a new with testing values
-        let file_manager = FileManager::new();
         let path = file_manager.create_path().unwrap();
         let copied = Arc::new(Mutex::new(SingleValue { value: None }));
 
+        // return new instance of app
         App {
             vault_state: LoginStates::new(file_manager.check_db_exist()),
             text_fields: EditableTextFields::new(),
@@ -294,7 +294,7 @@ impl<'a> App<'a> {
             // remove button
             values.pop();
 
-            // ToDo: correct template
+            // select correct database from template in which to insert
             let database_name = self.templates.get_ref(
                 self.current_template.unwrap()
             ).unwrap().db_name.clone();
@@ -305,6 +305,7 @@ impl<'a> App<'a> {
             );
             self.insert_success = Some(success);
 
+            // display depending if insert worked or not
             if success {
                 // load entries and clear fields
                 self.update_entries();

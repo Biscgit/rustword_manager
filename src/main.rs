@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::{app::App, terminal::*, types::*};
+use crate::file_manager::FileManager;
 
 mod aes_impl;
 mod app;
@@ -18,16 +19,27 @@ mod ui;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
-    // main function to setup app and run
-    let mut terminal = setup_terminal()?;
-    let app = App::new();
+    // check if instance is already running
+    let mut file_manager = FileManager::new();
 
-    let result = app.run(&mut terminal);
+    if !file_manager.check_lock_set()? {
+        let mut terminal = setup_terminal()?;
+        let app = App::new(&mut file_manager);
 
-    restore_terminal(terminal)?;
+        let result = app.run(&mut terminal);
 
-    if let Err(err) = result {
-        eprintln!("{err:?}");
+        restore_terminal(terminal)?;
+
+        if let Err(err) = result {
+            eprintln!("{err:?}");
+        }
+
+        file_manager.release_file_lock()?;
+    } else {
+        eprintln!(
+            "\nAn instance is already running\n\
+            File 'home/RustwordManager/lock' is present\n"
+        );
     }
     Ok(())
 }
