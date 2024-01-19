@@ -88,6 +88,8 @@ impl<'a> App<'a> {
 
     pub fn run(mut self, terminal: &mut Terminal) -> crate::Result<()> {
         // runs application forever until exited. Draws to the screen and handles events
+        log::info!("Starting application view");
+
         loop {
             if handle_events(&mut self)?.is_break() {
                 return Ok(());
@@ -100,6 +102,8 @@ impl<'a> App<'a> {
     pub fn display_entry(&mut self) {
         // displays a selected entry in ui
         if let Some(item) = self.entries_list.current_item() {
+            log::info!("Loading new entry to display");
+
             // get data from database
             let (template_name, elements) = self.db_manager.get_entry(
                 item.clone(),
@@ -226,7 +230,6 @@ impl<'a> App<'a> {
         self.page_selected = false;
     }
 
-
     pub fn update_entries(&mut self) {
         // updates the currently cached names according to the set filter if set
         let filter = self.text_fields.search_bar.lines()[0].as_str();
@@ -263,6 +266,8 @@ impl<'a> App<'a> {
             // load entries and templates
             self.templates.set_items(self.db_manager.get_all_templates());
             self.update_entries();
+            log::info!("Loaded templates from database");
+
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
             self.login_count += 1;
@@ -290,6 +295,8 @@ impl<'a> App<'a> {
         // unlock vault and load templates
         self.templates.set_items(self.db_manager.get_all_templates());
         self.vault_state.state = LoginState::Unlocked;
+
+        log::info!("Created new vault");
     }
 
     pub fn lock_vault(&mut self) {
@@ -300,6 +307,8 @@ impl<'a> App<'a> {
         // clear clipboard and clean search field on exiting
         self.clipboard.force_clear_clipboard();
         self.text_fields.search_bar = input_field();
+
+        log::info!("Reset Login for vault");
     }
 
     pub fn save_entry(&mut self) {

@@ -38,6 +38,7 @@ impl ClipboardManager {
 
     pub fn copy_to_clipboard(&mut self, text: &str) {
         // function to call for copying a text to clipboard
+        log::info!("Copied value to clipboard");
         self.reset_timer(text);
 
         let mut clipboard = self.shared_clipboard.lock().unwrap();
@@ -88,8 +89,10 @@ impl ClipboardManager {
                 let copied = String::from_utf8(current_pw.get_contents()).unwrap_or_default();
 
                 if copied == clipboard.get_text().unwrap_or_default() {
-                    if let Err(_err) = clipboard.clear() {
-                        // ToDo: log if failed to clear clipboard
+                    log::info!("Clearing clipboard");
+
+                    if clipboard.clear().is_err() {
+                        log::warn!("Failed to clear clipboard");
                     }
                 }
 
@@ -134,8 +137,8 @@ impl ClipboardManager {
                 .send(Message::Stop)
                 .unwrap_or(());
 
-            if let Err(_err) = handle.join() {
-                // ToDo: log if failed to join thread
+            if handle.join().is_err() {
+                log::warn!("Failed to join clipboard thread");
             }
         }
     }

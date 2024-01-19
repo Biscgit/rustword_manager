@@ -29,8 +29,8 @@ fn main() -> std::result::Result<(), Box<dyn Error>> {
         log::info!("Setup global logger");
 
         let mut terminal = setup_terminal()?;
-        let app = App::new(&mut file_manager);
 
+        let app = App::new(&mut file_manager);
         let result = app.run(&mut terminal);
 
         restore_terminal(terminal)?;

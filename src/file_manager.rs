@@ -95,16 +95,17 @@ impl FileManager {
 
     pub fn get_salt(&mut self) -> io::Result<[u8; 16]> {
         // sqlcipher stores a random salt as the first 16 bytes of a file
-
         if let Some(salt) = self.salt {
             Ok(salt)
         } else {
-            let mut file = fs::File::open(self.create_path().unwrap())?;
+            let mut file = File::open(self.create_path().unwrap())?;
 
             let mut buf = [0; 16];
             file.read_exact(&mut buf)?;
 
             self.salt = Some(buf);
+
+            log::info!("Read Salt from sqlite");
             Ok(buf)
         }
     }

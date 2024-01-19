@@ -30,6 +30,7 @@ impl LoginStates {
 
     pub fn set_password(&mut self, password: String) {
         // sets first entered password
+        log::info!("Set password to confirm");
         self.last_password = Some(password);
     }
 
