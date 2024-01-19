@@ -1,3 +1,4 @@
+use chrono::Utc;
 use std::{
     fs::{self, File},
     io::{self, Read},
@@ -106,5 +107,18 @@ impl FileManager {
             self.salt = Some(buf);
             Ok(buf)
         }
+    }
+
+    pub fn get_logger_path(&self) -> PathBuf {
+        // creates a new logging path
+
+        let mut logging_path = self.filepath.clone();
+
+        logging_path.push("logs");
+        logging_path.push(
+            &format!("RWManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S"))
+        );
+
+        logging_path
     }
 }

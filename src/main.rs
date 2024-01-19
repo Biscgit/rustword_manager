@@ -20,13 +20,15 @@ mod ui;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
-    // setup global logger
-    logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S")));
-
-    // check if instance is already running
+    // main: programm start
     let mut file_manager = FileManager::new();
 
+    // check if instance is already running
     if !file_manager.check_lock_set()? {
+        // setup global logger
+        logger::init_logger(file_manager.get_logger_path());
+        log::info!("Setup global logger");
+
         let mut terminal = setup_terminal()?;
         let app = App::new(&mut file_manager);
 
