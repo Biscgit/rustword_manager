@@ -111,14 +111,14 @@ impl<'a> App<'a> {
                 .find(|t| t.db_name == template_name)
                 .unwrap();
 
-            // elem.1.clone()
             self.current_entry = Some(StatefulList::with_items(template
                 .elements
                 .iter()
                 .zip(elements)
                 .map(|(temp, elem)| {
-                    (temp.name.clone(), String::from("cont"), temp.private)
+                    (temp.name.clone(), elem.1.clone(), temp.private)
                 })
+                .chain(std::iter::once((String::new(), String::new(), false)))
                 .collect()
             ));
 
