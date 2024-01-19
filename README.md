@@ -1,4 +1,4 @@
-# This is the RustwortManager,
+# This is the Rustword-Manager,
 
 a password-safe coded entirely in Rust! It is work in progress but contains the most important features as of now:
 - Setting up a master-password for the whole database
@@ -13,13 +13,13 @@ If this is not deployed as an executable, you will also need to install the Rust
 Now, with all requirements installed:
 
 1. Open the terminal (cmd on Windows) and move to the directoy/folder you want to install the program in.
-2. Install our software using by typing "git clone https://github.com/Biscgit/RustwortManager.git".
+2. Install our software using by typing `git clone https://github.com/Biscgit/rustword_manager.git`.
 3. Run with `cargo run --release`
 
 # HOW TO USE
 
 You can run the source code via
-    `cargo run --bin RustwortManager --release`
+    `cargo run --bin rustword_manager --release`
 through the terminal. The `--release` part is optional but without that, the login into the database will take significantly longer.
 Upon running the program for the first time, you will need to enter a master-password fulfilling the following minimum requirements:
 - One uppercase letter
