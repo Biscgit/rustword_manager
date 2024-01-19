@@ -1,4 +1,6 @@
-# This is the Rustword-Manager,
+<img src="assets/logo.png" alt="logo"/>
+
+# This is the Rustword-Manager
 
 a password-safe coded entirely in Rust! It is work in progress but contains the most important features as of now:
 - Setting up a master-password for the whole database
