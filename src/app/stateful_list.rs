@@ -18,12 +18,23 @@ impl<T> StatefulList<T> {
     }
 
     pub fn len(&self) -> usize {
+        // returns the length
         self.items.len()
     }
 
     pub fn set_items(&mut self, items: Vec<T>) {
+        // set items to a new vector
         self.items = items;
         self.default_selected();
+    }
+
+    pub fn set_index(&mut self, index: usize) {
+        // sets index of currently selected
+        if index < self.len() {
+            self.state.select(Some(index));
+        } else {
+            self.default_selected();
+        }
     }
 
     pub fn default_selected(&mut self) {

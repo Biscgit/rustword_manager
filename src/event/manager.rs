@@ -117,6 +117,9 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                             } else {
                                 app.reset_input_fields();
                             }
+
+                            // set view back to selected
+                            app.templates.set_index(app.current_template.unwrap());
                         }
                         KeyCode::Enter => app.reset_input_fields(),
 
