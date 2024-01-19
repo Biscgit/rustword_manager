@@ -35,7 +35,7 @@ pub struct App<'a> {
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<String>,
-    pub current_entry: Option<StatefulList<(String, String, bool)>>,
+    pub current_entry: Option<(String, StatefulList<(String, String, bool)>)>,
     pub delete_confirm: bool,
 
     pub templates: StatefulList<Template>,
@@ -110,7 +110,7 @@ impl<'a> App<'a> {
                 .find(|t| t.db_name == template_name)
                 .unwrap();
 
-            self.current_entry = Some(StatefulList::with_items(template
+            self.current_entry = Some((template.name.clone(), StatefulList::with_items(template
                 .elements
                 .iter()
                 .zip(elements)
@@ -119,7 +119,7 @@ impl<'a> App<'a> {
                 })
                 .chain(std::iter::once((String::new(), String::new(), false)))
                 .collect()
-            ));
+            )));
 
             self.set_copied_state(None);
         }
@@ -374,6 +374,7 @@ impl<'a> App<'a> {
             self.current_entry
                 .as_ref()
                 .unwrap()
+                .1
                 .current_index()
                 .unwrap(),
         ));

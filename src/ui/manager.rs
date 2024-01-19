@@ -154,13 +154,25 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
 
 fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
     // function for rendering selected credentials
-    if let Some(entries) = &app.current_entry {
+    if let Some((temp_name, entries)) = &app.current_entry {
+        let title_content = Layout::new(Direction::Vertical, vec![
+            Constraint::Length(2),
+            Constraint::Min(0),
+        ]).split(area);
+
+        // show template name
+        frame.render_widget(
+            Paragraph::new(temp_name.clone().bold())
+                .alignment(Alignment::Center),
+            title_content[0]
+        );
+
         // create all fields in a layout
         let mut fields = vec![Constraint::Length(4); entries.items.len() - 1];
         fields.push(Constraint::Min(0));
         fields.push(Constraint::Length(3));
 
-        let credentials_layout = Layout::new(Direction::Vertical, fields).split(area);
+        let credentials_layout = Layout::new(Direction::Vertical, fields).split(title_content[1]);
 
         // fill fields with content and highlight
         for (entry, (index, field)) in entries

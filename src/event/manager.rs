@@ -46,11 +46,11 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         // moves focus up or down on entries
                         KeyCode::Up => {
-                            app.current_entry.as_mut().unwrap().previous();
+                            app.current_entry.as_mut().unwrap().1.previous();
                             app.delete_confirm = false;
                         }
                         KeyCode::Down => {
-                            app.current_entry.as_mut().unwrap().next();
+                            app.current_entry.as_mut().unwrap().1.next();
                             app.delete_confirm = false;
                         }
 
@@ -59,6 +59,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 .current_entry
                                 .as_mut()
                                 .unwrap()
+                                .1
                                 .current_item_mut()
                                 .unwrap();
                             entry.2 = !entry.2;
@@ -68,7 +69,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         KeyCode::Enter => {
                             let entries = app.current_entry.as_ref().unwrap();
-                            if entries.current_index().unwrap() == entries.items.len() - 1 {
+                            if entries.1.current_index().unwrap() == entries.1.items.len() - 1 {
                                 // delete entry when confirmed
                                 if app.delete_confirm {
                                     app.delete_entry();
@@ -82,11 +83,12 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         // copy by pressing "c"
                         KeyCode::Char('c') => {
                             let entries = app.current_entry.as_ref().unwrap();
-                            if entries.current_index().unwrap() != entries.items.len() - 1 {
+                            if entries.1.current_index().unwrap() != entries.1.items.len() - 1 {
                                 let text = app
                                     .current_entry
                                     .as_ref()
                                     .unwrap()
+                                    .1
                                     .current_item()
                                     .unwrap()
                                     .1
