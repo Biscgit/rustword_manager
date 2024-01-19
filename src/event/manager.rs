@@ -152,16 +152,20 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                 .as_mut()
                                 .unwrap();
 
-                            // toggle mask if not button
+                            // toggle mask if not button and private
                             if fields.current_index().unwrap() != fields.items.len() - 1 {
-                                let current_input = fields
-                                    .current_item_mut()
-                                    .unwrap();
+                                let current_temp = app.templates.get_ref(app.current_template.unwrap()).unwrap();
 
-                                if current_input.mask_char().is_none() {
-                                    current_input.set_mask_char('\u{2022}');
-                                } else {
-                                    current_input.clear_mask_char();
+                                if current_temp.elements[fields.current_index().unwrap()].private {
+                                    let current_input = fields
+                                        .current_item_mut()
+                                        .unwrap();
+
+                                    if current_input.mask_char().is_none() {
+                                        current_input.set_mask_char('\u{2022}');
+                                    } else {
+                                        current_input.clear_mask_char();
+                                    }
                                 }
                             }
                         }
