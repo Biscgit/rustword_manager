@@ -234,12 +234,15 @@ impl<'a> App<'a> {
         // updates the currently cached names according to the set filter if set
         let filter = self.text_fields.search_bar.lines()[0].as_str();
 
-        self.entries_list.set_items(
-            self.db_manager.get_entry_names(filter)
+        self.entries_list.set_items({
+            let mut entries = self.db_manager.get_entry_names(filter)
                 .iter()
                 .map(|s| s.clone())
-                .collect()
-        );
+                .collect::<Vec<String>>();
+
+            entries.sort_by(|a, b| a.cmp(&b));
+            entries
+        })
     }
 
     pub fn unlock_vault(&mut self) {
@@ -267,7 +270,6 @@ impl<'a> App<'a> {
             self.templates.set_items(self.db_manager.get_all_templates());
             self.update_entries();
             log::info!("Loaded templates from database");
-
         } else {
             self.vault_state.state = LoginState::IncorrectLogin;
             self.login_count += 1;
