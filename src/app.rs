@@ -23,6 +23,7 @@ use crate::{
     },
 };
 
+
 mod clipboard_thread;
 pub(crate) mod extras;
 mod stateful_list;
@@ -34,7 +35,7 @@ pub struct App<'a> {
     pub text_fields: EditableTextFields<'a>,
 
     pub entries_list: StatefulList<String>,
-    pub current_entry: Option<StatefulList<(&'a str, &'a str, bool)>>,
+    pub current_entry: Option<StatefulList<(String, String, bool)>>,
     pub delete_confirm: bool,
 
     pub templates: StatefulList<Template>,
@@ -99,19 +100,27 @@ impl<'a> App<'a> {
     pub fn display_entry(&mut self) {
         // ToDo: set entry from DB
         if let Some(item) = self.entries_list.current_item() {
-            self.db_manager.get_entry(
+            let (template_name, elements) = self.db_manager.get_entry(
                 item.clone(),
-                self.master_key.as_mut().unwrap().get_contents()
+                self.master_key.as_mut().unwrap().get_contents(),
             );
 
+            let template = self.templates
+                .items
+                .iter()
+                .find(|t| t.db_name == template_name)
+                .unwrap();
 
-            self.current_entry = Some(StatefulList::with_items(vec![
-                ("Title1", "Content1 and this is a very long content or password or idk", false),
-                ("Title2", "Content2 is hidden", true),
-                ("Title3", "Content3", false),
-                ("Title3", "", true),
-                ("", "", false),
-            ]));
+            // elem.1.clone()
+            self.current_entry = Some(StatefulList::with_items(template
+                .elements
+                .iter()
+                .zip(elements)
+                .map(|(temp, elem)| {
+                    (temp.name.clone(), String::from("cont"), temp.private)
+                })
+                .collect()
+            ));
 
             self.set_copied_state(None);
         }
@@ -359,9 +368,9 @@ impl<'a> App<'a> {
         true
     }
 
-    pub fn copy_to_clipboard(&mut self, text: &str) {
+    pub fn copy_to_clipboard(&mut self, text: String) {
         // copies a string to clipboard
-        self.clipboard.copy_to_clipboard(text);
+        self.clipboard.copy_to_clipboard(text.as_str());
         self.set_copied_state(Some(
             self.current_entry
                 .as_ref()

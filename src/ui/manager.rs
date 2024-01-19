@@ -196,7 +196,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 .borders(Borders::ALL)
                 .border_type(border_type)
                 .fg(color)
-                .title(entry.0);
+                .title(entry.0.as_str());
 
             // apply theme if copied field
             if let Some(copied) = app.get_copied_state() {

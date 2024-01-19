@@ -89,7 +89,8 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                                     .unwrap()
                                     .current_item()
                                     .unwrap()
-                                    .1;
+                                    .1
+                                    .clone();
                                 app.copy_to_clipboard(text);
                             }
                         }
