@@ -143,7 +143,7 @@ pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (Str
     //let args: Vec<String> = stmt.query_map([], |row| row.get(0)).expect("").collect::<Result<Vec<String>>>().expect("");
     let cols: Vec<String> = get_columns_from_table(conn, &encoded_table);
     let mut combined_vec: Vec<(String, String)> = vec![];
-    for col in cols.iter().skip(1) { //Skip description
+    for col in cols.iter() { //Skip description
         combined_vec.push((decode_base64(col), select_entry(conn, decode_base64(&encoded_table), description.clone(), col.to_string(), key.clone())))
     };
 
@@ -232,7 +232,7 @@ pub fn insert_entry(conn: &Connection, table_name: String, args_str: Vec<String>
 
 pub fn select_entry(conn: &Connection, table_name: String, description: String, column: String, key: Vec<u8>) -> String {
     //Inverse order: Decode from Base64 -> Decrypt using AES and given nonce -> return lé value
-    let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
+    let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", column, encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let stmt: String = conn.query_row(&format!("SELECT nonce FROM nonces WHERE orig_table = '{}' AND orig_entry = '{}' AND orig_desc = '{}'", encode_base64(&table_name), &column, encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let nonce: Vec<u8> = base64::decode(stmt).expect("");
 
