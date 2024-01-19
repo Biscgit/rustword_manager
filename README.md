@@ -14,12 +14,13 @@ Now, with all requirements installed:
 
 1. Open the terminal (cmd on Windows) and move to the directoy/folder you want to install the program in.
 2. Install our software using by typing "git clone https://github.com/Biscgit/RustwortManager.git".
+3. Run with `cargo run --release`
 
 # HOW TO USE
 
 You can run the source code via
-    cargo run --bin RustwortManager --release
-through the terminal. The --release part is optional but without that, the login into the database will take significantly longer.
+    `cargo run --bin RustwortManager --release`
+through the terminal. The `--release` part is optional but without that, the login into the database will take significantly longer.
 Upon running the program for the first time, you will need to enter a master-password fulfilling the following minimum requirements:
 - One uppercase letter
 - One lowercase letter
