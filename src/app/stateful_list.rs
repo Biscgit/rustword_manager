@@ -90,7 +90,7 @@ impl<T> StatefulList<T> {
         self.items.get(index)
     }
 
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+    pub fn _get_mut(&mut self, index: usize) -> Option<&mut T> {
         // get a mutable reference to an item from index
         self.items.get_mut(index)
     }

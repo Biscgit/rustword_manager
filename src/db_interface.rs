@@ -90,7 +90,7 @@ pub fn get_columns_from_table(conn: &Connection, table_name: &str) -> Vec<String
     filtered_column_names
 }
 
-pub fn get_all_columns_total(conn: &Connection) -> Vec<String> {
+pub fn _get_all_columns_total(conn: &Connection) -> Vec<String> {
     //Helper function; returns all columns across all tables.
     let all_tables = get_all_tables(conn);
 
@@ -150,7 +150,7 @@ pub fn select_line(conn: &Connection, description: String, key: Vec<u8>) -> (Str
     (decode_base64(encoded_table), combined_vec)
 }
 
-pub fn select_line_encrypted(conn: &Connection, description: String) -> (String, Vec<(String, Vec<u8>)>) {
+pub fn _select_line_encrypted(conn: &Connection, description: String) -> (String, Vec<(String, Vec<u8>)>) {
     //select_line() but doesn't decrypt. Use this combined with decrypt_single_entry() instead of select_line.
     let encoded_table: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let cols: Vec<String> = get_columns_from_table(conn, &encoded_table);
@@ -163,7 +163,7 @@ pub fn select_line_encrypted(conn: &Connection, description: String) -> (String,
     (decode_base64(encoded_table), combined_vec)
 }
 
-pub fn decrypt_single_entry(conn: &Connection, description: String, column: String, key: Vec<u8>) -> String {
+pub fn _decrypt_single_entry(conn: &Connection, description: String, column: String, key: Vec<u8>) -> String {
     //Decrypts just one entry instead of a whole row. Use this combined with select_line_encrypted() instead of select_line.
     let table_name: String = conn.query_row(&format!("SELECT template FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![], |row| row.get(0)).expect("");
     let query_result: String = conn.query_row(&format!("SELECT \"{}\" FROM \"{}\" WHERE description = '{}'", encode_base64(&column), encode_base64(&table_name), encode_base64(&description)), params![], |row| row.get(0)).expect("");
@@ -178,7 +178,7 @@ pub fn decrypt_single_entry(conn: &Connection, description: String, column: Stri
 
 // IMPLEMENTING SQL COMMANDS
 
-pub fn create_table(conn: &Connection, table_name: String, columns: Vec<String>) -> Result<()> {
+pub fn _create_table(conn: &Connection, table_name: String, columns: Vec<String>) -> Result<()> {
     //Create new template with columns
     conn.execute(&format!("CREATE TABLE \"{}\" (description TEXT, {})", encode_base64(table_name), columns.iter()
         .map(|column| format!("\"{}\" TEXT", encode_base64(column)))
@@ -250,7 +250,7 @@ pub fn delete_entry(conn: &Connection, description: String) {
     conn.execute(&format!("DELETE FROM descriptions WHERE description = '{}'", encode_base64(&description)), params![]).expect("");
 }
 
-pub fn update_entry(conn: &Connection, table_name: String, description: String, edited_entry: String, edited_column: String, key: Vec<u8>) -> Result<()> {
+pub fn _update_entry(conn: &Connection, table_name: String, description: String, edited_entry: String, edited_column: String, key: Vec<u8>) -> Result<()> {
     //Not yet used nor tested!
     let key_usable: GenericArray<u8, U32> = u32_from_slice(&key);
     let nonce_usable: GenericArray<u8, U12> = loop {
@@ -288,7 +288,7 @@ pub fn check_name_available(conn: &Connection, description: String) -> bool {
 }
 
 
-pub fn decode_vec_string_b64(encoded_vec: Vec<String>) -> Vec<String> {
+pub fn _decode_vec_string_b64(encoded_vec: Vec<String>) -> Vec<String> {
     //Decode a full vector of base64-encoded values
     let decoded_vec: Vec<String> = encoded_vec
         .iter()

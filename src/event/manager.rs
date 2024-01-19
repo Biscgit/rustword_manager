@@ -173,7 +173,7 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
 
                         KeyCode::Enter => {
                             // select next or confirm button
-                            let mut fields = app.text_fields.edit_fields.as_ref().unwrap();
+                            let fields = app.text_fields.edit_fields.as_ref().unwrap();
                             if let Some(index) = fields.current_index() {
                                 if index == fields.items.len() - 1 {
                                     app.save_entry();
