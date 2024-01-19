@@ -68,12 +68,12 @@ VALUES ('SSH-Keypair', CAST('{
 }' AS BLOB));
 
 -- banking information
-CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
+CREATE TABLE IF NOT EXISTS "dHBfYmFua2luZw=="
 (
     description TEXT UNIQUE,
     clear_1     TEXT,
-    hidden_1    Text,
-    hidden_2    Text
+    hidden_1    TEXT,
+    hidden_2    TEXT
 );
 INSERT INTO templates (name, structure)
 VALUES ('Banking', CAST('{
@@ -99,6 +99,7 @@ VALUES ('Banking', CAST('{
     }
   ]
 }' AS BLOB));
+
 
 CREATE TABLE IF NOT EXISTS nonces
 (
