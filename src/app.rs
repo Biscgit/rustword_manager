@@ -98,7 +98,13 @@ impl<'a> App<'a> {
 
     pub fn display_entry(&mut self) {
         // ToDo: set entry from DB
-        if self.entries_list.current_index().is_some() {
+        if let Some(item) = self.entries_list.current_item() {
+            self.db_manager.get_entry(
+                item.clone(),
+                self.master_key.as_mut().unwrap().get_contents()
+            );
+
+
             self.current_entry = Some(StatefulList::with_items(vec![
                 ("Title1", "Content1 and this is a very long content or password or idk", false),
                 ("Title2", "Content2 is hidden", true),
