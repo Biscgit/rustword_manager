@@ -98,7 +98,6 @@ impl<'a> App<'a> {
     }
 
     pub fn display_entry(&mut self) {
-        // ToDo: set entry from DB
         if let Some(item) = self.entries_list.current_item() {
             let (template_name, elements) = self.db_manager.get_entry(
                 item.clone(),
