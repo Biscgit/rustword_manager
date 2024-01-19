@@ -32,7 +32,7 @@ Upon running the program for the first time, you will need to enter a master-pas
 A value that shows the an approximation for the strength of your password is also presented.
 ! IMPORTANT ! Pressing TAB in this screen will show your currently entered password! Use with caution!
 
-Using TAB you can switch between the list of current entries and a creation prompt. As of right now, you can create Username-Password entries, SSH-keypair entries with an associated website and notes.
+Using TAB you can switch between the list of current entries and a creation prompt. As of right now, you can create Username-Password entries, SSH-keypair entries with an associated website and bank-account details (for European banks only).
 
 On the New Entry screen, you can navigate through the template options. Using right-arrow, you can select a template.
 Press TAB to hide/unhide an input.
