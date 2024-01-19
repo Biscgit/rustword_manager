@@ -1,3 +1,4 @@
+use chrono::Utc;
 use std::error::Error;
 
 use crate::{app::App, terminal::*, types::*};
@@ -19,6 +20,9 @@ mod ui;
 
 
 fn main() -> std::result::Result<(), Box<dyn Error>> {
+    // setup global logger
+    logger::init_logger(&format!("RustwordManager_{}.log", Utc::now().format("%Y%m%d_%H%M%S")));
+
     // check if instance is already running
     let mut file_manager = FileManager::new();
 
