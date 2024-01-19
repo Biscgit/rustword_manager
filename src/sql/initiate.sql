@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS templates
 CREATE TABLE IF NOT EXISTS "dHBfd2ViX2NyZWRlbnRpYWw="
 (
     description TEXT UNIQUE,
-    clear_1     TEXT,
-    hidden_1    Text
+    "Y2xlYXJfMQ=="     TEXT,
+    "aGlkZGVuXzE="    Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('Web Credential', CAST('{
@@ -38,9 +38,9 @@ VALUES ('Web Credential', CAST('{
 CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
 (
     description TEXT UNIQUE,
-    clear_1     TEXT,
-    clear_2     Text,
-    hidden_1    Text
+    "Y2xlYXJfMQ=="     TEXT,
+    "Y2xlYXJfMg=="     Text,
+    "aGlkZGVuXzE="    Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('SSH-Keypair', CAST('{
@@ -68,12 +68,12 @@ VALUES ('SSH-Keypair', CAST('{
 }' AS BLOB));
 
 -- banking information
-CREATE TABLE IF NOT EXISTS "dHBfYmFua2luZw=="
+CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
 (
     description TEXT UNIQUE,
-    clear_1     TEXT,
-    hidden_1    TEXT,
-    hidden_2    TEXT
+    "Y2xlYXJfMQ=="     TEXT,
+    "aGlkZGVuXzE="    Text,
+    "aGlkZGVuXzI="    Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('Banking', CAST('{
@@ -99,7 +99,6 @@ VALUES ('Banking', CAST('{
     }
   ]
 }' AS BLOB));
-
 
 CREATE TABLE IF NOT EXISTS nonces
 (
