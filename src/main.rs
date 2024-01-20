@@ -21,6 +21,7 @@ mod ui;
 fn main() -> std::result::Result<(), Box<dyn Error>> {
     // main: programm start
     let mut file_manager = FileManager::new();
+    file_manager.create_path().unwrap();
 
     // check if instance is already running
     if !file_manager.check_lock_set()? {
