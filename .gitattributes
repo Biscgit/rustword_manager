@@ -1,0 +1,9 @@
+# Auto detect text files and perform normalization
+# see https://github.com/gitattributes/gitattributes/blob/master/Rust.gitattributes
+*          text=auto
+
+*.rs       text diff=rust
+*.toml     text diff=toml
+
+# custom attributes
+*.sql      linguist-detectable=true
