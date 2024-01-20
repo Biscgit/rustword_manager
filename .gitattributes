@@ -7,3 +7,4 @@
 
 # custom attributes
 *.sql      linguist-detectable=true
+*.toml     linguist-detectable=true
