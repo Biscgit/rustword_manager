@@ -7,7 +7,7 @@ a password-safe coded entirely in Rust! It is work in progress but contains the 
 - Creation and deletion of Username-Password Entries and SSH-keypairs
 - Selecting inputs and copying inputs to clipboard without showing them as plaintext
 
-# HOW TO INSTALL
+## HOW TO INSTALL
 
 To use the RustwortManager, you will need to have SQLCipher installed (https://www.zetetic.net/sqlcipher/). This program uses the Community-version. 
 If this is not deployed as an executable, you will also need to install the Rust compiler (https://www.rust-lang.org/tools/install) and git (https://git-scm.com/downloads).
@@ -18,7 +18,7 @@ Now, with all requirements installed:
 2. Install our software using by typing `git clone https://github.com/Biscgit/rustword_manager.git`.
 3. Run with `cargo run --release`
 
-# HOW TO USE
+## HOW TO USE
 
 You can run the source code via
     `cargo run --bin rustword_manager --release`
@@ -46,7 +46,7 @@ Press up-arrow or down-arrow to move through a currently selected entry.
 Press C to copy an entry to your clipboard.
 Press ENTER twice while hovering over the "Delete Entry" button to delete the currently selected entry.
 
-# SECURITY IMPLEMENTATIONS
+## SECURITY IMPLEMENTATIONS
 
 The database is encrypted while on the hard-drive. The decryption key is passed to SQLCipher via key-derivation using Argon2 and a salt-value generated from SQLCipher. SQLCipher decryptes the database with its own derived key from the input using PBKDF2.
 During runtime, all entries are encrypted using AES-256-GCM until they are used. We use the key derived from Argon2.
