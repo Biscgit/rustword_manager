@@ -118,7 +118,7 @@ pub fn filter_for_description(conn: &Connection, input: &str) -> Vec<String> { /
     }
 
     for desc in all_descriptions.iter() {
-        if desc.contains(input) {
+        if desc.to_lowercase().contains(&input.to_lowercase()) {
             return_vec.push(desc.to_string());
         }
     }

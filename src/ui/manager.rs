@@ -72,7 +72,7 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         Color::Yellow
     };
 
-    let search = app.text_fields.search_bar.lines()[0].clone();
+    let search = app.text_fields.search_bar.lines()[0].to_lowercase();
     let items: Vec<ListItem> = app
         .entries_list
         .items
@@ -84,11 +84,14 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                 ListItem::new(name)
                     .style(Style::default().fg(entry_color))
             } else {
-                let (first, last) = name.split_once(search.as_str()).unwrap_or_default();
+                let lower = name.to_lowercase();
+                let (first, last) = lower.split_once(search.as_str()).unwrap_or_default();
+                let (first, last) = (&name[..first.len()], &name[name.len() - last.len()..]);
+                let middle = &name[first.len()..name.len() - last.len()];
 
                 ListItem::new(Line::from(vec![
                     first.to_string().yellow(),
-                    search.clone().light_yellow().bold().on_dark_gray(),
+                    middle.to_string().light_yellow().bold().on_dark_gray(),
                     last.to_string().yellow(),
                 ]))
             }
