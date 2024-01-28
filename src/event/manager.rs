@@ -2,6 +2,7 @@ use std::{error::Error, ops::ControlFlow};
 
 use crate::app::App;
 use crossterm::event::{self, Event, KeyCode};
+use crate::ui::fields::input_field;
 
 
 pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
@@ -14,7 +15,12 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                     // credentials left side
                     false => match key.code {
                         KeyCode::Esc => {
-                            app.lock_vault();
+                            if app.text_fields.search_bar.is_empty() {
+                                app.lock_vault();
+                            } else {
+                                app.text_fields.search_bar = input_field();
+                                app.update_entries();
+                            }
                         }
 
                         KeyCode::Tab => app.page_index.page_up(),
