@@ -23,7 +23,10 @@ pub fn handle_events(app: &mut App) -> Result<ControlFlow<()>, Box<dyn Error>> {
                         KeyCode::Up => app.entries_list.previous(),
                         KeyCode::Down => app.entries_list.next(),
 
-                        KeyCode::Enter => app.display_entry(),
+                        KeyCode::Enter => {
+                            app.display_entry();
+                            app.select_entry();
+                        }
                         KeyCode::Right => {
                             if app.text_fields.search_bar.is_empty() {
                                 if app.current_entry.is_none() {
