@@ -16,6 +16,7 @@ pub fn derive_key(password: String, salt: &[u8; 16]) -> Vec<u8> {
         Params::new(
             1024 * 256,
             8,
+            // ToDo: Not portable with other core count!
             available_parallelism()
                  .unwrap_or(NonZeroUsize::new(1).unwrap())
                  .get() as u32
