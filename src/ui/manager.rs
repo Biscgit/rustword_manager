@@ -85,15 +85,22 @@ fn page_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
                     .style(Style::default().fg(entry_color))
             } else {
                 let lower = name.to_lowercase();
-                let (first, last) = lower.split_once(search.as_str()).unwrap_or_default();
-                let (first, last) = (&name[..first.len()], &name[name.len() - last.len()..]);
-                let middle = &name[first.len()..name.len() - last.len()];
 
-                ListItem::new(Line::from(vec![
-                    first.to_string().yellow(),
-                    middle.to_string().light_yellow().bold().on_dark_gray(),
-                    last.to_string().yellow(),
-                ]))
+                let line = if let Some(index) = lower.find(&search) {
+                    let first = &name[..index];
+                    let middle = &name[index..index + search.len()];
+                    let last = &name[index + search.len()..];
+
+                    Line::from(vec![
+                        first.to_string().yellow(),
+                        middle.to_string().light_yellow().bold().on_dark_gray(),
+                        last.to_string().yellow(),
+                    ])
+                } else {
+                    Line::from("An Error occurred")
+                };
+
+                ListItem::new(line)
             }
         })
         .collect();
@@ -167,7 +174,7 @@ fn render_credentials(frame: &mut Frame, app: &mut App, area: Rect) {
         frame.render_widget(
             Paragraph::new(temp_name.as_str().bold())
                 .alignment(Alignment::Center),
-            title_content[0]
+            title_content[0],
         );
 
         // create all fields in a layout
