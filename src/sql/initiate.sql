@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS templates
 -- username-password template
 CREATE TABLE IF NOT EXISTS "dHBfd2ViX2NyZWRlbnRpYWw="
 (
-    description TEXT UNIQUE,
-    "Y2xlYXJfMQ=="     TEXT,
-    "aGlkZGVuXzE="    Text
+    description    TEXT UNIQUE,
+    "Y2xlYXJfMQ==" TEXT,
+    "aGlkZGVuXzE=" Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('Web Credential', CAST('{
@@ -37,10 +37,10 @@ VALUES ('Web Credential', CAST('{
 -- ssh key pair
 CREATE TABLE IF NOT EXISTS "dHBfc3NoX2tleXBhaXI="
 (
-    description TEXT UNIQUE,
-    "Y2xlYXJfMQ=="     TEXT,
-    "Y2xlYXJfMg=="     Text,
-    "aGlkZGVuXzE="    Text
+    description    TEXT UNIQUE,
+    "Y2xlYXJfMQ==" TEXT,
+    "Y2xlYXJfMg==" Text,
+    "aGlkZGVuXzE=" Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('SSH-Keypair', CAST('{
@@ -70,10 +70,10 @@ VALUES ('SSH-Keypair', CAST('{
 -- banking information
 CREATE TABLE IF NOT EXISTS "dHBfYmFua2luZw=="
 (
-    description TEXT UNIQUE,
-    "Y2xlYXJfMQ=="     TEXT,
-    "aGlkZGVuXzE="    Text,
-    "aGlkZGVuXzI="    Text
+    description    TEXT UNIQUE,
+    "Y2xlYXJfMQ==" TEXT,
+    "aGlkZGVuXzE=" Text,
+    "aGlkZGVuXzI=" Text
 );
 INSERT INTO templates (name, structure)
 VALUES ('Banking', CAST('{
